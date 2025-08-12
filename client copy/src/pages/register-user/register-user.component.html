@@ -1,0 +1,48 @@
+<ui-card class="login_page" gapStyle="medium" alignItems="center" justifyContent="center" layout="vertical">
+
+	<div class="login_container">
+		<h2>Criar Conta</h2>
+
+		@if (boats.length !== 0) {
+
+			<form [formGroup]="registerUserForm">
+				<ui-card layout="vertical" gapStyle="medium">
+					<div class="form-floating w-100">
+						<input type="email" class="form-control" id="floatingInput" formControlName="name" placeholder="Nome de Usuário">
+						<label for="floatingInput">Nome de Usuário</label>
+					</div>
+		
+					<div class="form-floating w-100">
+						<input type="email" class="form-control" id="floatingEmail" formControlName="email" placeholder="Email">
+						<label for="floatingEmail">Email</label>
+					</div>
+					
+					<div class="form-floating w-100">
+						<select class="form-select" id="floatingBoatId" formControlName="boatId">
+							@for(boat of boats; track boat.boatId) {
+								<option [disabled]="boat.assignedUsersCount >= boat.capacity" value="{{boat.boatId}}">{{boat.name}}</option>
+							}
+						</select>
+						<label for="floatingBoatId">Nome do Barco</label>
+					</div>
+		
+					<div class="form-floating w-100">
+						<input type="password" class="form-control" id="floatingPassword" formControlName="password" placeholder="Senha">
+						<label for="floatingPassword">Senha</label>
+					</div>
+					
+					<!-- <div class="form-floating w-100">
+						<select class="form-select" id="floatingRole" formControlName="role" [disabled]="true">
+						<option value="Member">Membro</option>
+						<option value="Admin">Administrador</option>
+						</select>
+						<label for="floatingRole">Função</label>
+					</div> -->
+				</ui-card>
+			</form>
+		
+			<button type="button" class="btn btn-primary" (click)="registerNewUser()">Criar Conta e Entrar</button>
+
+		}
+	</div>
+</ui-card>

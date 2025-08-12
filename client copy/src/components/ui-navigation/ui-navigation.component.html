@@ -1,0 +1,25 @@
+<ul class="nav nav-tabs">
+  @if (role !== 'Unknown') {
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    </li>
+  
+    @if (role === 'Admin') {
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/manage-users" routerLinkActive="active">Usuários</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/manage-boats" routerLinkActive="active">Barcos</a>
+      </li>
+    }
+    
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/profile" routerLinkActive="active">Perfil</a>
+    </li>
+  } @else {
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/login" routerLinkActive="active">Login</a>
+    </li>    
+  }
+  
+</ul>

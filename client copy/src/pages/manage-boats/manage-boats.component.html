@@ -1,0 +1,128 @@
+<ui-card layout="vertical" class="manage_boats_container" justifyContent="space-between" gapStyle="large">
+  <ui-card alignItems="center">
+    <h4 class="m-0">Todos os Barcos</h4>
+    <select [ngModel]="boatId" (ngModelChange)="onSelectBoatId($event)">
+      @for (boat of boats; track boat.boatId) {
+        <option value="{{ boat.boatId }}" [selected]="boat.boatId === boatId">{{ boat.name }}</option>
+      }
+    </select>  
+  </ui-card>
+
+  @if (boat) {
+    <ui-card gapStyle="large" class="w-100" [flexWrap]="true"> 
+      <ui-card layout="vertical" class="boat_container">
+        <div class="display_row">
+          <p>ID do Barco:</p>
+          <p>&nbsp;</p>
+          <span>{{ boat.boatId }}</span>
+        </div>
+        <div class="display_row">
+          <p>Nome do Barco:</p>
+          <p>&nbsp;</p>
+          <span>{{ boat.name }}</span>
+        </div>
+        <div class="display_row">
+          <p>Capacidade do Barco:</p>
+          <p>&nbsp;</p>
+          <span>{{ boat.capacity }}</span>
+        </div>
+        <div class="display_row">
+          <p>Quantidade Atual de Usuários Atribuídos ao Barco:</p>
+          <p>&nbsp;</p>
+          <span>{{ boat.assignedUsersCount }}</span>
+        </div>
+      </ui-card>
+      
+      <ui-card layout="vertical" class="boat_container">
+        <div>Reservas:</div>
+        @for (reservation of reservationsByBoatId; track reservation) {
+          @if (reservation.boatId === boat.boatId) {
+            <div class="display_row">
+              <p>Data da Reserva:</p>
+              <p>&nbsp;</p>
+              <span>{{ reservation.day + '/' + reservation.month + '/' + reservation.year }}</span>
+            </div>
+          }
+        }
+      </ui-card>
+    </ui-card>
+  }
+
+  <ui-card layout="vertical" class="add_boat_container">
+    <button class="btn btn-primary" (click)="changeBoatModalState()">{{ addBoatModal ? "Fechar Formulário de Barco" : "Abrir Formulário de Barco" }}</button>
+  </ui-card>
+
+</ui-card>
+
+@if (addBoatModal) {
+  <ui-card [flexWrap]="true">
+    <ui-card class="manage_boats_container" layout="vertical">
+      Adicionar Novo Barco
+      <ui-card layout="vertical" class="boat_container">
+        <!-- Entrada para o Nome do Barco -->
+        <div class="form-group mb-3 display_row">
+          <label for="boatName" class="form-label">Nome do Barco:</label>
+          <input
+            type="text"
+            id="boatName"
+            class="form-control"
+            [(ngModel)]="newBoatName"
+            placeholder="Insira o nome do barco"
+          />
+        </div>
+        
+        <!-- Entrada para a Capacidade do Barco -->
+        <div class="form-group mb-3 display_row">
+          <label for="boatCapacity" class="form-label">Capacidade do Barco:</label>
+          <input
+            type="number"
+            id="boatCapacity"
+            class="form-control"
+            [(ngModel)]="newBoatCapacity"
+            placeholder="Insira a capacidade do barco"
+          />
+        </div>
+        
+        <!-- Botão para Adicionar o Barco -->
+        <div class="d-flex justify-content-end">
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="addNewBoat()"
+          >
+            Adicionar Barco
+          </button>
+        </div>
+      </ui-card>
+    </ui-card>
+  
+    <ui-card class="manage_boats_container" layout="vertical">
+      Excluir Barco
+      <ui-card layout="vertical" class="boat_container">
+        <!-- Entrada para o ID do Barco -->
+        <div class="form-group mb-3 display_row">
+          <label for="boatId" class="form-label">ID do Barco:</label>
+          <input
+            type="text"
+            id="boatId"
+            class="form-control"
+            [(ngModel)]="deleteBoatId"
+            placeholder="Insira o ID do barco"
+          />
+        </div>
+        
+        <!-- Botão para Excluir o Barco -->
+        <div class="d-flex justify-content-end">
+          <button
+            type="button"
+            class="btn btn-danger"
+            (click)="deleteBoat()"
+          >
+            Excluir Barco
+          </button>
+        </div>
+      </ui-card>
+    </ui-card>
+  </ui-card>
+
+}

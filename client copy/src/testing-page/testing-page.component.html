@@ -1,0 +1,198 @@
+<ui-card justifyContent="center" alignItems="center" layout="vertical">
+	<h3>Dev Page</h3>
+
+	<ui-card class="w-100 py-5" justifyContent="flex-start" alignItems="center">
+		<h5>Delete Past reservations and update user quotas:</h5>
+		<button type="button" class="btn btn-danger" (click)="deletePastReservations()">Delete Past Reservations</button>
+	</ui-card>
+	<span>{{ result }}</span>
+
+	<ui-card class="w-100 py-5" justifyContent="flex-start" alignItems="center">
+		<h5>Update All Reservations:</h5>
+		<button type="button" class="btn btn-warning" (click)="updateReservations()">Update All Reservations</button>
+	</ui-card>
+	<span>{{ updationResult }}</span>
+
+
+
+	<ui-card class="w-100" justifyContent="space-evenly">
+		@if (userViewModel(); as user) {
+			<ui-card layout="vertical" class="column">
+				<h5>Users</h5>
+				<ui-card layout="vertical" class="pb-20">
+					<button type="button" class="btn btn-primary" (click)="getAllUsers()">Get All Users</button>
+	
+					<ui-card>
+						<button type="button" class="btn btn-primary" (click)="getUserById()">Get By Id</button>
+						<textarea class="form-control" rows="1" placeholder="User Id" (change)="updateUserViewModel($event,'getUserId')"></textarea>
+					</ui-card>
+
+					<ui-card layout="vertical">
+						<ui-card alignItems="center">
+							<button type="button" class="btn btn-primary" (click)="searchUserByPartialName()">Search</button>
+							<textarea class="form-control" rows="1" placeholder="Search by user name" (change)="updateUserViewModel($event,'searchQuery')"></textarea>
+						</ui-card>
+						
+						<ui-card layout="vertical">
+							@if (user.searchedUsers.length) {
+								<ul>
+									@for (searchedUser of user.searchedUsers; track searchedUser) {
+										<li>{{ searchedUser.name }} - {{ searchedUser.userId }}</li>
+									}
+								</ul>
+							}
+						</ui-card>
+					</ui-card>
+
+					<ui-card>
+						<button type="button" class="btn btn-success"
+							(click)="addQuota()">
+							Add Quotas
+						</button>
+					</ui-card>
+	
+					<!-- <ui-card>
+						<button type="button" class="btn btn-success"
+							(click)="postRegularUser()">
+							Add new member
+						</button>
+						<ui-card layout="vertical">
+							<textarea class="form-control" rows="1" placeholder="User Name" (change)="updateUserViewModel($event,'postUserName')"></textarea>
+							<textarea class="form-control" rows="1" placeholder="User Email" (change)="updateUserViewModel($event,'postUserEmail')"></textarea>
+							<textarea class="form-control" rows="1" placeholder="Boat Id" (change)="updateUserViewModel($event,'postUserBoatId')"></textarea>
+						</ui-card>
+					</ui-card> -->
+	
+					<!-- <ui-card>
+						<button type="button" class="btn btn-success"
+							(click)="postUserAsAdmin()">
+							Admin posting new user
+						</button>
+						<ui-card layout="vertical">
+							<textarea class="form-control" rows="1" placeholder="User Name" (change)="updateUserViewModel($event,'postUserName')"></textarea>
+							<textarea class="form-control" rows="1" placeholder="User Email" (change)="updateUserViewModel($event,'postUserEmail')"></textarea>
+							<textarea class="form-control" rows="1" placeholder="User Role" (change)="updateUserViewModel($event,'postUserRole')"></textarea>
+							<textarea class="form-control" rows="1" placeholder="User Quota" (change)="updateUserViewModel($event,'postUserQuotas')"></textarea>
+							<textarea class="form-control" rows="1" placeholder="Boat Id" (change)="updateUserViewModel($event,'postUserBoatId')"></textarea>
+						</ui-card>
+					</ui-card> -->
+
+					<ui-card>
+						<button type="button" class="btn btn-danger" (click)="deleteUserById()">Delete</button>
+						<textarea class="form-control" rows="1" placeholder="User Id" (change)="updateUserViewModel($event, 'deleteUserId')"></textarea>
+					</ui-card>
+				</ui-card>
+				<p>Result: {{ userResult?.length }}</p>
+				<ui-card>
+					<pre>{{ userResult | json }}</pre>
+				</ui-card>
+			</ui-card>
+		}
+
+
+		@if (boatViewModel(); as boat) {
+			<ui-card layout="vertical" class="column">
+				<h5>Boats</h5>
+				<ui-card layout="vertical" class="pb-20">
+					<button type="button" class="btn btn-primary" (click)="getAllBoats()">Get All Boats</button>
+
+					<ui-card>
+						<button type="button" class="btn btn-primary" (click)="getBoatById()">Get By Id</button>
+						<textarea class="form-control" rows="1" placeholder="Boat Id" (change)="updateBoatViewModel($event,'getBoatId')"></textarea>
+					</ui-card>
+
+					<ui-card>
+						<button type="button" class="btn btn-success"
+							(click)="postBoat()">
+							Post
+						</button>
+						<ui-card layout="vertical">
+							<textarea class="form-control" rows="1" placeholder="Boat Id" (change)="updateBoatViewModel($event,'postBoatId')"></textarea>
+							<textarea class="form-control" rows="1" placeholder="Boat Name" (change)="updateBoatViewModel($event,'postName')"></textarea>
+							<textarea class="form-control" rows="1" placeholder="Boat Type" (change)="updateBoatViewModel($event,'postType')"></textarea>
+							<textarea class="form-control" rows="1" placeholder="Boat Capacity" (change)="updateBoatViewModel($event,'postCapacity')"></textarea>
+						</ui-card>
+					</ui-card>
+
+					<ui-card>
+						<button type="button" class="btn btn-danger" (click)="deleteBoatById()">Delete</button>
+						<textarea class="form-control" rows="1" placeholder="Boat Id" (change)="updateBoatViewModel($event, 'deleteBoatId')"></textarea>
+					</ui-card>
+				</ui-card>
+				<p>Result: {{ boatResult?.length }}</p>
+				<ui-card>
+					<pre>{{ boatResult | json }}</pre>
+				</ui-card>
+			</ui-card>
+		}
+
+		<ui-card layout="vertical">
+			<h5>Date Management</h5>
+			<p>
+				Current Date and Hour:
+				<span>{{ currentDateTime.toFormat('dd/MM/yyyy') }}</span>
+				&nbsp;
+				<span>{{ currentHour + ':00' }}</span>
+			</p>
+			<ui-card layout="vertical" class="pb-20">
+				<button type="button" class="btn btn-primary" (click)="advanceDate()">Advance Date</button>
+				<button type="button" class="btn btn-primary" (click)="regressDate()">Regress Date</button>
+				<textarea class="form-control" rows="1" placeholder="Hour" (change)="setContingencyTime($event)"></textarea>
+				<button type="button" class="btn btn-primary" (click)="resetTime()">Reset Time</button>
+			</ui-card>
+		</ui-card>
+
+
+		@if (reservationViewModel(); as reservation) {
+			<ui-card layout="vertical" class="column">
+
+				<h5>Reservations</h5>
+
+				<ui-card layout="vertical" class="pb-20">
+
+					<button type="button" class="btn btn-primary" (click)="getAllReservations()">Get All Reservations</button>
+
+					<!-- <ui-card>
+						<button type="button" class="btn btn-primary" (click)="getReservationByBoatId()">By Boat Id</button>
+						<textarea class="form-control" rows="1" placeholder="Boat Id" (change)="updateReservationViewModel($event,'getReservationId')"></textarea>
+					</ui-card> -->
+
+					<ui-card>
+						<button type="button" class="btn btn-success"
+							(click)="postReservation()">
+							Post
+						</button>
+						<ui-card layout="vertical">
+							<textarea class="form-control" rows="1" placeholder="User Id" (change)="updateReservationViewModel($event,'postUserId')"></textarea>
+							<textarea class="form-control" rows="1" placeholder="Boat Id" (change)="updateReservationViewModel($event,'postBoatId')"></textarea>
+							<textarea class="form-control" rows="1" placeholder="Year" (change)="updateReservationViewModel($event,'postYear')"></textarea>
+							<textarea class="form-control" rows="1" placeholder="Month" (change)="updateReservationViewModel($event,'postMonth')"></textarea>
+							<textarea class="form-control" rows="1" placeholder="Day" (change)="updateReservationViewModel($event,'postDay')"></textarea>
+						</ui-card>
+					</ui-card>
+
+					<ui-card>
+						<button type="button" class="btn btn-danger" (click)="deleteReservationById()">Delete</button>
+						<textarea class="form-control" rows="1" placeholder="Reservation Id" (change)="updateReservationViewModel($event, 'deleteReservationId')"></textarea>
+					</ui-card>
+
+					<ui-card>
+						<button type="button" class="btn btn-primary" (click)="getOccupiedDatesForYear()">Fetch by year</button>
+						<textarea class="form-control" rows="1" placeholder="Year" (change)="updateReservationViewModel($event,'year')"></textarea>
+					</ui-card>
+
+				</ui-card>
+
+				<p>Result: {{ reservationResult?.length }}</p>
+
+				<ui-card>
+					<pre>{{ reservationResult | json }}</pre>
+				</ui-card>
+			</ui-card>
+		}
+	</ui-card>
+</ui-card>
+
+<ui-card>
+	<!-- <ui-calendar [currentDate]="currentDateTime"></ui-calendar> -->
+</ui-card>

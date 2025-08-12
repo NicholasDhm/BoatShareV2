@@ -1,0 +1,26 @@
+.modal {
+  position: fixed;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--background-colour-one);
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  z-index: 1000;
+
+  border-radius: 6px;
+  width: 400px;
+  height: 400px;
+
+  input {
+    height: 30px;
+  }
+
+  textarea {
+    margin-top: 1px;
+    margin-left: 1px;
+  }
+}
+.Contingency__text { color: var(--contingency-colour) }
+.Standard__text { color: var(--standard-colour) }
+.Substitution__text { color: var(--substitution-colour) }

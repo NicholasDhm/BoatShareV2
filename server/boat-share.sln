@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "boat-share", "boat-share\boat-share.csproj", "{2F76B149-083D-4C5E-B493-65454342C3CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "boat-shareTests", "boat-shareTests\boat-shareTests.csproj", "{1A86BCED-9F92-4899-8AB2-D74E31530583}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2F76B149-083D-4C5E-B493-65454342C3CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F76B149-083D-4C5E-B493-65454342C3CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F76B149-083D-4C5E-B493-65454342C3CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F76B149-083D-4C5E-B493-65454342C3CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A86BCED-9F92-4899-8AB2-D74E31530583}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A86BCED-9F92-4899-8AB2-D74E31530583}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A86BCED-9F92-4899-8AB2-D74E31530583}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A86BCED-9F92-4899-8AB2-D74E31530583}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {648B0C85-ACFC-41D4-B3D2-EBDA3832A035}
+	EndGlobalSection
+EndGlobal

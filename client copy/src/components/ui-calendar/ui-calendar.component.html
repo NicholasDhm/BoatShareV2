@@ -1,0 +1,35 @@
+@if (calendarViewModel; as calendar) {
+  <ui-card layout="vertical" gapStyle="none" class="calendar-container">
+    <header>
+      <section>
+        <i class="bi bi-chevron-left" (click)="monthClick(-1)"></i>
+        
+        @if (monthToDisplay) {
+          <p>{{ monthToDisplay }}</p>
+          <p>{{ calendar.displayDate.year }}</p>
+        }
+
+        <i class="bi bi-chevron-right" (click)="monthClick(1)"></i>
+      </section>
+    </header>
+
+    <div class="calendar-body">
+      <div class="d-flex w-100 pt-1">
+        @for (day of daysOfWeek; track day) {
+          <div class="weekday">{{ day }}</div>
+        }
+      </div>
+
+      <div class="divider"></div>
+
+      @for (week of weeksOfMonth; track week) {
+        @for (day of week; track day) {
+          <ui-calendar-day
+            [day]="day"
+            (daySelected)="onDateSelected(day)">
+          </ui-calendar-day>
+        }
+      }
+    </div>
+  </ui-card>
+}

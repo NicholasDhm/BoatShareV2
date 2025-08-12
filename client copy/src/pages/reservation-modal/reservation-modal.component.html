@@ -1,0 +1,33 @@
+<div class="backdrop" (click)="closeModal()"></div>
+
+@if (userReservationToDisplay && userReservationToDisplay.status === 'Unconfirmed') {
+  <app-confirmation-modal
+    [reservationDate]="reservationDate"
+    [reservationType]="userReservationToDisplay.type"
+    [weekday]="weekday"
+    (cancel)="onCancelReservation()"
+    (close)="closeModal()"
+    (confirm)="onConfirmReservation()">
+  </app-confirmation-modal>
+
+} @else if (userReservationToDisplay){
+  <app-standard-modal
+    [reservationDate]="reservationDate"
+
+    [confirmationDate]="confirmationDate"
+    [reservationType]="userReservationToDisplay.type"
+    [status]="userReservationToDisplay.status ?? ''"
+
+    [activeUser]="activeUser"
+    [firstReservationUser]="firstReservationUser"
+
+    [weekday]="weekday"
+    (cancel)="onCancelReservation()"
+    (close)="closeModal()"
+    (reserve)="makeReservation()">    
+  </app-standard-modal>
+}
+
+<!-- userReservationToDisplay && userReservationToDisplay.status === 'Confirmed' && confirmedReservationUser ||
+  userReservationToDisplay && userReservationToDisplay.status === 'Pending' && userReservationToDisplay.type === 'Substitution' && confirmedReservationUser ||
+  userReservationToDisplay && userReservationToDisplay.type !== 'Substitution' -->

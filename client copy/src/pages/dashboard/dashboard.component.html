@@ -1,0 +1,96 @@
+<ui-card justifyContent="flex-start" class="dashboard-container">
+
+  <!-- <ui-card layout="vertical" class="dashboard-sidebar" gapStyle="medium" alignItems="flex-start">
+    👤 User Summary
+    <ui-card class="panel user-summary">
+      <h3>User Summary</h3>
+    </ui-card>
+
+		<ui-card class="panel upcoming-reservations" layout="vertical" gapStyle="medium" alignItems="flex-start">
+			<h3>Upcoming Reservations</h3>
+			<div class="reservation-item">
+				<ui-card class="reservation-card" layout="horizontal" gapStyle="small" alignItems="center">
+					<div class="reservation-date">
+						<strong>March 15, 2023</strong>
+					</div>
+					<div class="reservation-details">
+						<span>Boat A</span> - <span>10:00 AM to 2:00 PM</span>
+					</div>
+					<div class="reservation-type">
+						<span class="badge standard">Standard</span>
+					</div>
+				</ui-card>
+			</div>
+			<div class="reservation-item">
+				<ui-card class="reservation-card" layout="horizontal" gapStyle="small" alignItems="center">
+					<div class="reservation-date">
+						<strong>March 20, 2023</strong>
+					</div>
+					<div class="reservation-details">
+						<span>Boat B</span> - <span>1:00 PM to 5:00 PM</span>
+					</div>
+					<div class="reservation-type">
+						<span class="badge substitution">Substitution</span>
+					</div>
+				</ui-card>
+			</div>
+			<div class="reservation-item">
+				<ui-card class="reservation-card" layout="horizontal" gapStyle="small" alignItems="center">
+					<div class="reservation-date">
+						<strong>March 25, 2023</strong>
+					</div>
+					<div class="reservation-details">
+						<span>Boat C</span> - <span>9:00 AM to 12:00 PM</span>
+					</div>
+					<div class="reservation-type">
+						<span class="badge contingency">Contingency</span>
+					</div>
+				</ui-card>
+			</div>
+		</ui-card>
+
+    <ui-card class="panel reservation-stats">
+      <h3>Reservation Stats</h3>
+    </ui-card>
+
+    <ui-card class="panel reservation-legend">
+      <h3>Legend</h3>
+      <div class="legend-item"><span class="legend-dot blue"></span>Standard</div>
+      <div class="legend-item"><span class="legend-dot red"></span>Substitution</div>
+      <div class="legend-item"><span class="legend-dot orange"></span>Contingency</div>
+    </ui-card>
+  </ui-card> -->
+
+  <!-- 📅 Calendar Section -->
+  <ui-card layout="vertical" alignItems="center" gapStyle="medium" class="calendar-section">
+
+    @if (calendarViewModel) {
+      <ui-reservation-description [user]="currentUser"></ui-reservation-description>
+
+      <ui-calendar
+        [calendarViewModel]="calendarViewModel"
+        (selectedDay)="onDaySelected($event)"
+        (monthChanged)="onMonthChanged($event)">
+      </ui-calendar>
+    }
+
+    @if (validationError) {
+      {{ validationError }}
+    }
+  </ui-card>
+
+</ui-card>
+
+<!-- 📆 Reservation Modal -->
+@if (showModal) {
+  <app-reservation-modal
+    [userReservationToDisplay]="userReservationToDisplay"
+    [firstReservationToDisplay]="firstReservationToDisplay"
+    [activeUser]="currentUser"
+    [firstReservationUser]="firstReservationUser"
+    (close)="closeModal()"
+    (newReservation)="makeReservation($event)"
+    (cancelReservation)="cancelReservation($event)"
+    (confirmReservation)="confirmReservation($event)">
+  </app-reservation-modal>
+}

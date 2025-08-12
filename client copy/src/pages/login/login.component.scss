@@ -1,0 +1,45 @@
+:host {
+	width: 100%;
+	min-height: 600px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.login_page {
+	gap: 20px;
+	min-width: 380px;
+}
+
+.link_text {
+	font-size: 16px;
+	color: blue;
+
+	&:hover {
+		text-decoration: underline;
+		cursor: pointer;
+	}
+}
+
+.login_container {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	gap: 40px;
+	background-color: var(--background-colour-one);
+	border-radius: 6px;
+	padding: 30px 40px;
+	box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+
+	h3 {
+		width: 100%;
+		align-items: flex-start;
+	}
+
+	button {
+		width: 270px;
+		height: 50px;
+		border-radius: 30px;
+	}
+}

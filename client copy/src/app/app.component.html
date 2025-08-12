@@ -1,0 +1,16 @@
+<header>
+  <ui-navigation [role]="activeUser ? activeUser.role : 'Unknown'"></ui-navigation>
+  @if (activeUser) {
+    <ui-card justifyContent="space-between" alignItems="center" [flexWrap]="true">
+      <span>{{ activeUser.name }}</span>
+      <app-logout></app-logout>
+    </ui-card>
+  }
+</header>
+
+<div class="app__container">
+
+  <ui-loading-spinner></ui-loading-spinner>
+  <router-outlet></router-outlet>
+
+</div>

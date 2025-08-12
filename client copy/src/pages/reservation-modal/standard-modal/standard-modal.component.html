@@ -1,0 +1,60 @@
+<ui-card layout="vertical" justifyContent="space-between" class="modal">
+  
+  <ui-card layout="vertical" gapStyle="large">
+    <ui-card layout="vertical">
+      @if (status) {
+        <h3>Sua Reserva</h3>
+      } @else {
+        <h3>Fazer Reserva</h3>
+      }
+      <span class="d-flex">
+        <p> {{ weekday + ','}} </p>
+        &nbsp;
+        <p> {{ reservationDate | date: 'longDate':'':'pt-BR'}} </p>
+      </span>
+      @if (status === "Pending" && !firstReservationUser) {
+        <span class="confirmation_period">
+          <p>O Período de Confirmação será entre: </p>
+          &nbsp;
+          <span>
+            <p>{{ confirmationDate | date: 'shortDate'}} -</p>
+            &nbsp;
+            <p>{{ reservationDate | date: 'shortDate'}}</p>
+          </span>
+        </span>
+      }
+    </ui-card>
+
+    <ui-card layout="vertical">
+      @if (reservationType === "Substitution" && status) {
+        @if (firstReservationUser && firstReservationUser !== activeUser) {
+          <p>Você já fez uma reserva para esta data. Se {{ firstReservationUser.name }} cancelar a reserva, ela será sua. Você pode aguardar ou cancelar sua reserva.</p>
+        } @else {
+          <p>Você já fez uma reserva para esta data. Deseja cancelar?</p>
+        }
+      } @else if (reservationType === "Substitution" && !status) {
+        <p>Uma reserva já foi feita por {{ firstReservationUser?.name }} para esta data. Escolha outra data ou entre na fila.</p> 
+      } @else if (status) {
+        <p>Você já fez uma reserva para esta data. Deseja cancelar?</p>
+      } @else {
+        <p>Não há reservas para esta data. Reserve agora!</p>
+      }
+      <span class="d-flex justify-content-between w-100 align-items-center" [class.Greyish]="status">
+        <p>Tipo de Reserva:</p>
+        &nbsp;
+        <p [ngClass]="status ? '' : (reservationType + '__text')"> {{ reservationTypeInPt }}</p>
+      </span>
+  
+    </ui-card>
+  </ui-card>
+
+  <ui-card gapStyle="medium">
+    @if (status) {
+      <button type="button" class="btn btn-danger" (click)="onCancelReservation()">Cancelar Reserva</button>
+    } @else {
+      <button type="button" class="btn" [ngClass]="reservationType" (click)="makeReservation()">Fazer Reserva</button>
+    }
+    <button type="button" class="btn btn-secondary" (click)="closeModal()">Fechar</button>
+  </ui-card>
+
+</ui-card>

@@ -1,0 +1,53 @@
+@if (user) {
+  <ui-card gapStyle="medium" alignItems="center" class="description_container">
+    <a class="reservation_type__standard"
+      tabindex="0"
+      data-bs-placement="left"
+      data-bs-toggle="standard-state-popover"
+      data-bs-trigger="focus"
+      data-bs-title="Reserva - Padrão"
+      data-bs-content="• Essa reserva consumirá 1 cotas Padrao.<br/>
+      • Pode ser realizada em qualquer dia disponível no calendário.<br/>
+      • Se a reserva for cancelada ou o dia passar, as cotas serão devolvidas automaticamente.<br/>
+      • Reservas futuras são destacadas com a cor padrão.">
+      <ui-card class="position-relative">
+        <ui-svg [state]="'Standard'" [width]="18" [height]="18"></ui-svg>
+        <span class="standard">{{ user.standardQuota }}</span>
+      </ui-card>
+      <p>Padrão</p>
+    </a>
+    
+    <a class="reservation_type__reserved"
+      tabindex="0"
+      data-bs-toggle="reserved-state-popover"
+      data-bs-trigger="focus"
+      data-bs-title="Reserva - Suplência"
+      data-bs-content="• Essa reserva consumirá 1 cota Suplente.<br/>
+      • Pode ser realizada em um dia que já está reservado por outro usuário.<br/>
+      • Caso o usuário original cancele ou a data passe, suas cotas serão restauradas automaticamente.<br/>
+      • Indicada para reservas de substituição.">
+      <ui-card class="position-relative">
+        <ui-svg [state]="'Substitution'" [width]="18" [height]="18"></ui-svg>
+        <span class="substitution">{{ user.substitutionQuota }}</span>  
+      </ui-card>
+      <p>Suplência</p>
+    </a>
+    
+    <a class="reservation_type__contingency"
+      tabindex="0"
+      data-bs-placement="right"
+      data-bs-toggle="contingency-state-popover"
+      data-bs-trigger="focus"
+      data-bs-title="Reserva - Contingência"
+      data-bs-content="• Essa reserva não consumirá 1 cota Contingente.<br/>
+      • Só pode ser feita no mesmo dia a partir das 6:00.<br/>
+      • Perfeita para dias em que não conseguiu agendar com antecedência.<br/>
+      • Disponível apenas para os dias em aberto, sem bloqueio ou conflito com outras reservas.">
+      <ui-card class="position-relative">
+        <ui-svg [state]="'Contingency'" [width]="18" [height]="18"></ui-svg>
+        <span class="contingency">{{ user.contingencyQuota }}</span>
+      </ui-card>
+      <p>Contingência</p>
+    </a>
+  </ui-card>
+}

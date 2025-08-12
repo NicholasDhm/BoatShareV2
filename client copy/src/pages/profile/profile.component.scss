@@ -1,0 +1,36 @@
+.profile_container {
+  padding: 30px;
+
+  header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    i {
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+  }
+
+  .data_container {
+    background-color: var(--background-colour-one);
+    padding: 15px 20px;
+    border-radius: 6px;
+
+    .display_row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+    }
+
+    input {
+      width: 180px;
+      height: 44px;
+      min-height: 44px;
+    }
+  }
+}

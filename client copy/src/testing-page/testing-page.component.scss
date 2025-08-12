@@ -1,0 +1,20 @@
+:host {
+	padding: 25px;
+
+	button {
+		min-width: 100px;
+	}
+
+	.column {
+		max-width: 400px;
+		overflow: hidden;
+	}
+	pre {
+		background-color: #f8f9fa; /* Light grey background */
+		padding: 10px;             /* Some padding */
+		border-radius: 5px;        /* Rounded corners */
+		overflow: auto;            /* Scrollable if content overflows */
+		white-space: pre-wrap;     /* Wrap long lines */
+		max-width: 400px;
+	}
+}

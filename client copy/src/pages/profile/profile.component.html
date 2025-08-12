@@ -1,0 +1,105 @@
+<ui-card layout="vertical" class="profile_container" justifyContent="space-between" gapStyle="large">
+  <ui-card
+    class="w-100"
+    layout="horizontal"
+    [flexWrap]="true"
+    alignItems="center"
+    justifyContent="space-between">
+    <h5>Informações do Usuário</h5>
+    @if (user && boat) {
+      @if (!isEditing) {
+        <p (click)="changeEditState()">
+          <i class="bi bi-pencil-square"></i>
+          Editar
+        </p>
+      } @else {
+        <ui-card>
+          <p (click)="confirmChanges()" class="cursor-pointer">
+            <i class="bi bi-floppy"></i>
+            Salvar
+          </p>
+          <p (click)="changeEditState()">
+            <i class="bi bi-x-lg"></i>
+            Cancelar
+          </p>
+        </ui-card>
+      }
+    }
+  </ui-card>
+  @if (user && boat) {
+    <ui-card gapStyle="large" class="w-100" [flexWrap]="true"> 
+      <ui-card layout="vertical" class="data_container" gapStyle="medium">
+        <div class="display_row">
+          <p>Nome de Usuário:</p>
+          <p>&nbsp;</p>
+          <span>{{ user.name }}</span>
+        </div>
+        <div class="display_row">
+          <p>ID de Usuário:</p>
+          <p>&nbsp;</p>
+          <span>{{ user.userId }}</span>
+        </div>
+        <div class="display_row">
+          <p>Email:</p>
+          <p>&nbsp;</p>
+          <span>{{ user.email }}</span>
+        </div>
+        <div class="display_row">
+          <p>Cargo:</p>
+          <p>&nbsp;</p>
+          <span>{{ user.role }}</span>
+        </div>
+        <div class="display_row">
+          <p>Cotas Padrões:</p>
+          <p>&nbsp;</p>
+          <span>{{ user.standardQuota }}</span>
+        </div>
+        <div class="display_row">
+          <p>Cotas Suplentes:</p>
+          <p>&nbsp;</p>
+          <span>{{ user.substitutionQuota }}</span>
+        </div>
+        <div class="display_row">
+          <p>Cotas Contingentes:</p>
+          <p>&nbsp;</p>
+          <span>{{ user.contingencyQuota }}</span>
+        </div>
+        <div class="display_row">
+          <p>Seu Barco:</p>
+          <p>&nbsp;</p>
+          <span>{{ boat.name }}</span>
+        </div>
+        <div class="display_row">
+          <p>Senha:</p>
+          <p>&nbsp;</p>
+          @if (isEditing) {
+            <form [formGroup]="newPasswordForm">
+              <div class="form">
+                <input type="text" class="form-control" formControlName="password" id="password" placeholder="Nova Senha">
+              </div>
+            </form>
+          } @else {
+            <span>********</span>
+          }
+        </div>
+      </ui-card>
+        
+      <ui-card layout="vertical" class="data_container">
+        <div>Suas Reservas:</div>
+        @if (reservations.length === 0) {
+          <div class="display_row">
+            <p>Nenhuma reserva encontrada</p>
+          </div>
+        } @else {
+          @for (reservation of reservations; track reservation) {
+            <div class="display_row">
+              <p>Data da Reserva:</p>
+              <p>&nbsp;</p>
+              <span>{{ reservation.day + '/' + reservation.month + '/' + reservation.year }}</span>
+            </div>
+          }
+        }
+      </ui-card>
+    </ui-card>
+  }
+</ui-card>

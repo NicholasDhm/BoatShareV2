@@ -1,0 +1,93 @@
+/* You can add global styles to this file, and also import other style files */
+@import "bootstrap/scss/bootstrap";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+// @import "styles/styles.common.scss";
+
+body {
+	font-family: 'Roboto', sans-serif;
+}
+
+h5 { margin: 0 }
+p { margin: 0 }
+
+:root {
+	/* Primary Colors */
+	--primary-colour-one: #0077cc; /* Primary Blue */
+	--primary-colour-two: #e6f2ff; /* Light Blue Background */
+	--primary-colour-three: #005fa3; /* Darker Blue for Active States */
+
+	/* Calendar State Colors */
+	--substitution-colour: #ff4081;
+	--contingency-colour: #ff5722;
+	--standard-colour: #0077cc;
+	--disabled-colour: #b6b4af;
+	--greyish-colour: #9e9e9e;
+	
+	--substitution-colour-hover: #e13671b3;  /* 30% opacity */
+	--contingency-colour-hover: #e64a19b3;   /* 30% opacity */
+	--standard-colour-hover: #006bb3b3;      /* 30% opacity */
+
+	--confirmed-colour: #4CAF50;
+	--pending-colour: #005fa3;
+	--unconfirmed-colour: #F44336;
+
+	// Text Colours
+  --color-text-primary: #565962;
+  --color-text-secondary: #6a6f7c;
+  --color-text-disabled: #a8b1b9;
+  --color-text-inverted: #ffffff;
+
+	/* Background & Borders */
+	--background-colour-one: #f0f4f8; /* Light greyish-blue for general backgrounds */
+	--background-colour-two: #e0f7fa; /* Soft minty green */
+	--border-colour-one: #cfd8dc; /* Soft grey-blue for borders */
+	--border-colour-two: #b0bec5; /* Slightly darker for focused elements */
+
+	/* Accents */
+	// --accent-colour-one: #ff4081; /* Bright pink for calls-to-action */
+	--accent-colour-two: #80deea; /* Light teal for secondary highlights */
+}
+	
+
+// /* Calendar State Colors */
+// --substitution-colour: #ff4081; /* Pink for substitution reservations */
+// --contingency-colour: #ff5722; /* Orange for contingency reservations */
+// --standard-colour: #0077cc; /* Blue for standard reservations */
+// --disabled-colour: #b6b4af; /* Light grey for disabled dates */
+// --greyish-colour: #9e9e9e; /* Neutral grey for secondary text */
+
+// /* General Backgrounds */
+// --background-colour-one: #f0f4f8; /* Light greyish-blue for general backgrounds */
+// --background-colour-two: #ffffff; /* White for cards and form backgrounds */
+// --background-colour-three: #e3eaf3; /* Light blue for hover states and active elements */
+
+// /* Header & Navigation */
+// --header-background-colour: #0066aa; /* Darker blue for header/navigation bar */
+// --header-text-colour: #ffffff; /* White for header text and icons */
+
+// /* Buttons & Links */
+// --button-primary-colour: #005fa3; /* Primary button color (blue) */
+// --button-hover-colour: #003f73; /* Darker blue for button hover state */
+// --button-text-colour: #ffffff; /* White for button text */
+// --logout-button-colour: #d32f2f; /* Red for logout button */
+// --link-colour: #1976d2; /* Blue for links */
+// --link-hover-colour: #0d47a1; /* Darker blue for link hover */
+
+// /* Forms */
+// --form-input-border-colour: #cccccc; /* Light grey for input field borders */
+// --form-input-focus-colour: #0077cc; /* Blue for input field focus */
+// --form-input-background: #ffffff; /* White for form input background */
+
+// /* Text Colors */
+// --primary-text-colour: #333333; /* Dark grey for primary text */
+// --secondary-text-colour: #666666; /* Medium grey for secondary text */
+
+// /* Success & Error */
+// --success-colour: #4caf50; /* Green for success messages */
+// --error-colour: #f44336; /* Red for error messages */
+
+// /* Quota Indicator */
+// --quota-remaining-colour: #4caf50; /* Green for remaining quotas */
+// --quota-low-colour: #ff9800; /* Orange for low quotas */
+// --quota-exhausted-colour: #f44336; /* Red for exhausted quotas */
+//

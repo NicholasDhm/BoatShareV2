@@ -1,0 +1,26 @@
+<ui-card class="login_page" gapStyle="medium" alignItems="center" justifyContent="center" layout="vertical">
+	<div class="login_container">
+		<h2>Entrar</h2>
+	
+		<form [formGroup]="createAccountForm">
+			<ui-card layout="vertical" gapStyle="medium">
+				<div class="form-floating w-100">
+					<input type="email" class="form-control" formControlName="email" id="floatingEmail" placeholder="Email">
+					<label for="floatingEmail">Email</label>
+				</div>
+				<div class="form-floating w-100">
+					<input type="password" class="form-control" formControlName="password" id="floatingPassword" placeholder="Senha">
+					<label for="floatingPassword">Senha</label>
+				</div>
+				<!-- <p class="link_text">Esqueceu a senha?</p> -->
+			</ui-card>
+		</form>
+	
+		<button type="button" class="btn btn-primary" (click)="verifyAndLogin()">Entrar</button>
+	</div>
+	
+	<ui-card>
+		<span>Novo no Boat-Share?</span>
+		<p class="link_text" [routerLink]="'/register-user'">Crie uma conta aqui</p>
+	</ui-card>
+</ui-card>

@@ -1,0 +1,28 @@
+:host {
+	display: flex;
+	align-items: center;
+	flex-direction: row;
+
+	&.gap__extra-small {
+		gap: 6px;
+	}
+	&.gap__small {
+		gap: 8px;
+	}
+	&.gap__medium {
+		gap: 20px;
+	}
+	&.gap__large {
+		gap: 30px;
+	}
+
+	&.card__vertical {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	&.card__flexWrap {
+		flex-wrap: wrap;
+	}
+}
+  

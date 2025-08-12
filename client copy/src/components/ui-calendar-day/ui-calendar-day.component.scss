@@ -1,0 +1,56 @@
+.day {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border: 2px solid var(--border-colour-one);
+  border-radius: 25%;
+  padding: 6px 10px;
+  width: 100%;
+  height: 100%;
+  font-size: 14px;
+
+  .confirmation {
+    position: absolute;
+    top: -18%;
+  }
+
+  &.Disabled {
+    color: var(--disabled-colour);
+  }
+
+  &.Standard {
+    border: 2px solid var(--standard-colour);
+    transition: 0.2s ease-in-out;
+
+    &:hover {
+      cursor: pointer;
+      border-radius: 40%;
+    }
+  }
+
+  &.Contingency {
+    border: 2px solid var(--contingency-colour);
+    transition: 0.2s ease-in-out;
+
+    &:hover {
+      cursor: pointer;
+      border-radius: 40%;
+    }
+  }
+
+  &.Greyish {
+    border: 2px solid var(--greyish-colour);
+  }
+
+  &.Substitution {
+    border: 2px solid var(--substitution-colour);
+    transition: 0.2s ease-in-out;
+
+    &:hover {
+      cursor: pointer;
+      border-radius: 40%;
+    }
+  }
+}

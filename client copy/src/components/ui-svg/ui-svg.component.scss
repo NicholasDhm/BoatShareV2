@@ -1,0 +1,40 @@
+.Disabled {
+  fill: var(--disabled-colour);
+}
+
+.Standard {
+  fill: var(--standard-colour);
+}
+
+.Contingency {
+  fill: var(--contingency-colour);
+}
+
+.Greyish {
+  fill: var(--greyish-colour);
+}
+
+.Substitution {
+  fill: var(--substitution-colour);
+}
+
+i {
+  background-color: var(--background-colour-one);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  width: 18px;
+  height: 18px;
+}
+
+.confirmed {
+  color: var(--confirmed-colour);
+}
+
+.pending {
+  color: var(--pending-colour);
+}
+
+.unconfirmed {
+  color: var(--unconfirmed-colour);
+}

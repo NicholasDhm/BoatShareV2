@@ -1,0 +1,22 @@
+.manage_boats_container {
+  padding: 30px;
+
+  p {
+    margin: 0;
+  }
+
+  .boat_container {
+    min-width: 300px;
+    padding: 15px 20px;
+    border-radius: 6px;
+    background-color: var(--background-colour-one);
+
+    .display_row {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      width: 100%;
+    }
+
+  }
+}
