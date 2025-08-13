@@ -1,16 +1,41 @@
-<header>
-  <ui-navigation [role]="activeUser ? activeUser.role : 'Unknown'"></ui-navigation>
-  @if (activeUser) {
-    <ui-card justifyContent="space-between" alignItems="center" [flexWrap]="true">
-      <span>{{ activeUser.name }}</span>
-      <app-logout></app-logout>
-    </ui-card>
-  }
-</header>
+<!-- Modern App Layout -->
+<div class="app-layout">
+  <!-- Header Section -->
+  <header class="app-header">
+    <div class="container-modern">
+      <div class="header-content">
+        <!-- Navigation -->
+        <nav class="navigation-section">
+          <ui-navigation [role]="userRole"></ui-navigation>
+        </nav>
+        
+        <!-- User Section -->
+        @if (activeUser) {
+          <div class="user-section animate-fade-in">
+            <ui-card 
+              justifyContent="space-between" 
+              alignItems="center" 
+              [flexWrap]="true"
+              class="user-card">
+              <div class="user-info">
+                <span class="user-name">{{ userName }}</span>
+                <small class="user-role">{{ userRole }}</small>
+              </div>
+              <app-logout></app-logout>
+            </ui-card>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
 
-<div class="app__container">
-
-  <ui-loading-spinner></ui-loading-spinner>
-  <router-outlet></router-outlet>
-
+  <!-- Main Content -->
+  <main class="app-main">
+    <div class="container-modern">
+      <ui-loading-spinner></ui-loading-spinner>
+      <div class="content-wrapper animate-fade-in">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </main>
 </div>

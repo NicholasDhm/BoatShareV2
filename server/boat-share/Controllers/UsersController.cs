@@ -1,95 +1,169 @@
-﻿using boat_share.Models;
-using boat_share.Services;
-using Microsoft.AspNetCore.Identity;
+using boat_share.Abstract;
+using boat_share.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace boat_share.Controllers
 {
-    [Route("api/users")]
+    [Authorize]
     [ApiController]
+    [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public UsersController(UserService userService)
+        public UsersController(IUserService userService)
         {
             _userService = userService;
         }
 
-        // GET: api/users
+        /// <summary>
+        /// Get all users (Admin only)
+        /// </summary>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<UserListDTO>>> GetUsers()
         {
-            var users = await _userService.GetAllUsersAsync();
-            return Ok(users);
+            try
+            {
+                var users = await _userService.GetUsersAsync();
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving users", error = ex.Message });
+            }
         }
 
-        // GET: api/users/{userId}
-        [HttpGet("{userId}")]
-        public async Task<ActionResult<User>> GetUserById(string userId)
+        /// <summary>
+        /// Get user by ID
+        /// </summary>
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserInfoDTO>> GetUser(int id)
         {
-            var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null)
+            try
             {
-                return NotFound("User not found.");
+                var currentUserId = GetCurrentUserId();
+                var currentUserRole = GetCurrentUserRole();
+
+                // Users can only access their own data unless they're admin
+                if (currentUserRole != "Admin" && currentUserId != id)
+                {
+                    return Forbid("You can only access your own user data");
+                }
+
+                var user = await _userService.GetUserByIdAsync(id);
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                return Ok(user);
             }
-            return Ok(user);
-		}
-        
-        // PUT: api/user/{userId}
-		[HttpPut("{userId}")]
-		public async Task<IActionResult> UpdateUser(string userId, [FromBody] User user)
-		{
-			if (user == null || userId != user.UserId)
-			{
-				return BadRequest("User details are invalid or UserId mismatch.");
-			}
-
-			await _userService.UpdateUser(user);
-
-            return NoContent();
-		}
-
-
-		[HttpPut("{userId}/add-quotas")]
-        public async Task<IActionResult> AddQuotasBack(string userId, [FromBody] Reservation reservation)
-        {
-            var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null)
+            catch (Exception ex)
             {
-                return NotFound("User not found.");
+                return StatusCode(500, new { message = "An error occurred while retrieving the user", error = ex.Message });
             }
-
-            // Add quotas back
-            await _userService.AddQuotasBack(user, reservation);
-
-            return Ok(user); // Return the updated user or a success message
         }
 
-        // GET: api/users/search/{partialName}
-        [HttpGet("search/{partialName}")]
-        public async Task<ActionResult<List<User>>> GetUsersByName(string partialName)
+        /// <summary>
+        /// Create a new user (Admin only)
+        /// </summary>
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<UserInfoDTO>> CreateUser(UserCreateDTO userCreateDto)
         {
-            var users = await _userService.GetUsersByPartialNameAsync(partialName);
-            if (users == null || users.Count == 0)
+            try
             {
-                return NotFound();
+                var user = await _userService.CreateUserAsync(userCreateDto);
+                if (user == null)
+                {
+                    return BadRequest(new { message = "Failed to create user. Email may already exist or boat may not exist." });
+                }
+
+                var userInfo = await _userService.GetUserByIdAsync(user.UserId);
+                return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, userInfo);
             }
-            return Ok(users);
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while creating the user", error = ex.Message });
+            }
         }
 
-        // DELETE: api/users/{userId}
-        [HttpDelete("{userId}")]
-        public async Task<ActionResult> DeleteUser(string userId)
+        /// <summary>
+        /// Update user
+        /// </summary>
+        [HttpPut("{id}")]
+        public async Task<ActionResult<UserInfoDTO>> UpdateUser(int id, UserUpdateDTO userUpdateDto)
         {
-            var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null)
+            try
             {
-                return NotFound("User not found.");
-            }
+                var currentUserId = GetCurrentUserId();
+                var currentUserRole = GetCurrentUserRole();
 
-            await _userService.DeleteUserAsync(userId);
-            return NoContent();
-		}
-	}
+                // Users can only update their own data unless they're admin
+                if (currentUserRole != "Admin" && currentUserId != id)
+                {
+                    return Forbid("You can only update your own user data");
+                }
+
+                // Non-admin users cannot change role or quotas
+                if (currentUserRole != "Admin")
+                {
+                    userUpdateDto.Role = null;
+                    userUpdateDto.StandardQuota = null;
+                    userUpdateDto.SubstitutionQuota = null;
+                    userUpdateDto.ContingencyQuota = null;
+                    userUpdateDto.IsActive = null;
+                }
+
+                var updatedUser = await _userService.UpdateUserAsync(id, userUpdateDto);
+                if (updatedUser == null)
+                {
+                    return NotFound(new { message = "User not found or update failed" });
+                }
+
+                return Ok(updatedUser);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the user", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Delete user (Admin only)
+        /// </summary>
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            try
+            {
+                var success = await _userService.DeleteUserAsync(id);
+                if (!success)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting the user", error = ex.Message });
+            }
+        }
+
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(userIdClaim, out var userId) ? userId : 0;
+        }
+
+        private string GetCurrentUserRole()
+        {
+            return User.FindFirst(ClaimTypes.Role)?.Value ?? "Member";
+        }
+    }
 }

@@ -1,93 +1,148 @@
-﻿using boat_share.Models;
-using boat_share.Services;
+using boat_share.Abstract;
+using boat_share.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace boat_share.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
+    [Route("api/[controller]")]
     public class BoatsController : ControllerBase
     {
-        private readonly BoatService _boatService;
+        private readonly IBoatService _boatService;
 
-        public BoatsController(BoatService boatService)
+        public BoatsController(IBoatService boatService)
         {
             _boatService = boatService;
         }
 
-        // GET: api/boats
+        /// <summary>
+        /// Get all boats
+        /// </summary>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Boat>>> GetBoats()
+        public async Task<ActionResult<List<BoatDTO>>> GetBoats()
         {
-            var boats = await _boatService.GetBoatsAsync();
-            return Ok(boats);
+            try
+            {
+                var boats = await _boatService.GetBoatsAsync();
+                return Ok(boats);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving boats", error = ex.Message });
+            }
         }
 
-        // GET: api/boats/{boatId}
-        [HttpGet("{boatId}")]
-        public async Task<ActionResult<Boat>> GetBoatByBoatId(string boatId)
+        /// <summary>
+        /// Get boat by ID
+        /// </summary>
+        [HttpGet("{id}")]
+        public async Task<ActionResult<BoatDTO>> GetBoat(int id)
         {
-            var boat = await _boatService.GetBoatByIdAsync(boatId);
-
-            if (boat == null)
+            try
             {
-                return NotFound($"Boat with ID {boatId} not found.");
-            }
+                var boat = await _boatService.GetBoatByIdAsync(id);
+                if (boat == null)
+                {
+                    return NotFound(new { message = "Boat not found" });
+                }
 
-            return Ok(boat);
+                return Ok(boat);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving the boat", error = ex.Message });
+            }
         }
 
-		// POST: api/boats
-		[HttpPost]
-		public async Task<ActionResult<Boat>> AddBoat([FromBody] Boat newBoat)
-		{
-			if (newBoat == null)
-			{
-				return BadRequest("Invalid boat details.");
-			}
-
-			// Generate a new Guid if the BoatId is empty or null
-			if (string.IsNullOrEmpty(newBoat.BoatId))
-			{
-				newBoat.BoatId = Guid.NewGuid().ToString();
-			}
-
-			await _boatService.AddBoatAsync(newBoat);
-			return CreatedAtAction(nameof(GetBoatByBoatId), new { boatId = newBoat.BoatId }, newBoat);
-		}
-
-		// DELETE: api/boats/{boatId}
-		[HttpDelete("{boatId}")]
-        public async Task<IActionResult> DeleteBoat(string boatId)
+        /// <summary>
+        /// Create a new boat (Admin only)
+        /// </summary>
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<BoatDTO>> CreateBoat(BoatCreateDTO boatCreateDto)
         {
-            var boat = await _boatService.GetBoatByIdAsync(boatId);
-
-            if (boat == null)
+            try
             {
-                return NotFound($"Boat with ID {boatId} not found.");
-            }
+                var boat = await _boatService.CreateBoatAsync(boatCreateDto);
+                var boatDto = await _boatService.GetBoatByIdAsync(boat.BoatId);
 
-            await _boatService.DeleteBoatAsync(boatId);
-            return NoContent();
+                return CreatedAtAction(nameof(GetBoat), new { id = boat.BoatId }, boatDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while creating the boat", error = ex.Message });
+            }
         }
 
-        // PUT: api/boats/{boatId}
-        [HttpPut("{boatId}")]
-        public async Task<IActionResult> UpdateBoat(string boatId, [FromBody] Boat updatedBoat)
+        /// <summary>
+        /// Update boat (Admin only)
+        /// </summary>
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<BoatDTO>> UpdateBoat(int id, BoatUpdateDTO boatUpdateDto)
         {
-            if (boatId != updatedBoat.BoatId)
+            try
             {
-                return BadRequest("Boat ID mismatch.");
-            }
+                var updatedBoat = await _boatService.UpdateBoatAsync(id, boatUpdateDto);
+                if (updatedBoat == null)
+                {
+                    return NotFound(new { message = "Boat not found" });
+                }
 
-            var boat = await _boatService.GetBoatByIdAsync(boatId);
-            if (boat == null)
+                return Ok(updatedBoat);
+            }
+            catch (Exception ex)
             {
-                return NotFound($"Boat with ID {boatId} not found.");
+                return StatusCode(500, new { message = "An error occurred while updating the boat", error = ex.Message });
             }
+        }
 
-            await _boatService.UpdateBoatAsync(updatedBoat);
-            return NoContent();
+        /// <summary>
+        /// Delete boat (Admin only)
+        /// </summary>
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteBoat(int id)
+        {
+            try
+            {
+                var success = await _boatService.DeleteBoatAsync(id);
+                if (!success)
+                {
+                    return NotFound(new { message = "Boat not found" });
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting the boat", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Assign user to boat (Admin only)
+        /// </summary>
+        [HttpPost("{boatId}/assign/{userId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AssignUserToBoat(int boatId, int userId)
+        {
+            try
+            {
+                var success = await _boatService.AssignUserToBoatAsync(boatId, userId);
+                if (!success)
+                {
+                    return NotFound(new { message = "Boat or user not found" });
+                }
+
+                return Ok(new { message = "User successfully assigned to boat" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while assigning user to boat", error = ex.Message });
+            }
         }
     }
 }

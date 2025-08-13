@@ -14,7 +14,8 @@
     </header>
 
     <div class="calendar-body">
-      <div class="d-flex w-100 pt-1">
+      <!-- Days of week header -->
+      <div class="weekdays-header">
         @for (day of daysOfWeek; track day) {
           <div class="weekday">{{ day }}</div>
         }
@@ -22,14 +23,17 @@
 
       <div class="divider"></div>
 
-      @for (week of weeksOfMonth; track week) {
-        @for (day of week; track day) {
-          <ui-calendar-day
-            [day]="day"
-            (daySelected)="onDateSelected(day)">
-          </ui-calendar-day>
+      <!-- Calendar grid -->
+      <div class="calendar-grid">
+        @for (week of weeksOfMonth; track week) {
+          @for (day of week; track day) {
+            <ui-calendar-day
+              [day]="day"
+              (daySelected)="onDateSelected(day)">
+            </ui-calendar-day>
+          }
         }
-      }
+      </div>
     </div>
   </ui-card>
 }

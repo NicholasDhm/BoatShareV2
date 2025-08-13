@@ -1,6 +1,6 @@
 @if (day) {
   <div class="day"
-    [ngClass]="day.state"
+    [ngClass]="[day.state, !day.isCurrentMonth ? 'other-month' : '']"
     (click)="day.isCurrentMonth && day.state !== 'Greyish' && onDaySelected()">
     @if (day.state !== 'Greyish' && (day.status === 'Confirmed' || day.status === 'Pending' || day.status === 'Unconfirmed')) {
       <ui-svg [type]="day.status" class="confirmation"></ui-svg>

@@ -1,85 +1,91 @@
-<ui-card justifyContent="flex-start" class="dashboard-container">
-
-  <!-- <ui-card layout="vertical" class="dashboard-sidebar" gapStyle="medium" alignItems="flex-start">
-    👤 User Summary
-    <ui-card class="panel user-summary">
-      <h3>User Summary</h3>
-    </ui-card>
-
-		<ui-card class="panel upcoming-reservations" layout="vertical" gapStyle="medium" alignItems="flex-start">
-			<h3>Upcoming Reservations</h3>
-			<div class="reservation-item">
-				<ui-card class="reservation-card" layout="horizontal" gapStyle="small" alignItems="center">
-					<div class="reservation-date">
-						<strong>March 15, 2023</strong>
-					</div>
-					<div class="reservation-details">
-						<span>Boat A</span> - <span>10:00 AM to 2:00 PM</span>
-					</div>
-					<div class="reservation-type">
-						<span class="badge standard">Standard</span>
-					</div>
-				</ui-card>
-			</div>
-			<div class="reservation-item">
-				<ui-card class="reservation-card" layout="horizontal" gapStyle="small" alignItems="center">
-					<div class="reservation-date">
-						<strong>March 20, 2023</strong>
-					</div>
-					<div class="reservation-details">
-						<span>Boat B</span> - <span>1:00 PM to 5:00 PM</span>
-					</div>
-					<div class="reservation-type">
-						<span class="badge substitution">Substitution</span>
-					</div>
-				</ui-card>
-			</div>
-			<div class="reservation-item">
-				<ui-card class="reservation-card" layout="horizontal" gapStyle="small" alignItems="center">
-					<div class="reservation-date">
-						<strong>March 25, 2023</strong>
-					</div>
-					<div class="reservation-details">
-						<span>Boat C</span> - <span>9:00 AM to 12:00 PM</span>
-					</div>
-					<div class="reservation-type">
-						<span class="badge contingency">Contingency</span>
-					</div>
-				</ui-card>
-			</div>
-		</ui-card>
-
-    <ui-card class="panel reservation-stats">
-      <h3>Reservation Stats</h3>
-    </ui-card>
-
-    <ui-card class="panel reservation-legend">
-      <h3>Legend</h3>
-      <div class="legend-item"><span class="legend-dot blue"></span>Standard</div>
-      <div class="legend-item"><span class="legend-dot red"></span>Substitution</div>
-      <div class="legend-item"><span class="legend-dot orange"></span>Contingency</div>
-    </ui-card>
-  </ui-card> -->
-
-  <!-- 📅 Calendar Section -->
-  <ui-card layout="vertical" alignItems="center" gapStyle="medium" class="calendar-section">
-
-    @if (calendarViewModel) {
-      <ui-reservation-description [user]="currentUser"></ui-reservation-description>
-
-      <ui-calendar
-        [calendarViewModel]="calendarViewModel"
-        (selectedDay)="onDaySelected($event)"
-        (monthChanged)="onMonthChanged($event)">
-      </ui-calendar>
-    }
-
+<div class="dashboard-container">
+  <!-- Dashboard Header with User Info -->
+  <div class="dashboard-header">
+    <div class="user-welcome">
+      <h1>Painel de Controle</h1>
+      @if (currentUser) {
+        <p class="welcome-text">Bem-vindo, <strong class="username">{{ currentUser.name }}</strong> — Navegue pelas suas reservas</p>
+      }
+    </div>
+    
     @if (validationError) {
-      {{ validationError }}
+      <div class="error-message">
+        <i class="bi bi-exclamation-triangle"></i>
+        {{ validationError }}
+      </div>
     }
-  </ui-card>
+  </div>
 
-</ui-card>
+  <!-- Main Dashboard Content -->
+  <div class="dashboard-content">
+    <!-- Left Sidebar - Reservation Info -->
+    <div class="dashboard-sidebar">
+      @if (calendarViewModel && currentUser) {
+        <ui-card class="quota-card" gapStyle="none">
+          <ui-reservation-description [user]="currentUser"></ui-reservation-description>
+        </ui-card>
+
+        <!-- Quick Stats -->
+        <ui-card class="stats-card" layout="vertical" gapStyle="small">
+          <h3>Estatísticas</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-number">{{ getActiveQuotas() }}</span>
+              <span class="stat-label">Cotas Ativas</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">{{ getInactiveQuotas() }}</span>
+              <span class="stat-label">Cotas Inativas</span>
+            </div>
+          </div>
+        </ui-card>
+
+        <!-- Legend -->
+        <ui-card class="legend-card" layout="vertical" gapStyle="small">
+          <h3>Legenda</h3>
+          <div class="legend-items">
+            <div class="legend-item">
+              <span class="legend-dot standard"></span>
+              <span>Padrão</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot substitution"></span>
+              <span>Suplência</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot contingency"></span>
+              <span>Contingência</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot disabled"></span>
+              <span>Indisponível</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot other-month"></span>
+              <span>Outro Mês</span>
+            </div>
+          </div>
+        </ui-card>
+      }
+    </div>
+
+    <!-- Calendar Section -->
+    <div class="calendar-section">
+      @if (calendarViewModel) {
+        <ui-calendar
+          [calendarViewModel]="calendarViewModel"
+          (selectedDay)="onDaySelected($event)"
+          (monthChanged)="onMonthChanged($event)">
+        </ui-calendar>
+      } @else {
+        <div class="loading-state">
+          <ui-loading-spinner></ui-loading-spinner>
+          <p>Carregando calendário...</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>
 
 <!-- 📆 Reservation Modal -->
 @if (showModal) {

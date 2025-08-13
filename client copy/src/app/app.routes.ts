@@ -1,61 +1,91 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { HomeComponent } from '../pages/home/home.component';
-import { DashboardComponent } from '../pages/dashboard/dashboard.component';
-import { ManageUsersComponent } from '../pages/manage-users/mange-users.component';
-import { ProfileComponent } from '../pages/profile/profile.component';
-import { ManageBoatsComponent } from '../pages/manage-boats/manage-boats.component';
-import { LoginComponent } from '../pages/login/login.component';
-import { UiCalendarComponent } from '../components/ui-calendar/ui-calendar.component';
-import { TestingPageComponent } from '../testing-page/testing-page.component';
-import { RegisterUserComponent } from '../pages/register-user/register.component';
+import { Routes } from '@angular/router';
 
-export const routes: Routes = [
+// Lazy-loaded components for better performance
+const routes: Routes = [
+  // Public routes
   {
-    path: 'home',
-    component: HomeComponent
-	},
+    path: 'login',
+    loadComponent: () => import('../pages/login/login.component').then(m => m.LoginComponent),
+    title: 'Login - BoatShare'
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('../pages/register-user/register.component').then(m => m.RegisterUserComponent),
+    title: 'Register - BoatShare'
+  },
+
+  // Protected routes
   {
     path: 'dashboard',
-    component: DashboardComponent
-	},
-	{
-		path: 'profile',
-		component: ProfileComponent
-	},
-	{
-		path: 'manage-users',
-		component: ManageUsersComponent
-	},
-	{
-		path: 'manage-boats',
-		component: ManageBoatsComponent
-	},
+    loadComponent: () => import('../pages/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    title: 'Painel de Controle - BoatShare',
+    // canActivate: [AuthGuard] // Uncomment when AuthGuard is implemented
+  },
   {
-		path: 'login',
-		component: LoginComponent
-	},
+    path: 'profile',
+    loadComponent: () => import('../pages/profile/profile.component').then(m => m.ProfileComponent),
+    title: 'Profile - BoatShare',
+    // canActivate: [AuthGuard]
+  },
+
+  // Admin routes
   {
-		path: 'register-user',
-		component: RegisterUserComponent
-	},
+    path: 'admin',
+    // canActivate: [AuthGuard, AdminGuard], // Uncomment when guards are implemented
+    children: [
+      {
+        path: 'users',
+        loadComponent: () => import('../pages/manage-users/mange-users.component').then(m => m.ManageUsersComponent),
+        title: 'Manage Users - BoatShare'
+      },
+      {
+        path: 'boats',
+        loadComponent: () => import('../pages/manage-boats/manage-boats.component').then(m => m.ManageBoatsComponent),
+        title: 'Manage Boats - BoatShare'
+      },
+      {
+        path: '',
+        redirectTo: 'users',
+        pathMatch: 'full'
+      }
+    ]
+  },
+
+  // Legacy route redirects for backward compatibility
   {
-		path: 'test-page',
-		component: TestingPageComponent 
-	},
+    path: 'register-user',
+    redirectTo: 'register',
+    pathMatch: 'full'
+  },
   {
-		path: 'calendar',
-		component: UiCalendarComponent 
-	},
+    path: 'manage-users',
+    redirectTo: 'admin/users',
+    pathMatch: 'full'
+  },
   {
-		path: '**',
-		redirectTo: 'dashboard',
-		pathMatch: 'full'
-	}
+    path: 'manage-boats',
+    redirectTo: 'admin/boats',
+    pathMatch: 'full'
+  },
+
+  // Development/Testing routes (remove in production)
+  {
+    path: 'test',
+    loadComponent: () => import('../testing-page/testing-page.component').then(m => m.TestingPageComponent),
+    title: 'Testing - BoatShare'
+  },
+
+  // Default routes
+  {
+    path: '',
+    redirectTo: 'dashboard',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: 'dashboard',
+    pathMatch: 'full'
+  }
 ];
 
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
-})
-export class AppRoutingModule {}
+export { routes };

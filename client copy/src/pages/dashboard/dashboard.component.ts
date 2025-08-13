@@ -10,6 +10,7 @@ import { BoatService } from '../../services/boat.service';
 import { ReservationService } from '../../services/reservation.service';
 import { CalendarService } from '../../services/calendar.service';
 import { UiReservationDescriptionComponent } from '../../components/ui-reservation-description/ui-reservation-description.component';
+import { UiLoadingSpinnerComponent } from '../../components/ui-loading-spinner/ui-loading-spinner.component';
 import { ReservationModalComponent } from '../reservation-modal/reservation-modal.component';
 import { DashboardCommonService } from '../../services/dashboard-common.service';
 import { ValidationService } from '../../services/validation.service';
@@ -22,7 +23,8 @@ import { ValidationService } from '../../services/validation.service';
 		UiCardComponent,
 		ReservationModalComponent,
 		UiCardComponent,
-		UiReservationDescriptionComponent
+		UiReservationDescriptionComponent,
+		UiLoadingSpinnerComponent
 	],
 	templateUrl: './dashboard.component.html',
 	styleUrls: ['./dashboard.component.scss']
@@ -33,6 +35,7 @@ export class DashboardComponent {
 
   boat: IBoat | null = null;
 	calendarViewModel: ICalendarViewModel | null = null;
+	userReservations: IReservation[] = [];
 
 	validationError = '';
 
@@ -59,6 +62,7 @@ export class DashboardComponent {
 
 		this._reservationService.reservationsUpdated$.subscribe(() => {
 			this._calendarService.loadCalendarViewModel(this.calendarViewModel?.displayDate);
+			this.loadUserReservations();
 		});
 
     this._userService.currentUser$.subscribe(user => {
@@ -66,6 +70,7 @@ export class DashboardComponent {
 				return;
 			}
       this.currentUser = user;
+			this.loadUserReservations();
 			this._boatService.getBoatByBoatId(this.currentUser.boatId).then(boat => {
 				if (boat) {
 					this.boat = boat;
@@ -142,6 +147,38 @@ export class DashboardComponent {
 
 	closeModal(): void {
 		this.showModal = false;
+	}
+
+	getTotalQuotas(): number {
+		if (!this.currentUser) return 0;
+		return this.currentUser.standardQuota + this.currentUser.substitutionQuota + this.currentUser.contingencyQuota;
+	}
+
+	getActiveQuotas(): number {
+		if (!this.currentUser) return 0;
+		// Cotas Ativas = quotas em uso (reservas ativas)
+		return this.userReservations.filter(reservation => 
+			reservation.status === 'Confirmed' || reservation.status === 'Pending'
+		).length;
+	}
+
+	getInactiveQuotas(): number {
+		if (!this.currentUser) return 0;
+		// Cotas Inativas = quotas disponíveis (total - em uso)
+		const totalQuotas = this.currentUser.standardQuota + this.currentUser.substitutionQuota + this.currentUser.contingencyQuota;
+		const activeQuotas = this.getActiveQuotas();
+		return totalQuotas - activeQuotas;
+	}
+
+	private loadUserReservations(): void {
+		if (!this.currentUser) return;
+		
+		this._reservationService.getReservationsByUserId(this.currentUser.userId).then(reservations => {
+			this.userReservations = reservations || [];
+		}).catch(error => {
+			console.warn('Error loading user reservations:', error);
+			this.userReservations = [];
+		});
 	}
 
 }

@@ -1,156 +1,222 @@
-﻿using Amazon.DynamoDBv2.DataModel;
-using boat_share.Models;
-using boat_share.Services;
-using boat_share.UseCases;
+using boat_share.Abstract;
+using boat_share.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace boat_share.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ReservationsController : ControllerBase
     {
-        private readonly ReservationService _reservationService;
-        private readonly DeleteAllPastReservationsUseCase _deleteAllPastReservationsUseCase;
-        private readonly DeleteReservationUseCase _deleteReservationUseCase;
-        private readonly ReservationDataService _reservationDataService;
+        private readonly IReservationService _reservationService;
 
-        public ReservationsController(
-            ReservationService reservationService,
-            DeleteAllPastReservationsUseCase deleteAllPastReservationsUseCase,
-            DeleteReservationUseCase deleteReservationUseCase,
-            ReservationDataService reservationDataService
-        )
+        public ReservationsController(IReservationService reservationService)
         {
             _reservationService = reservationService;
-            _deleteAllPastReservationsUseCase = deleteAllPastReservationsUseCase;
-            _deleteReservationUseCase = deleteReservationUseCase;
-            _reservationDataService = reservationDataService;
         }
 
-        // POST: api/reservation/add
-        [HttpPost("add")]
-        public async Task<IActionResult> AddReservation([FromBody] ReservationDBO reservationDbo)
-        {
-            var result = await _reservationService.AddReservation(reservationDbo);
-
-            if (result == "Reservation successfully created.")
-            {
-                return Ok(new { message = result });
-            }
-            else
-            {
-                return BadRequest(new { message = result });
-            }
-        }
-
-        // POST: api/reservation/restore-quotas
-        [HttpPost("restore-quotas")]
-        public async Task<IActionResult> RestoreQuotas([FromBody] Reservation reservation)
-        {
-            await _reservationService.RestoreQuotas(reservation);
-            return Ok(new { message = "Quotas restored if applicable." });
-		}
-
-        // PUT: api/reservation/confirm-reservation
-        [HttpPut("confirm-reservation")]
-        public async Task<IActionResult> ConfirmReservation([FromBody] Reservation reservation)
-        {
-            await _reservationService.ConfirmReservation(reservation);
-            return Ok(new { message = "Reservation confirmed." });
-        }
-
-		// GET all reservations
-		[HttpGet]
-		public async Task<ActionResult<List<Reservation>>> GetAllReservations()
-		{
-			var reservations = await _reservationDataService.GetAllReservationsAsync();
-			return Ok(reservations);
-		}
-
-		//GET Reservation by boat id
-		[HttpGet("boat/{boatId}")]
-		public async Task<ActionResult<List<Reservation>>> GetReservationsByBoatId(string boatId)
-		{
-			var reservations = await _reservationService.GetReservationsByBoatIdAsync(boatId);
-			if (reservations == null)
-			{
-				return NotFound();
-			}
-			return Ok(reservations);
-		}
-
-		//GET Reservation by user id
-		[HttpGet("user/{userId}")]
-		public async Task<ActionResult<List<Reservation>>> GetReservationsByUserId(string userId)
-		{
-			var reservations = await _reservationService.GetReservationsByUserIdAsync(userId);
-			
-			return Ok(reservations);
-		}
-
-		// GET Reservation by date and boatId
-		[HttpGet("by-date-and-boatId")]
-		public async Task<IActionResult> GetReservationByDateAndBoatId(int day, int month, int year, string boatId)
-		{
-			var reservation = await _reservationService.GetReservationByDateAndBoatIdAsync(day, month, year, boatId);
-			if (reservation == null)
-			{
-				return NotFound("No reservation found for the specified date.");
-			}
-			return Ok(reservation);
-		}
-
-		[HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteReservation(string id)
-        {
-            await _deleteReservationUseCase.Execute(id);
-            return NoContent();
-        }
-
-        [HttpGet("occupied/year/{year}")]
-        public async Task<IActionResult> GetOccupiedDatesForYear(int year)
+        /// <summary>
+        /// Get all reservations (Admin only)
+        /// </summary>
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<ReservationResponseDTO>>> GetReservations()
         {
             try
             {
-                // Call the service to get occupied dates for the entire year
-                var occupiedDates = await _reservationService.GetOccupiedDatesForYearAsync(year);
-
-                // Return the dates as JSON
-                return Ok(occupiedDates);
+                var reservations = await _reservationService.GetReservationsAsync();
+                return Ok(reservations);
             }
             catch (Exception ex)
             {
-                // Handle errors
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, new { message = "An error occurred while retrieving reservations", error = ex.Message });
             }
         }
 
-        [HttpDelete("delete-past")]
-        public async Task<IActionResult> DeleteAllPastReservations()
+        /// <summary>
+        /// Get reservations by user ID
+        /// </summary>
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<List<ReservationResponseDTO>>> GetReservationsByUserId(int userId)
         {
-            await _deleteAllPastReservationsUseCase.Execute();
-            return NoContent();
+            try
+            {
+                var currentUserId = GetCurrentUserId();
+                var currentUserRole = GetCurrentUserRole();
+
+                // Users can only access their own reservations unless they're admin
+                if (currentUserRole != "Admin" && currentUserId != userId)
+                {
+                    return Forbid("You can only access your own reservations");
+                }
+
+                var reservations = await _reservationService.GetReservationsByUserIdAsync(userId);
+                return Ok(reservations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving user reservations", error = ex.Message });
+            }
         }
 
+        /// <summary>
+        /// Get reservations by boat ID
+        /// </summary>
+        [HttpGet("boat/{boatId}")]
+        public async Task<ActionResult<List<ReservationResponseDTO>>> GetReservationsByBoatId(int boatId)
+        {
+            try
+            {
+                var reservations = await _reservationService.GetReservationsByBoatIdAsync(boatId);
+                return Ok(reservations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving boat reservations", error = ex.Message });
+            }
+        }
 
-		[HttpPut("update-reservations")]
-		public async Task<IActionResult> UpdateAllReservations()
-		{
-			try
-			{
-				// Call the service to update all reservations
-				await _reservationService.UpdateAllReservations();
+        /// <summary>
+        /// Get reservation by ID
+        /// </summary>
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ReservationResponseDTO>> GetReservation(int id)
+        {
+            try
+            {
+                var reservation = await _reservationService.GetReservationByIdAsync(id);
+                if (reservation == null)
+                {
+                    return NotFound(new { message = "Reservation not found" });
+                }
 
-				// Return success response
-				return Ok("All reservations updated successfully.");
-			}
-			catch (Exception ex)
-			{
-				// In case of an error, return an error response
-				return StatusCode(500, $"An error occurred while updating reservations: {ex.Message}");
-			}
-		}
+                var currentUserId = GetCurrentUserId();
+                var currentUserRole = GetCurrentUserRole();
 
-	}
+                // Users can only access their own reservations unless they're admin
+                if (currentUserRole != "Admin" && reservation.UserId != currentUserId)
+                {
+                    return Forbid("You can only access your own reservations");
+                }
+
+                return Ok(reservation);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving the reservation", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Create a new reservation
+        /// </summary>
+        [HttpPost]
+        public async Task<ActionResult<ReservationResponseDTO>> CreateReservation(CreateReservationDTO createReservationDto)
+        {
+            try
+            {
+                var currentUserId = GetCurrentUserId();
+                var reservation = await _reservationService.CreateReservationAsync(createReservationDto, currentUserId);
+                var reservationResponse = await _reservationService.GetReservationByIdAsync(reservation.ReservationId);
+
+                return CreatedAtAction(nameof(GetReservation), new { id = reservation.ReservationId }, reservationResponse);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while creating the reservation", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Update reservation
+        /// </summary>
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ReservationResponseDTO>> UpdateReservation(int id, ReservationDTO reservationDto)
+        {
+            try
+            {
+                var existingReservation = await _reservationService.GetReservationByIdAsync(id);
+                if (existingReservation == null)
+                {
+                    return NotFound(new { message = "Reservation not found" });
+                }
+
+                var currentUserId = GetCurrentUserId();
+                var currentUserRole = GetCurrentUserRole();
+
+                // Users can only update their own reservations unless they're admin
+                if (currentUserRole != "Admin" && existingReservation.UserId != currentUserId)
+                {
+                    return Forbid("You can only update your own reservations");
+                }
+
+                var updatedReservation = await _reservationService.UpdateReservationAsync(id, reservationDto);
+                if (updatedReservation == null)
+                {
+                    return NotFound(new { message = "Reservation not found" });
+                }
+
+                return Ok(updatedReservation);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the reservation", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Delete reservation
+        /// </summary>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteReservation(int id)
+        {
+            try
+            {
+                var existingReservation = await _reservationService.GetReservationByIdAsync(id);
+                if (existingReservation == null)
+                {
+                    return NotFound(new { message = "Reservation not found" });
+                }
+
+                var currentUserId = GetCurrentUserId();
+                var currentUserRole = GetCurrentUserRole();
+
+                // Users can only delete their own reservations unless they're admin
+                if (currentUserRole != "Admin" && existingReservation.UserId != currentUserId)
+                {
+                    return Forbid("You can only delete your own reservations");
+                }
+
+                var success = await _reservationService.DeleteReservationAsync(id);
+                if (!success)
+                {
+                    return NotFound(new { message = "Reservation not found" });
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting the reservation", error = ex.Message });
+            }
+        }
+
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(userIdClaim, out var userId) ? userId : 0;
+        }
+
+        private string GetCurrentUserRole()
+        {
+            return User.FindFirst(ClaimTypes.Role)?.Value ?? "Member";
+        }
+    }
 }

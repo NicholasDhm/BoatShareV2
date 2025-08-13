@@ -1,177 +1,77 @@
-using System.Text;
-using Amazon.DynamoDBv2.DataModel;
-using Amazon.DynamoDBv2;
+using Microsoft.EntityFrameworkCore;
+using boat_share.Data;
+using boat_share.Abstract;
 using boat_share.Services;
-using Amazon.S3;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using boat_share.Api.Core.BackgroundReservation;
-using NLog;
-using NLog.Web;
-using boat_share.UseCases;
+using System.Text;
 
+var builder = WebApplication.CreateBuilder(args);
 
-namespace BoatShare
+// Add Entity Framework and PostgreSQL
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register services
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IBoatService, BoatService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+
+// Add CORS
+builder.Services.AddCors(options =>
 {
-	public class Program
+    options.AddPolicy("AllowAngular", policy =>
     {
-        public static void Main(string[] args)
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+// Add JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            var logFactory = LogManager.Setup().LoadConfigurationFromAppSettings().LogFactory;
-            var logger = logFactory.GetCurrentClassLogger();
-            try
-            {
-                logger.Info("Starting application...");
-                CreateHostBuilder(args);
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex, "Application stopped due to an exception.");
-                throw;
-            }
-            finally
-            {
-                NLog.LogManager.Shutdown();
-            }
-        }
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "BoatShare",
+            ValidAudience = "BoatShare",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-secret-key-that-is-at-least-32-characters-long"))
+        };
+    });
 
-        public static void CreateHostBuilder(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+// Add services
+builder.Services.AddControllers();
 
-            // Register S3Service
-            builder.Services.AddSingleton<S3Service>(sp =>
-            {
-                var s3Client = sp.GetRequiredService<IAmazonS3>();
-                var bucketName = builder.Configuration["AWS:S3:BucketName"];
-                return new S3Service(s3Client, bucketName);
-            });
+var app = builder.Build();
 
-            // Register services here
-            ConfigureServices(builder.Services, builder.Configuration);
+// Configure the HTTP request pipeline
+app.UseCors("AllowAngular");
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 
-			// Configure middleware pipeline and build the app
-			var app = builder.Build();
-
-            // Add Swagger to the middleware pipeline
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Boat Share API v1");
-            });
-
-            app.UseRouting();
-
-            // Enable CORS
-            app.UseCors("AllowAll");
-
-            // Enable Authentication and Authorization
-            app.UseAuthentication();  // Make sure to add authentication middleware here
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-
-            app.Run();
-        }
-        public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll",
-                    builder => builder
-                        .AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
-            });
-
-			services.AddControllers();
-
-            // Register services here
-            services.AddSingleton<BoatService>();
-            services.AddSingleton<UserService>();
-            services.AddSingleton<ReservationService>();
-			services.AddSingleton<AuthService>();
-            services.AddSingleton<ReservationDataService>();
-            services.AddSingleton<NextRunService>();
-            services.AddHostedService<ReservationBackgroundService>();
-
-            services.AddSingleton<DeleteAllPastReservationsUseCase>();
-            services.AddSingleton<DeleteReservationUseCase>();
-
-
-            /*
-            var awsOptions = configuration.GetAWSOptions();
-            services.AddDefaultAWSOptions(awsOptions);
-
-            // Register DynamoDB and S3 clients
-            services.AddSingleton<IDynamoDBContext, DynamoDBContext>(serviceProvider =>
-            {
-                var amazonDynamoDBClient = serviceProvider.GetRequiredService<IAmazonDynamoDB>();
-                var dynamoDBContextConfig = new DynamoDBContextConfig();
-                return new DynamoDBContext(amazonDynamoDBClient, dynamoDBContextConfig);
-            });
-            services.AddAWSService<IAmazonDynamoDB>();
-            */
-
-            // Register DynamoDB and S3 clients
-            services.AddSingleton<IAmazonDynamoDB, AmazonDynamoDBClient>();
-            services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
-            services.AddSingleton<IAmazonS3, AmazonS3Client>();
-            services.AddAWSService<IAmazonS3>();
-
-            // JWT Authentication Configuration
-            var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"]);
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-            });
-
-            // Add Swagger and include JWT in Swagger UI
-            services.AddSwaggerGen(c =>
-            {
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Description = "JWT Authorization header using the Bearer scheme (Example: 'Bearer 12345abcdef')",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer"
-                });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
-                    }
-                });
-            });
-
-			services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
-		}
-
+// Initialize database
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    try
+    {
+        Console.WriteLine("Creating database...");
+        context.Database.EnsureCreated();
+        Console.WriteLine("Database created successfully!");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error creating database: {ex.Message}");
+        throw;
     }
 }
+
+app.Run();

@@ -1,25 +1,169 @@
-<ul class="nav nav-tabs">
-  @if (role !== 'Unknown') {
-    <li class="nav-item">
-      <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-    </li>
-  
-    @if (role === 'Admin') {
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/manage-users" routerLinkActive="active">Usuários</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/manage-boats" routerLinkActive="active">Barcos</a>
-      </li>
-    }
-    
-    <li class="nav-item">
-      <a class="nav-link" routerLink="/profile" routerLinkActive="active">Perfil</a>
-    </li>
-  } @else {
-    <li class="nav-item">
-      <a class="nav-link" routerLink="/login" routerLinkActive="active">Login</a>
-    </li>    
-  }
-  
-</ul>
+<!-- Modern Navigation with improved accessibility and design -->
+<nav class="navbar navbar-expand-lg" role="navigation" aria-label="Main navigation">
+  <div class="container-fluid">
+    <!-- Brand/Logo -->
+    <a class="navbar-brand" routerLink="/dashboard" aria-label="BoatShare - Go to dashboard">
+      <i class="bi bi-sailboat me-2" aria-hidden="true"></i>
+      <span>BoatShare</span>
+    </a>
+
+    <!-- Mobile toggle button -->
+    <button 
+      class="navbar-toggler" 
+      type="button" 
+      data-bs-toggle="collapse" 
+      data-bs-target="#navbarNav" 
+      aria-controls="navbarNav" 
+      aria-expanded="false" 
+      aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navigation Links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto" role="menubar">
+        @if (role !== 'Unknown') {
+          <!-- Dashboard -->
+          <li class="nav-item" role="none">
+            <a 
+              class="nav-link" 
+              routerLink="/dashboard" 
+              routerLinkActive="active"
+              role="menuitem"
+              aria-label="Go to dashboard">
+              <i class="bi bi-house-door me-1" aria-hidden="true"></i>
+              Início
+            </a>
+          </li>
+
+          <!-- Profile -->
+          <li class="nav-item" role="none">
+            <a 
+              class="nav-link" 
+              routerLink="/profile" 
+              routerLinkActive="active"
+              role="menuitem"
+              aria-label="View profile">
+              <i class="bi bi-person me-1" aria-hidden="true"></i>
+              Perfil
+            </a>
+          </li>
+
+          <!-- Admin Section -->
+          @if (role === 'Admin') {
+            <li class="nav-item dropdown" role="none">
+              <a 
+                class="nav-link dropdown-toggle" 
+                href="#" 
+                id="adminDropdown" 
+                role="menuitem"
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+                aria-haspopup="true"
+                aria-label="Admin options">
+                <i class="bi bi-gear me-1" aria-hidden="true"></i>
+                Administração
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="adminDropdown" role="menu">
+                <li role="none">
+                  <a 
+                    class="dropdown-item" 
+                    routerLink="/admin/users"
+                    role="menuitem"
+                    aria-label="Manage users">
+                    <i class="bi bi-people me-2" aria-hidden="true"></i>
+                    Usuários
+                  </a>
+                </li>
+                <li role="none">
+                  <a 
+                    class="dropdown-item" 
+                    routerLink="/admin/boats"
+                    role="menuitem"
+                    aria-label="Manage boats">
+                    <i class="bi bi-sailboat me-2" aria-hidden="true"></i>
+                    Barcos
+                  </a>
+                </li>
+                <li role="none">
+                  <hr class="dropdown-divider">
+                </li>
+                <li role="none">
+                  <a 
+                    class="dropdown-item" 
+                    href="#"
+                    role="menuitem"
+                    aria-label="View analytics">
+                    <i class="bi bi-graph-up me-2" aria-hidden="true"></i>
+                    Relatórios
+                    <small class="text-muted ms-1">(Em breve)</small>
+                  </a>
+                </li>
+              </ul>
+            </li>
+          }
+        } @else {
+          <!-- Public navigation for non-authenticated users -->
+          <li class="nav-item" role="none">
+            <a 
+              class="nav-link" 
+              routerLink="/login" 
+              routerLinkActive="active"
+              role="menuitem"
+              aria-label="Sign in to your account">
+              <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>
+              Entrar
+            </a>
+          </li>
+        }
+      </ul>
+
+      <!-- Right side actions -->
+      <div class="navbar-nav">
+        @if (role === 'Unknown') {
+          <a 
+            class="btn btn-primary nav-cta" 
+            routerLink="/register"
+            aria-label="Create new account">
+            <i class="bi bi-person-plus me-1" aria-hidden="true"></i>
+            Criar Conta
+          </a>
+        } @else {
+          <!-- Quick actions for authenticated users -->
+          <div class="nav-item dropdown">
+            <button 
+              class="btn btn-outline-primary dropdown-toggle" 
+              type="button" 
+              id="quickActionsDropdown" 
+              data-bs-toggle="dropdown" 
+              aria-expanded="false"
+              aria-label="Quick actions">
+              <i class="bi bi-plus-circle me-1" aria-hidden="true"></i>
+              Ações
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quickActionsDropdown">
+              <li>
+                <button 
+                  class="dropdown-item" 
+                  type="button"
+                  aria-label="Create new reservation">
+                  <i class="bi bi-calendar-plus me-2" aria-hidden="true"></i>
+                  Nova Reserva
+                </button>
+              </li>
+              <li>
+                <button 
+                  class="dropdown-item" 
+                  type="button"
+                  aria-label="View my reservations">
+                  <i class="bi bi-list-check me-2" aria-hidden="true"></i>
+                  Minhas Reservas
+                </button>
+              </li>
+            </ul>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</nav>

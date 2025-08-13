@@ -1,19 +1,15 @@
 ﻿using boat_share.Models;
+using boat_share.DTOs;
 
 namespace boat_share.Abstract
 {
 	public interface IBoatService
 	{
-		Task<List<Boat>> GetBoatsAsync();
-
-		Task<Boat> GetBoatByIdAsync(string boatId);
-
-		Task AddBoatAsync(Boat boat);
-
-		Task DeleteBoatAsync(string boatId);
-
-		Task UpdateBoatAsync(Boat boat);
-
-		Task AssignUserToBoatAsync(string boatId, string userId);
+		Task<List<BoatDTO>> GetBoatsAsync();
+		Task<BoatDTO?> GetBoatByIdAsync(int boatId);
+		Task<Boat> CreateBoatAsync(BoatCreateDTO boatCreateDto);
+		Task<BoatDTO?> UpdateBoatAsync(int boatId, BoatUpdateDTO boatUpdateDto);
+		Task<bool> DeleteBoatAsync(int boatId);
+		Task<bool> AssignUserToBoatAsync(int boatId, int userId);
 	}
 }
