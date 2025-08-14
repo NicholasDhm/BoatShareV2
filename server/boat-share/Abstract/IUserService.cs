@@ -10,5 +10,6 @@ namespace boat_share.Abstract
 		Task<User?> CreateUserAsync(UserCreateDTO userCreateDto);
 		Task<UserInfoDTO?> UpdateUserAsync(int userId, UserUpdateDTO userUpdateDto);
 		Task<bool> DeleteUserAsync(int userId);
+		Task<UserInfoDTO?> AddQuotaBackAsync(int userId, string reservationType);
 	}
 }

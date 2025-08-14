@@ -53,6 +53,15 @@ export class CalendarService {
     });
   }
 
+  updateReservationStatuses(): void {
+    this._reservationService.updateReservations().then(() => {
+      // After updating statuses, reload the calendar
+      this.loadCalendarViewModel();
+    }).catch(error => {
+      console.error("Error updating reservation statuses:", error);
+    });
+  }
+
   updateCalendarMonth(month: number): void {
     let updatedViewModel = this.getCalendarViewModel();
     if (updatedViewModel) {

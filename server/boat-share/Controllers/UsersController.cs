@@ -155,6 +155,37 @@ namespace boat_share.Controllers
             }
         }
 
+        /// <summary>
+        /// Add quotas back to user (typically used when reservation is cancelled)
+        /// </summary>
+        [HttpPut("{id}/add-quotas")]
+        public async Task<ActionResult<UserInfoDTO>> AddQuotasBack(int id, [FromBody] AddQuotaDTO addQuotaDto)
+        {
+            try
+            {
+                var currentUserId = GetCurrentUserId();
+                var currentUserRole = GetCurrentUserRole();
+
+                // Users can only add quotas to their own account unless they're admin
+                if (currentUserRole != "Admin" && currentUserId != id)
+                {
+                    return Forbid("You can only manage your own quotas");
+                }
+
+                var updatedUser = await _userService.AddQuotaBackAsync(id, addQuotaDto.ReservationType);
+                if (updatedUser == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                return Ok(updatedUser);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while adding quota back", error = ex.Message });
+            }
+        }
+
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

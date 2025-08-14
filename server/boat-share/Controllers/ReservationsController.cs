@@ -172,6 +172,93 @@ namespace boat_share.Controllers
         }
 
         /// <summary>
+        /// Get reservation by date and boat ID
+        /// </summary>
+        [HttpGet("by-date-and-boatId")]
+        public async Task<ActionResult<ReservationResponseDTO>> GetReservationByDateAndBoatId(
+            int day, int month, int year, int boatId)
+        {
+            try
+            {
+                var date = new DateTime(year, month, day);
+                var reservation = await _reservationService.GetReservationByDateAndBoatIdAsync(date, boatId);
+                
+                if (reservation == null)
+                {
+                    return NotFound(new { message = "No reservation found for this date and boat" });
+                }
+
+                return Ok(reservation);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving the reservation", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Update reservation statuses based on current business rules
+        /// </summary>
+        [HttpPut("update-reservations")]
+        public async Task<IActionResult> UpdateReservationStatuses()
+        {
+            try
+            {
+                await _reservationService.UpdateReservationStatusesAsync();
+                return Ok(new { message = "Reservation statuses updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating reservation statuses", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Confirm a reservation
+        /// </summary>
+        [HttpPut("confirm-reservation")]
+        public async Task<ActionResult<ReservationResponseDTO>> ConfirmReservation(ReservationDTO reservationDto)
+        {
+            try
+            {
+                var reservationId = reservationDto.ReservationId;
+                if (reservationId <= 0)
+                {
+                    return BadRequest(new { message = "Invalid reservation ID" });
+                }
+
+                var existingReservation = await _reservationService.GetReservationByIdAsync(reservationId);
+                if (existingReservation == null)
+                {
+                    return NotFound(new { message = "Reservation not found" });
+                }
+
+                var currentUserId = GetCurrentUserId();
+                var currentUserRole = GetCurrentUserRole();
+
+                // Users can only confirm their own reservations unless they're admin
+                if (currentUserRole != "Admin" && existingReservation.UserId != currentUserId)
+                {
+                    return Forbid("You can only confirm your own reservations");
+                }
+
+                // Update the status to Confirmed
+                reservationDto.Status = "Confirmed";
+                var updatedReservation = await _reservationService.UpdateReservationAsync(reservationId, reservationDto);
+                if (updatedReservation == null)
+                {
+                    return NotFound(new { message = "Reservation not found" });
+                }
+
+                return Ok(updatedReservation);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while confirming the reservation", error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Delete reservation
         /// </summary>
         [HttpDelete("{id}")]

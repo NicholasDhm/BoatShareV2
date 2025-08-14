@@ -80,10 +80,8 @@ export class ReservationTestPageService {
 		})
 	}
 
-	deleteReservationById(): Promise<IReservation> {
-		return this._reservationService.deleteReservationById(this._viewModel().deleteReservationId).then(reservation => {
-			return reservation;
-		})
+	deleteReservationById(): Promise<void> {
+		return this._reservationService.deleteReservationById(this._viewModel().deleteReservationId);
 	}
 
 	deletePastReservations(): Promise<void> {

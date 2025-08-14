@@ -5,6 +5,23 @@ import { Subject } from 'rxjs';
 import { UserService } from './user.service';
 import { environment } from '../environments/environment';
 
+interface ReservationResponseDTO {
+	reservationId: number;
+	userId: number;
+	userName?: string;
+	boatId: number;
+	boatName?: string;
+	startTime: string;
+	endTime: string;
+	durationHours: number;
+	totalCost: number;
+	status: string;
+	reservationType: string;
+	notes: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
 @Injectable({
 	providedIn: 'root'
 })
@@ -19,12 +36,28 @@ export class ReservationService {
 		private _userService: UserService,
 	) { }
 
+	private mapResponseToReservation(dto: ReservationResponseDTO): IReservation {
+		const startDate = new Date(dto.startTime);
+		return {
+			reservationId: dto.reservationId.toString(),
+			status: dto.status as 'Pending' | 'Confirmed' | 'Unconfirmed',
+			createdAtIsoDate: dto.createdAt,
+			type: dto.reservationType as 'Standard' | 'Substitution' | 'Contingency',
+			userId: dto.userId.toString(),
+			boatId: dto.boatId.toString(),
+			year: startDate.getFullYear(),
+			month: startDate.getMonth() + 1, // JS months are 0-indexed
+			day: startDate.getDate()
+		};
+	}
+
 	getAllReservations(): Promise<IReservation[]> {
 		return new Promise((resolve, reject) => {
-			this._httpClient.get<IReservation[]>(this.baseUrl).subscribe({
+			this._httpClient.get<ReservationResponseDTO[]>(this.baseUrl).subscribe({
 				next: result => {
 					console.debug(`getReservations: url ${this.baseUrl} result`, result);
-					resolve(result);
+					const mappedReservations = result.map(dto => this.mapResponseToReservation(dto));
+					resolve(mappedReservations);
 				},
 				error: err => {
 					console.warn(`getReservations: url ${this.baseUrl}`, err);
@@ -36,10 +69,11 @@ export class ReservationService {
 
 	getReservationsByBoatId(boatId: string): Promise<IReservation[]> {
 		return new Promise((resolve, reject) => {
-			this._httpClient.get<IReservation[]>(`${this.baseUrl}/boat/${boatId}`).subscribe({
+			this._httpClient.get<ReservationResponseDTO[]>(`${this.baseUrl}/boat/${boatId}`).subscribe({
 				next: result => {
 					console.debug(`getReservationById: url ${this.baseUrl}/boat/${boatId} result`, result);
-					resolve(result);
+					const mappedReservations = result.map(dto => this.mapResponseToReservation(dto));
+					resolve(mappedReservations);
 				},
 				error: err => {
 					console.warn(`getReservationById: url ${this.baseUrl}/boat/${boatId}`, err);
@@ -51,10 +85,11 @@ export class ReservationService {
 
 	getReservationsByUserId(userId: string): Promise<IReservation[]> {
 		return new Promise((resolve, reject) => {
-			this._httpClient.get<IReservation[]>(`${this.baseUrl}/user/${userId}`).subscribe({
+			this._httpClient.get<ReservationResponseDTO[]>(`${this.baseUrl}/user/${userId}`).subscribe({
 				next: result => {
 					console.debug(`getReservationById: url ${this.baseUrl}/user/${userId} result`, result);
-					resolve(result);
+					const mappedReservations = result.map(dto => this.mapResponseToReservation(dto));
+					resolve(mappedReservations);
 				},
 				error: err => {
 					console.warn(`getReservationById: url ${this.baseUrl}/user/${userId}`, err);
@@ -69,10 +104,11 @@ export class ReservationService {
 			// Create a query URL with date parameters
 			const url = `${this.baseUrl}/by-date-and-boatId?day=${day}&month=${month}&year=${year}&boatId=${boatId}`;
 	
-			this._httpClient.get<IReservation>(url).subscribe({
+			this._httpClient.get<ReservationResponseDTO>(url).subscribe({
 				next: result => {
 					console.debug(`getReservationByDate: url ${url} result`, result);
-					resolve(result);
+					const mappedReservation = this.mapResponseToReservation(result);
+					resolve(mappedReservation);
 				},
 				error: err => {
 					console.warn(`getReservationByDate: url ${url}`, err);
@@ -85,7 +121,19 @@ export class ReservationService {
 
 	createReservation(reservation: IReservation): Promise<string> {
 		return new Promise((resolve, reject) => {
-			this._httpClient.post<string>(`${this.baseUrl}/add`, reservation, { responseType: 'text' as 'json' }).subscribe({
+			// Transform IReservation to CreateReservationDTO format
+			const startTime = new Date(reservation.year, reservation.month - 1, reservation.day, 6, 0, 0); // 6:00 AM
+			const endTime = new Date(reservation.year, reservation.month - 1, reservation.day, 18, 0, 0); // 6:00 PM
+			
+			const createReservationDto = {
+				boatId: parseInt(reservation.boatId),
+				startTime: startTime.toISOString(),
+				endTime: endTime.toISOString(),
+				reservationType: reservation.type,
+				notes: ''
+			};
+
+			this._httpClient.post<string>(`${this.baseUrl}`, createReservationDto, { responseType: 'text' as 'json' }).subscribe({
 				next: result => {
 					console.debug(`createReservation: url ${this.baseUrl} result`, result);
           this.reservationsUpdated.next(); // Notify subscribers
@@ -102,15 +150,33 @@ export class ReservationService {
 
 	confirmReservation(reservation: IReservation): Promise<IReservation> {
 		return new Promise((resolve, reject) => {
-			this._httpClient.put<IReservation>(`${this.baseUrl}/confirm-reservation`, reservation, {}).subscribe({
+			if (!reservation.reservationId) {
+				reject(new Error('Reservation ID is required'));
+				return;
+			}
+
+			// Convert string to number for ReservationDTO
+			const reservationDto = {
+				reservationId: parseInt(reservation.reservationId),
+				userId: parseInt(reservation.userId),
+				boatId: parseInt(reservation.boatId),
+				startTime: new Date(reservation.year, reservation.month - 1, reservation.day, 6, 0, 0).toISOString(),
+				endTime: new Date(reservation.year, reservation.month - 1, reservation.day, 18, 0, 0).toISOString(),
+				reservationType: reservation.type,
+				status: 'Confirmed',
+				notes: ''
+			};
+
+			this._httpClient.put<ReservationResponseDTO>(`${this.baseUrl}/confirm-reservation`, reservationDto, {}).subscribe({
 				next: result => {
-					console.debug(`confirmReservation: url ${this.baseUrl}/confirm/${reservation.reservationId} result`, result);
+					console.debug(`confirmReservation: url ${this.baseUrl}/confirm-reservation result`, result);
 					this.reservationsUpdated.next(); // Notify subscribers
 					this._userService.updateCurrentUser();
-					resolve(result);
+					const mappedReservation = this.mapResponseToReservation(result);
+					resolve(mappedReservation);
 				},
 				error: err => {
-					console.warn(`confirmReservation: url ${this.baseUrl}/confirm/${reservation.reservationId}`, err);
+					console.warn(`confirmReservation: url ${this.baseUrl}/confirm-reservation`, err);
 					reject(err);
 				}
 			});
@@ -142,14 +208,14 @@ export class ReservationService {
 	
 	
 
-	deleteReservationById(id: string): Promise<IReservation> {
+	deleteReservationById(id: string): Promise<void> {
 		return new Promise((resolve, reject) => {
-			this._httpClient.delete<IReservation>(`${this.baseUrl}/${id}`).subscribe({
+			this._httpClient.delete<void>(`${this.baseUrl}/${id}`).subscribe({
 				next: result => {
 					console.debug(`deleteReservationById: url ${this.baseUrl}/${id} result`, result);
           this.reservationsUpdated.next();
 					this._userService.updateCurrentUser();
-					resolve(result);
+					resolve();
 				},
 				error: err => {
 					console.warn(`deleteReservationById: url ${this.baseUrl}/${id}`, err);
@@ -180,13 +246,13 @@ export class ReservationService {
 		return new Promise((resolve, reject) => {
 			this._httpClient.put<void>(`${this.baseUrl}/update-reservations`, {}).subscribe({
 				next: result => {
-					console.debug(`updateReservations: url ${this.baseUrl}/update result`, result);
+					console.debug(`updateReservations: url ${this.baseUrl}/update-reservations result`, result);
 					this.reservationsUpdated.next();
 					this._userService.updateCurrentUser();
 					resolve(result);
 				},
 				error: err => {
-					console.warn(`updateReservations: url ${this.baseUrl}/update`, err);
+					console.warn(`updateReservations: url ${this.baseUrl}/update-reservations`, err);
 					reject(err);
 				}
 			});

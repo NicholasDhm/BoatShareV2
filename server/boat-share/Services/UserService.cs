@@ -144,5 +144,17 @@ namespace boat_share.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<UserInfoDTO?> AddQuotaBackAsync(int userId, string reservationType)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return null;
+
+            // Restore the quota for the specific reservation type
+            user.RestoreQuota(reservationType);
+            await _context.SaveChangesAsync();
+
+            return await GetUserByIdAsync(userId);
+        }
     }
 }

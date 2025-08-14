@@ -142,21 +142,31 @@ export class UiCalendarComponent {
 			return 'Greyish';
     }
 		
-    // Colour 1 - Reserved (if there is a reservation for this day)
-    if (this.isDayReserved(this.calendarViewModel.displayDate.year, this.calendarViewModel.displayDate.month, day.date)) {			
-			return this.getReservationType(this.calendarViewModel.displayDate.year, this.calendarViewModel.displayDate.month, day.date);
-    }
+		// Check if current user has a reservation for this day
+		const userReservation = this.calendarViewModel.currentUserReservations.find(
+			x => x.day === day.date && x.month === this.calendarViewModel!.displayDate.month && x.year === this.calendarViewModel!.displayDate.year
+		);
 
-    // Colour 2 - Contingency (if it's today and after 07:00) or Standard (if it's today and before 07:00)
+		// Check if there's any reservation for this day on this boat
+		const dayIsReserved = this.isDayReserved(this.calendarViewModel.displayDate.year, this.calendarViewModel.displayDate.month, day.date);
+
+		if (userReservation) {
+			// User has a reservation - show their reservation type (Standard/Substitution/Contingency)
+			return userReservation.type;
+		} else if (dayIsReserved) {
+			// Day is reserved by someone else - show as Substitution (red) to indicate it's occupied
+			return 'Substitution';
+		}
+
+    // Day is free - determine available reservation type based on current time and date
     if (this.isToday(day)) {
+			// Colour 2 - Contingency (if it's today and after 07:00) or Standard (if it's today and before 07:00)
 			if (this.calendarViewModel.currentDate.hour > 6) {
 				return 'Contingency';
 			}
 			return 'Standard';
-    }
-
-    // Colour 3 - Standard (if the day is free and in the current month)
-    else {
+    } else {
+			// Colour 3 - Standard (if the day is free and in the current month)
 			return 'Standard';
     }
 	}

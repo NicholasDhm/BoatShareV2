@@ -57,7 +57,8 @@ export class DashboardComponent {
 	}
 
 	ngOnInit(): void {
-		this._calendarService.loadCalendarViewModel();
+		// Update reservation statuses first, then load calendar
+		this._calendarService.updateReservationStatuses();
 		this._userService.updateCurrentUser();
 
 		this._reservationService.reservationsUpdated$.subscribe(() => {
@@ -126,7 +127,21 @@ export class DashboardComponent {
 			}, 5000);
 		} else {
 			this.validationError = '';
-			this._reservationService.createReservation(reservationResult);
+			this._reservationService.createReservation(reservationResult).then(() => {
+				// Reservation created successfully
+				console.log('Reservation created successfully');
+			}).catch(error => {
+				// Handle server-side quota errors
+				console.error('Error creating reservation:', error);
+				if (error.error && error.error.message && error.error.message.includes('quota')) {
+					this.validationError = 'Erro: ' + error.error.message;
+				} else {
+					this.validationError = 'Erro ao criar reserva. Tente novamente.';
+				}
+				setTimeout(() => {
+					this.validationError = '';
+				}, 5000);
+			});
 		}
 	}
 
@@ -134,7 +149,12 @@ export class DashboardComponent {
 		if (!this.currentUser || !reservationResult?.reservationId) {
 			return;
 		}
-		this._reservationService.deleteReservationById(reservationResult.reservationId);
+		this._reservationService.deleteReservationById(reservationResult.reservationId).then(() => {
+			// Reservation deleted successfully
+			console.log('Reservation cancelled successfully');
+		}).catch(error => {
+			console.error('Error cancelling reservation:', error);
+		});
 	}
 
 	confirmReservation(reservationResult: IReservation | null): void {

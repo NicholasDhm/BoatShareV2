@@ -94,6 +94,17 @@ namespace boat_share.DTOs
         public bool? IsActive { get; set; }
     }
 
+    /// <summary>
+    /// DTO for adding quota back to a user
+    /// </summary>
+    public class AddQuotaDTO
+    {
+        [Required]
+        [RegularExpression("^(Standard|Substitution|Contingency)$", 
+            ErrorMessage = "ReservationType must be 'Standard', 'Substitution', or 'Contingency'")]
+        public required string ReservationType { get; set; }
+    }
+
     public class UserListDTO
     {
         public int UserId { get; set; }
