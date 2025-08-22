@@ -50,7 +50,7 @@ namespace boat_share.Controllers
                 // Users can only access their own reservations unless they're admin
                 if (currentUserRole != "Admin" && currentUserId != userId)
                 {
-                    return Forbid("You can only access your own reservations");
+                    return Forbid();
                 }
 
                 var reservations = await _reservationService.GetReservationsByUserIdAsync(userId);
@@ -99,7 +99,7 @@ namespace boat_share.Controllers
                 // Users can only access their own reservations unless they're admin
                 if (currentUserRole != "Admin" && reservation.UserId != currentUserId)
                 {
-                    return Forbid("You can only access your own reservations");
+                    return Forbid();
                 }
 
                 return Ok(reservation);
@@ -154,7 +154,7 @@ namespace boat_share.Controllers
                 // Users can only update their own reservations unless they're admin
                 if (currentUserRole != "Admin" && existingReservation.UserId != currentUserId)
                 {
-                    return Forbid("You can only update your own reservations");
+                    return Forbid();
                 }
 
                 var updatedReservation = await _reservationService.UpdateReservationAsync(id, reservationDto);
@@ -239,7 +239,7 @@ namespace boat_share.Controllers
                 // Users can only confirm their own reservations unless they're admin
                 if (currentUserRole != "Admin" && existingReservation.UserId != currentUserId)
                 {
-                    return Forbid("You can only confirm your own reservations");
+                    return Forbid();
                 }
 
                 // Update the status to Confirmed
@@ -278,7 +278,7 @@ namespace boat_share.Controllers
                 // Users can only delete their own reservations unless they're admin
                 if (currentUserRole != "Admin" && existingReservation.UserId != currentUserId)
                 {
-                    return Forbid("You can only delete your own reservations");
+                    return Forbid();
                 }
 
                 var success = await _reservationService.DeleteReservationAsync(id);

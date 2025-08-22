@@ -8,9 +8,18 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Entity Framework and PostgreSQL
+// Add Entity Framework - use in-memory DB for Testing, PostgreSQL otherwise
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    if (builder.Environment.IsEnvironment("Testing"))
+    {
+        options.UseInMemoryDatabase("BoatShare_TestDB_Program");
+    }
+    else
+    {
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    }
+});
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -75,3 +84,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+// Expose Program class for WebApplicationFactory in integration tests
+public partial class Program { }

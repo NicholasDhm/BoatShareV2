@@ -50,7 +50,7 @@ namespace boat_share.Controllers
                 // Users can only access their own data unless they're admin
                 if (currentUserRole != "Admin" && currentUserId != id)
                 {
-                    return Forbid("You can only access your own user data");
+                    return Forbid();
                 }
 
                 var user = await _userService.GetUserByIdAsync(id);
@@ -105,7 +105,7 @@ namespace boat_share.Controllers
                 // Users can only update their own data unless they're admin
                 if (currentUserRole != "Admin" && currentUserId != id)
                 {
-                    return Forbid("You can only update your own user data");
+                    return Forbid();
                 }
 
                 // Non-admin users cannot change role or quotas
@@ -169,7 +169,7 @@ namespace boat_share.Controllers
                 // Users can only add quotas to their own account unless they're admin
                 if (currentUserRole != "Admin" && currentUserId != id)
                 {
-                    return Forbid("You can only manage your own quotas");
+                    return Forbid();
                 }
 
                 var updatedUser = await _userService.AddQuotaBackAsync(id, addQuotaDto.ReservationType);
