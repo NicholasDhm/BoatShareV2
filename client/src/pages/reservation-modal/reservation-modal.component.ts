@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { UiCardComponent } from '../../components/ui-card/ui-card.component';
 import { CommonModule } from '@angular/common';
 import { IReservation } from '../../models/reservation';
 import { IUser } from '../../models/user';
@@ -10,7 +9,6 @@ import { StandardModalComponent } from './standard-modal/standard-modal.componen
   selector: 'app-reservation-modal',
   standalone: true,
   imports: [
-    UiCardComponent,
     CommonModule,
     ConfirmationModalComponent,
     StandardModalComponent

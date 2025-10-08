@@ -39,12 +39,12 @@ export class ReservationService {
 	private mapResponseToReservation(dto: ReservationResponseDTO): IReservation {
 		const startDate = new Date(dto.startTime);
 		return {
-			reservationId: dto.reservationId.toString(),
+			reservationId: dto.reservationId,
 			status: dto.status as 'Pending' | 'Confirmed' | 'Unconfirmed',
 			createdAtIsoDate: dto.createdAt,
 			type: dto.reservationType as 'Standard' | 'Substitution' | 'Contingency',
-			userId: dto.userId.toString(),
-			boatId: dto.boatId.toString(),
+			userId: dto.userId,
+			boatId: dto.boatId,
 			year: startDate.getFullYear(),
 			month: startDate.getMonth() + 1, // JS months are 0-indexed
 			day: startDate.getDate()
@@ -67,7 +67,7 @@ export class ReservationService {
 		});
 	}
 
-	getReservationsByBoatId(boatId: string): Promise<IReservation[]> {
+	getReservationsByBoatId(boatId: number): Promise<IReservation[]> {
 		return new Promise((resolve, reject) => {
 			this._httpClient.get<ReservationResponseDTO[]>(`${this.baseUrl}/boat/${boatId}`).subscribe({
 				next: result => {
@@ -83,7 +83,7 @@ export class ReservationService {
 		});
 	}
 
-	getReservationsByUserId(userId: string): Promise<IReservation[]> {
+	getReservationsByUserId(userId: number): Promise<IReservation[]> {
 		return new Promise((resolve, reject) => {
 			this._httpClient.get<ReservationResponseDTO[]>(`${this.baseUrl}/user/${userId}`).subscribe({
 				next: result => {
@@ -99,11 +99,11 @@ export class ReservationService {
 		});
 	}
 
-	getReservationByDateAndBoatId(day: number, month: number, year: number, boatId: string): Promise<IReservation> {
+	getReservationByDateAndBoatId(day: number, month: number, year: number, boatId: number): Promise<IReservation> {
 		return new Promise((resolve, reject) => {
 			// Create a query URL with date parameters
 			const url = `${this.baseUrl}/by-date-and-boatId?day=${day}&month=${month}&year=${year}&boatId=${boatId}`;
-	
+
 			this._httpClient.get<ReservationResponseDTO>(url).subscribe({
 				next: result => {
 					console.debug(`getReservationByDate: url ${url} result`, result);
@@ -126,7 +126,7 @@ export class ReservationService {
 			const endTime = new Date(reservation.year, reservation.month - 1, reservation.day, 18, 0, 0); // 6:00 PM
 			
 			const createReservationDto = {
-				boatId: parseInt(reservation.boatId),
+				boatId: reservation.boatId,
 				startTime: startTime.toISOString(),
 				endTime: endTime.toISOString(),
 				reservationType: reservation.type,
@@ -155,11 +155,10 @@ export class ReservationService {
 				return;
 			}
 
-			// Convert string to number for ReservationDTO
 			const reservationDto = {
-				reservationId: parseInt(reservation.reservationId),
-				userId: parseInt(reservation.userId),
-				boatId: parseInt(reservation.boatId),
+				reservationId: reservation.reservationId,
+				userId: reservation.userId,
+				boatId: reservation.boatId,
 				startTime: new Date(reservation.year, reservation.month - 1, reservation.day, 6, 0, 0).toISOString(),
 				endTime: new Date(reservation.year, reservation.month - 1, reservation.day, 18, 0, 0).toISOString(),
 				reservationType: reservation.type,
@@ -208,7 +207,7 @@ export class ReservationService {
 	
 	
 
-	deleteReservationById(id: string): Promise<void> {
+	deleteReservationById(id: number): Promise<void> {
 		return new Promise((resolve, reject) => {
 			this._httpClient.delete<void>(`${this.baseUrl}/${id}`).subscribe({
 				next: result => {

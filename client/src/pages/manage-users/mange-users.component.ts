@@ -22,7 +22,7 @@ export class ManageUsersComponent implements OnInit {
 	users: IUser[] = [];
 	reservationsByUserId: IReservation[] = [];
 	user: IUser | null = null;
-	userId: string | null = null;
+	userId: number | null = null;
 
 	currentUser: IUser | null = null;
   
@@ -50,7 +50,7 @@ export class ManageUsersComponent implements OnInit {
 		});
 	}
   
-	onSelectUserId(userId: string | null): void {
+	onSelectUserId(userId: number | null): void {
 	  if (userId) {
 			this.userId = userId;
 			this.user = this.users?.find(x => x.userId === userId) || null;
@@ -60,7 +60,7 @@ export class ManageUsersComponent implements OnInit {
 	  }
 	}
   
-	private getReservationsByUserId(userId: string) {
+	private getReservationsByUserId(userId: number) {
 	  this._reservationService.getReservationsByUserId(userId).then(reservationsByUserId => {
 		reservationsByUserId.forEach(reservation => {
 		  if (!this.reservationsByUserId.some(r => r.reservationId === reservation.reservationId)) {

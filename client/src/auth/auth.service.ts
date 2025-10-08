@@ -88,7 +88,7 @@ export class AuthService {
     });
   }
 
-  updateUserPassword(userId: string, newPassword: string): Promise<void> {
+  updateUserPassword(userId: number, newPassword: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this._httpClient.put<void>(`${this.apiUrl}/new-password`, { userId, newPassword })
         .subscribe({

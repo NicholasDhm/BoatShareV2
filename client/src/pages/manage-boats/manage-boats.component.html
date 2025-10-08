@@ -1,11 +1,11 @@
 <ui-card layout="vertical" class="manage_boats_container" justifyContent="space-between" gapStyle="large">
   <ui-card alignItems="center">
     <h4 class="m-0">Todos os Barcos</h4>
-    <select [ngModel]="boatId" (ngModelChange)="onSelectBoatId($event)">
+    <select [ngModel]="boatId" (ngModelChange)="onSelectBoatId(+$event)">
       @for (boat of boats; track boat.boatId) {
         <option value="{{ boat.boatId }}" [selected]="boat.boatId === boatId">{{ boat.name }}</option>
       }
-    </select>  
+    </select>
   </ui-card>
 
   @if (boat) {

@@ -22,12 +22,12 @@ export class ManageBoatsComponent implements OnInit {
   boats: IBoat[] = [];
   reservationsByBoatId: IReservation[] = [];
   boat: IBoat | null = null;
-  boatId: string | null = null;
+  boatId: number | null = null;
 
   addBoatModal = false;
   newBoatName: string = '';
   newBoatCapacity: number = 0;
-  deleteBoatId: string = '';
+  deleteBoatId: number = 0;
 
   constructor(
     private _boatService: BoatService,
@@ -48,7 +48,7 @@ export class ManageBoatsComponent implements OnInit {
     });
   }
 
-  onSelectBoatId(boatId: string | null): void {
+  onSelectBoatId(boatId: number | null): void {
     if (boatId) {
       this.boatId = boatId;
       this.boat = this.boats?.find(x => x.boatId === boatId) || null;
@@ -58,7 +58,7 @@ export class ManageBoatsComponent implements OnInit {
     }
   }
 
-  private getReservationsByBoatId(boatId: string) {
+  private getReservationsByBoatId(boatId: number) {
     this._reservationService.getReservationsByBoatId(boatId).then(reservationsByBoatId => {
       reservationsByBoatId.forEach(reservation => {
         if (!this.reservationsByBoatId.some(r => r.reservationId === reservation.reservationId)) {
@@ -74,7 +74,7 @@ export class ManageBoatsComponent implements OnInit {
 
   addNewBoat(): void {
     const newBoat: IBoat = {
-      boatId: '',
+      boatId: 0,
       name: this.newBoatName || '',
       capacity: this.newBoatCapacity || 0,
       assignedUsersCount: 0,

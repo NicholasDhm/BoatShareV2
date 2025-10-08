@@ -77,7 +77,7 @@ export class UserService {
     });
   }
 	
-	getUserById(userId: string): Promise<IUser> {
+	getUserById(userId: number): Promise<IUser> {
 		const url = this.baseUrl + `/${userId}`;
 		return new Promise((resolve, reject) => {
 			this._httpClient.get<IUser>(url).subscribe({

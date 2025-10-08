@@ -5,7 +5,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { UiCardComponent } from '../../components/ui-card/ui-card.component';
 import { AuthService } from '../../auth/auth.service';
 
 interface LoginForm {
@@ -17,9 +16,8 @@ interface LoginForm {
   selector: 'app-login',
   standalone: true,
   imports: [
-    CommonModule, 
-    UiCardComponent, 
-    RouterModule, 
+    CommonModule,
+    RouterModule,
     ReactiveFormsModule
   ],
   templateUrl: './login.component.html',

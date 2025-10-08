@@ -45,7 +45,7 @@ export class BoatService {
     });
   }
   
-  getBoatByBoatId(boatId: string): Promise<IBoat> {
+  getBoatByBoatId(boatId: number): Promise<IBoat> {
     return new Promise((resolve, reject) => {
       this._httpClient.get<IBoat>(`${this.baseUrl}/${boatId}`).subscribe({
         next: result => {
@@ -79,15 +79,15 @@ export class BoatService {
     });
   }
 
-  deleteBoatById(id: string): Promise<void> {
+  deleteBoatById(id: number): Promise<void> {
     return new Promise((resolve, reject) => {
       this._httpClient.delete(`${this.baseUrl}/${id}`).subscribe({
         next: () => {
           console.debug(`deleteBoatById: url ${this.baseUrl}/${id} succeeded`);
-  
+
           const currentBoats = this._boatsSubject.getValue().filter(boat => boat.boatId !== id);
           this._boatsSubject.next(currentBoats); // Update the BehaviorSubject
-  
+
           resolve(); // Resolve with no value since we don't return the deleted boat
         },
         error: err => {

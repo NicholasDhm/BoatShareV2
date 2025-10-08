@@ -1,11 +1,11 @@
 <ui-card layout="vertical" class="manage_users_container" justifyContent="space-between" gapStyle="large">
   <ui-card alignItems="center">
     <h4 class="m-0">Todos os Usuários</h4>
-    <select [ngModel]="userId" (ngModelChange)="onSelectUserId($event)">
+    <select [ngModel]="userId" (ngModelChange)="onSelectUserId(+$event)">
       @for (user of users; track user.userId) {
         <option value="{{ user.userId }}" [selected]="user.userId === userId">{{ user.name }}</option>
       }
-    </select>  
+    </select>
   </ui-card>
 
   @if (user) {
