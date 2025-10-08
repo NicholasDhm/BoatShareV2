@@ -181,8 +181,15 @@ namespace boat_share.Models
         [NotMapped]
         public string Status => IsActive ? "Active" : "Inactive";
 
-        // Navigation property for EF Core
+        // Navigation properties for EF Core
         [ForeignKey("BoatId")]
         public virtual Boat? Boat { get; set; }
+
+        public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+
+        /// <summary>
+        /// Soft delete timestamp - when set, user is considered deleted
+        /// </summary>
+        public DateTime? DeletedAt { get; set; }
     }
 }

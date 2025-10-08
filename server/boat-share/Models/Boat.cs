@@ -32,11 +32,9 @@ namespace boat_share.Models
 
         public bool IsActive { get; set; } = true;
 
-        public int AssignedUsersCount { get; set; } = 0;
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
         /// Updates the UpdatedAt timestamp
@@ -47,10 +45,25 @@ namespace boat_share.Models
         }
 
         /// <summary>
+        /// Soft delete timestamp - when set, boat is considered deleted
+        /// </summary>
+        public DateTime? DeletedAt { get; set; }
+
+        // Navigation properties for EF Core
+        public virtual ICollection<User> Users { get; set; } = new List<User>();
+        public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+
+        /// <summary>
+        /// Gets the actual count of assigned users (replaces manual count)
+        /// </summary>
+        [NotMapped]
+        public int AssignedUsersCount => Users?.Count(u => u.IsActive && u.DeletedAt == null) ?? 0;
+
+        /// <summary>
         /// Checks if the boat is available for new assignments
         /// </summary>
         [NotMapped]
-        public bool IsAvailableForAssignment => IsActive && AssignedUsersCount < Capacity;
+        public bool IsAvailableForAssignment => IsActive && DeletedAt == null && AssignedUsersCount < Capacity;
 
         /// <summary>
         /// Gets the remaining capacity for user assignments
@@ -62,7 +75,7 @@ namespace boat_share.Models
         /// Gets the boat's status as a string
         /// </summary>
         [NotMapped]
-        public string Status => IsActive ? "Active" : "Inactive";
+        public string Status => DeletedAt != null ? "Deleted" : (IsActive ? "Active" : "Inactive");
 
         /// <summary>
         /// Gets a summary of the boat's assignment status

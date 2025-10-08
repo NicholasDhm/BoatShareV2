@@ -115,17 +115,6 @@ namespace boat_share.Services
                     return null; // Boat doesn't exist
                 }
 
-                // Update boat counts
-                var oldBoat = user.Boat;
-                if (oldBoat != null)
-                {
-                    oldBoat.AssignedUsersCount--;
-                    oldBoat.MarkAsUpdated();
-                }
-
-                newBoat.AssignedUsersCount++;
-                newBoat.MarkAsUpdated();
-
                 user.BoatId = userUpdateDto.BoatId.Value;
             }
 
@@ -152,17 +141,18 @@ namespace boat_share.Services
 
         public async Task<bool> DeleteUserAsync(int userId)
         {
-            var user = await _context.Users.Include(u => u.Boat).FirstOrDefaultAsync(u => u.UserId == userId);
+            // Use IgnoreQueryFilters to find even soft-deleted users
+            var user = await _context.Users
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+
             if (user == null) return false;
 
-            // Update boat's assigned users count
-            if (user.Boat != null)
-            {
-                user.Boat.AssignedUsersCount--;
-                user.Boat.MarkAsUpdated();
-            }
+            // Soft delete - set DeletedAt timestamp
+            user.DeletedAt = DateTime.UtcNow;
+            user.IsActive = false;
+            user.MarkAsUpdated();
 
-            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             return true;
         }

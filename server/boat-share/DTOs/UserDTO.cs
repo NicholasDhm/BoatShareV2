@@ -13,9 +13,6 @@ namespace boat_share.DTOs
         public required string Name { get; set; }
 
         [Required]
-        [StringLength(100, MinimumLength = 8)]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$",
-            ErrorMessage = "Password must contain at least 8 characters, including uppercase, lowercase, number, and special character (@$!%*?&)")]
         public required string Password { get; set; }
 
         [Required]
@@ -66,9 +63,6 @@ namespace boat_share.DTOs
         public required string Name { get; set; }
 
         [Required]
-        [StringLength(100, MinimumLength = 8)]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$",
-            ErrorMessage = "Password must contain at least 8 characters, including uppercase, lowercase, number, and special character (@$!%*?&)")]
         public required string Password { get; set; }
 
         [Required]
@@ -127,9 +121,6 @@ namespace boat_share.DTOs
         public required int UserId { get; set; }
 
         [Required]
-        [StringLength(100, MinimumLength = 8)]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$",
-            ErrorMessage = "Password must contain at least 8 characters, including uppercase, lowercase, number, and special character")]
         public required string NewPassword { get; set; }
     }
 }

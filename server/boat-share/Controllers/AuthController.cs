@@ -131,11 +131,6 @@ namespace boat_share.Controllers
                 };
 
                 _context.Users.Add(newUser);
-
-                // Update boat's assigned users count
-                boat.AssignedUsersCount++;
-                boat.MarkAsUpdated();
-
                 await _context.SaveChangesAsync();
 
                 // Generate JWT token for automatic login

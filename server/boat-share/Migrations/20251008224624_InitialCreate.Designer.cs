@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using boat_share.Data;
 
 #nullable disable
@@ -12,66 +11,62 @@ using boat_share.Data;
 namespace boat_share.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250812125422_InitialCreate")]
+    [Migration("20251008224624_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
 
             modelBuilder.Entity("boat_share.Models.Boat", b =>
                 {
                     b.Property<int>("BoatId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("BoatId"));
-
-                    b.Property<int>("AssignedUsersCount")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Capacity")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("HourlyRate")
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("BoatId");
+
+                    b.HasIndex("DeletedAt");
 
                     b.ToTable("Boats");
 
@@ -79,30 +74,26 @@ namespace boat_share.Migrations
                         new
                         {
                             BoatId = 1,
-                            AssignedUsersCount = 0,
                             Capacity = 6,
-                            CreatedAt = new DateTime(2025, 8, 12, 12, 54, 21, 723, DateTimeKind.Utc).AddTicks(6830),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Beautiful 30ft sailing yacht perfect for day trips",
                             HourlyRate = 150.00m,
                             IsActive = true,
                             Location = "Marina Bay",
                             Name = "Ocean Explorer",
-                            Type = "Sailing Yacht",
-                            UpdatedAt = new DateTime(2025, 8, 12, 12, 54, 21, 723, DateTimeKind.Utc).AddTicks(6960)
+                            Type = "Sailing Yacht"
                         },
                         new
                         {
                             BoatId = 2,
-                            AssignedUsersCount = 0,
                             Capacity = 4,
-                            CreatedAt = new DateTime(2025, 8, 12, 12, 54, 21, 723, DateTimeKind.Utc).AddTicks(7070),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Fast motor boat for thrilling water adventures",
                             HourlyRate = 200.00m,
                             IsActive = true,
                             Location = "Harbor Point",
                             Name = "Speed Demon",
-                            Type = "Motor Boat",
-                            UpdatedAt = new DateTime(2025, 8, 12, 12, 54, 21, 723, DateTimeKind.Utc).AddTicks(7070)
+                            Type = "Motor Boat"
                         });
                 });
 
@@ -110,51 +101,63 @@ namespace boat_share.Migrations
                 {
                     b.Property<int>("ReservationId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ReservationId"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("BoatId")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ReservationType")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("TotalCost")
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ReservationId");
 
+                    b.HasIndex("BoatId");
+
+                    b.HasIndex("ReservationType");
+
+                    b.HasIndex("StartTime");
+
+                    b.HasIndex("Status");
+
                     b.HasIndex("UserId");
 
+                    b.HasIndex("UserId", "EndTime");
+
+                    b.HasIndex("UserId", "ReservationType");
+
                     b.HasIndex("BoatId", "StartTime", "EndTime");
+
+                    b.HasIndex("BoatId", "Status", "StartTime", "EndTime");
 
                     b.ToTable("Reservations");
                 });
@@ -163,57 +166,62 @@ namespace boat_share.Migrations
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("BoatId")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("ContingencyQuota")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("StandardQuota")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("SubstitutionQuota")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("UserId");
 
                     b.HasIndex("BoatId");
 
+                    b.HasIndex("DeletedAt");
+
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("Role");
 
                     b.ToTable("Users");
 
@@ -223,28 +231,27 @@ namespace boat_share.Migrations
                             UserId = 1,
                             BoatId = 1,
                             ContingencyQuota = 3,
-                            CreatedAt = new DateTime(2025, 8, 12, 12, 54, 21, 894, DateTimeKind.Utc).AddTicks(9470),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "admin@boatshare.com",
                             IsActive = true,
                             Name = "Admin User",
-                            PasswordHash = "$2a$11$CVj7neFuB0D4y4EaF/rBTu6TuVBTUXnpVeU9mexzYEC/vqut3Qh1q",
+                            PasswordHash = "$2a$11$XQUcMJK7fX6xYynk46Luyu9GZPbehLd9tFaaBii7mATFTkTXHlfNu",
                             Role = "Admin",
                             StandardQuota = 10,
-                            SubstitutionQuota = 5,
-                            UpdatedAt = new DateTime(2025, 8, 12, 12, 54, 21, 894, DateTimeKind.Utc).AddTicks(9630)
+                            SubstitutionQuota = 5
                         });
                 });
 
             modelBuilder.Entity("boat_share.Models.Reservation", b =>
                 {
                     b.HasOne("boat_share.Models.Boat", "Boat")
-                        .WithMany()
+                        .WithMany("Reservations")
                         .HasForeignKey("BoatId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("boat_share.Models.User", "User")
-                        .WithMany()
+                        .WithMany("Reservations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -257,12 +264,24 @@ namespace boat_share.Migrations
             modelBuilder.Entity("boat_share.Models.User", b =>
                 {
                     b.HasOne("boat_share.Models.Boat", "Boat")
-                        .WithMany()
+                        .WithMany("Users")
                         .HasForeignKey("BoatId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Boat");
+                });
+
+            modelBuilder.Entity("boat_share.Models.Boat", b =>
+                {
+                    b.Navigation("Reservations");
+
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("boat_share.Models.User", b =>
+                {
+                    b.Navigation("Reservations");
                 });
 #pragma warning restore 612, 618
         }

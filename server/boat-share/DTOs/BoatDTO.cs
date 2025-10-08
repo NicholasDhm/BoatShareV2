@@ -29,10 +29,10 @@ namespace boat_share.DTOs
         public bool IsActive { get; set; } = true;
         
         public int AssignedUsersCount { get; set; } = 0;
-        
+
         public DateTime CreatedAt { get; set; }
-        
-        public DateTime UpdatedAt { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
     }
 
     public class BoatCreateDTO

@@ -29,9 +29,9 @@ namespace boat_share.Data
                 entity.Property(e => e.CreatedAt).IsRequired();
                 entity.Property(e => e.UpdatedAt);
 
-                // User-Boat relationship
+                // User-Boat relationship with navigation
                 entity.HasOne(u => u.Boat)
-                    .WithMany()
+                    .WithMany(b => b.Users)
                     .HasForeignKey(u => u.BoatId)
                     .OnDelete(DeleteBehavior.Restrict);
 
@@ -39,6 +39,10 @@ namespace boat_share.Data
                 entity.HasIndex(e => e.Email).IsUnique();
                 entity.HasIndex(e => e.BoatId);
                 entity.HasIndex(e => e.Role);
+                entity.HasIndex(e => e.DeletedAt);
+
+                // Global query filter for soft delete
+                entity.HasQueryFilter(u => u.DeletedAt == null);
             });
 
             // Boat entity configuration
@@ -54,7 +58,14 @@ namespace boat_share.Data
                 entity.Property(e => e.HourlyRate).HasColumnType("decimal(10,2)");
                 entity.Property(e => e.IsActive).IsRequired();
                 entity.Property(e => e.CreatedAt).IsRequired();
-                entity.Property(e => e.UpdatedAt).IsRequired();
+                entity.Property(e => e.UpdatedAt);
+                entity.Property(e => e.DeletedAt);
+
+                // Indexes
+                entity.HasIndex(e => e.DeletedAt);
+
+                // Global query filter for soft delete
+                entity.HasQueryFilter(b => b.DeletedAt == null);
             });
 
             // Reservation entity configuration
@@ -73,14 +84,14 @@ namespace boat_share.Data
                 entity.Property(e => e.CreatedAt).IsRequired();
                 entity.Property(e => e.UpdatedAt).IsRequired();
 
-                // Foreign key relationships - explicitly configure
+                // Foreign key relationships with navigation properties
                 entity.HasOne(r => r.User)
-                    .WithMany()
+                    .WithMany(u => u.Reservations)
                     .HasForeignKey(r => r.UserId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(r => r.Boat)
-                    .WithMany()
+                    .WithMany(b => b.Reservations)
                     .HasForeignKey(r => r.BoatId)
                     .OnDelete(DeleteBehavior.Restrict);
 
@@ -88,8 +99,15 @@ namespace boat_share.Data
                 entity.HasIndex(e => e.UserId);
                 entity.HasIndex(e => e.BoatId);
                 entity.HasIndex(e => e.Status);
+                entity.HasIndex(e => e.ReservationType);
                 entity.HasIndex(e => e.StartTime);
                 entity.HasIndex(e => new { e.BoatId, e.StartTime, e.EndTime });
+                entity.HasIndex(e => new { e.BoatId, e.Status, e.StartTime, e.EndTime });
+                entity.HasIndex(e => new { e.UserId, e.EndTime });
+                entity.HasIndex(e => new { e.UserId, e.ReservationType });
+
+                // Global query filter to match Boat's soft delete filter
+                entity.HasQueryFilter(r => r.Boat != null && r.Boat.DeletedAt == null && r.User != null && r.User.DeletedAt == null);
             });
 
             // Seed initial data
@@ -98,6 +116,9 @@ namespace boat_share.Data
 
         private void SeedData(ModelBuilder modelBuilder)
         {
+            // Use static datetime for seeding to avoid model changes warning
+            var seedDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
             // Seed sample boats first
             modelBuilder.Entity<Boat>().HasData(
                 new Boat
@@ -110,9 +131,7 @@ namespace boat_share.Data
                     Capacity = 6,
                     HourlyRate = 150.00m,
                     IsActive = true,
-                    AssignedUsersCount = 0,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    CreatedAt = seedDate
                 },
                 new Boat
                 {
@@ -124,13 +143,12 @@ namespace boat_share.Data
                     Capacity = 4,
                     HourlyRate = 200.00m,
                     IsActive = true,
-                    AssignedUsersCount = 0,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    CreatedAt = seedDate
                 }
             );
 
             // Seed a default admin user
+            // Pre-hashed password for "admin123" (BCrypt hash is static to avoid model changes)
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
@@ -142,10 +160,9 @@ namespace boat_share.Data
                     SubstitutionQuota = 5,
                     ContingencyQuota = 3,
                     BoatId = 1,
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+                    PasswordHash = "$2a$11$XQUcMJK7fX6xYynk46Luyu9GZPbehLd9tFaaBii7mATFTkTXHlfNu",
                     IsActive = true,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    CreatedAt = seedDate
                 }
             );
         }

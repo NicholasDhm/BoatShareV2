@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("boat-shareTests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1f4343ca2ae6e270f4f4a95b32241fe94a393f1d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cc4737b3e9e3ffb6e117d79636da1fef6395a2d8")]
 [assembly: System.Reflection.AssemblyProductAttribute("boat-shareTests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("boat-shareTests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

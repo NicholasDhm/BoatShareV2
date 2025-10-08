@@ -53,15 +53,11 @@ export class LoginComponent implements OnInit, OnDestroy {
   private createLoginForm(): FormGroup {
     return this.formBuilder.group({
       email: ['', [
-        Validators.required, 
+        Validators.required,
         Validators.email,
         Validators.maxLength(255)
       ]],
-      password: ['', [
-        Validators.required, 
-        Validators.minLength(6),
-        Validators.maxLength(128)
-      ]],
+      password: ['', Validators.required],
     });
   }
 
@@ -126,12 +122,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   get passwordErrorMessage(): string {
     if (this.password?.errors?.['required']) {
       return 'Password is required';
-    }
-    if (this.password?.errors?.['minlength']) {
-      return 'Password must be at least 6 characters';
-    }
-    if (this.password?.errors?.['maxlength']) {
-      return 'Password is too long';
     }
     return '';
   }

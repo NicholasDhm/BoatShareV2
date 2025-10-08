@@ -8,16 +8,23 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Entity Framework - use in-memory DB for Testing, PostgreSQL otherwise
+// Add Entity Framework - use in-memory DB for Testing, SQLite for Development, PostgreSQL for Production
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     if (builder.Environment.IsEnvironment("Testing"))
     {
         options.UseInMemoryDatabase("BoatShare_TestDB_Program");
     }
+    else if (builder.Environment.IsDevelopment())
+    {
+        // Use SQLite for local development (easier setup, no external dependencies)
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+            ?? "Data Source=boatshare.db";
+        options.UseSqlite(connectionString);
+    }
     else
     {
-        // Use environment variable first, fall back to config
+        // Use PostgreSQL for production
         var connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")
             ?? builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Database connection string not configured");
@@ -82,20 +89,21 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Initialize database
+// Initialize database - use migrations instead of EnsureCreated
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     try
     {
-        Console.WriteLine("Creating database...");
-        context.Database.EnsureCreated();
-        Console.WriteLine("Database created successfully!");
+        Console.WriteLine("Applying database migrations...");
+        context.Database.Migrate();
+        Console.WriteLine("Database migrations applied successfully!");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error creating database: {ex.Message}");
-        throw;
+        Console.WriteLine($"Error applying migrations: {ex.Message}");
+        Console.WriteLine("Note: If database doesn't exist, create it manually first.");
+        // Don't throw - let the app start anyway
     }
 }
 

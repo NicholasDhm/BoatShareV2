@@ -152,50 +152,65 @@ namespace boat_share.Services
 
         public async Task<Reservation> CreateReservationAsync(CreateReservationDTO createReservationDto, int userId)
         {
-            // Get user to check quotas
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-                throw new ArgumentException("User not found");
+            // Use transaction with pessimistic locking to prevent quota race conditions
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            // Check if user has sufficient quota for this reservation type
-            if (!user.HasSufficientQuota(createReservationDto.ReservationType))
+            try
             {
-                throw new InvalidOperationException($"Insufficient {createReservationDto.ReservationType} quota. Available: {GetUserQuotaForType(user, createReservationDto.ReservationType)}");
+                // Lock user row for update (prevents concurrent quota modifications)
+                var user = await _context.Users
+                    .FromSqlRaw(@"SELECT * FROM ""Users"" WHERE ""UserId"" = {0} FOR UPDATE", userId)
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
+                    throw new ArgumentException("User not found");
+
+                // Check if user has sufficient quota for this reservation type
+                if (!user.HasSufficientQuota(createReservationDto.ReservationType))
+                {
+                    throw new InvalidOperationException($"Insufficient {createReservationDto.ReservationType} quota. Available: {GetUserQuotaForType(user, createReservationDto.ReservationType)}");
+                }
+
+                // Get boat to calculate cost
+                var boat = await _context.Boats.FindAsync(createReservationDto.BoatId);
+                if (boat == null)
+                    throw new ArgumentException("Boat not found");
+
+                var duration = (createReservationDto.EndTime - createReservationDto.StartTime).TotalHours;
+                var totalCost = (decimal)duration * boat.HourlyRate;
+
+                // Determine initial status based on business rules
+                var initialStatus = await DetermineReservationStatus(createReservationDto.StartTime, createReservationDto.BoatId, userId);
+
+                // Deduct quota from user (now safe from race conditions)
+                if (!user.DeductQuota(createReservationDto.ReservationType))
+                {
+                    throw new InvalidOperationException($"Failed to deduct {createReservationDto.ReservationType} quota");
+                }
+
+                var reservation = new Reservation
+                {
+                    UserId = userId,
+                    BoatId = createReservationDto.BoatId,
+                    StartTime = createReservationDto.StartTime,
+                    EndTime = createReservationDto.EndTime,
+                    ReservationType = createReservationDto.ReservationType,
+                    Status = initialStatus,
+                    Notes = createReservationDto.Notes ?? string.Empty,
+                    TotalCost = totalCost
+                };
+
+                _context.Reservations.Add(reservation);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return reservation;
             }
-
-            // Get boat to calculate cost
-            var boat = await _context.Boats.FindAsync(createReservationDto.BoatId);
-            if (boat == null)
-                throw new ArgumentException("Boat not found");
-
-            var duration = (createReservationDto.EndTime - createReservationDto.StartTime).TotalHours;
-            var totalCost = (decimal)duration * boat.HourlyRate;
-
-            // Determine initial status based on business rules
-            var initialStatus = await DetermineReservationStatus(createReservationDto.StartTime, createReservationDto.BoatId, userId);
-
-            // Deduct quota from user
-            if (!user.DeductQuota(createReservationDto.ReservationType))
+            catch
             {
-                throw new InvalidOperationException($"Failed to deduct {createReservationDto.ReservationType} quota");
+                await transaction.RollbackAsync();
+                throw;
             }
-
-            var reservation = new Reservation
-            {
-                UserId = userId,
-                BoatId = createReservationDto.BoatId,
-                StartTime = createReservationDto.StartTime,
-                EndTime = createReservationDto.EndTime,
-                ReservationType = createReservationDto.ReservationType,
-                Status = initialStatus,
-                Notes = createReservationDto.Notes ?? string.Empty,
-                TotalCost = totalCost
-            };
-
-            _context.Reservations.Add(reservation);
-            await _context.SaveChangesAsync();
-
-            return reservation;
         }
 
         /// <summary>
