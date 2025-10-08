@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace boat_share.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class BoatsController : ControllerBase
@@ -18,9 +17,38 @@ namespace boat_share.Controllers
         }
 
         /// <summary>
-        /// Get all boats
+        /// Get basic boat info for registration (public access)
+        /// </summary>
+        [HttpGet("public")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<object>>> GetPublicBoats()
+        {
+            try
+            {
+                var boats = await _boatService.GetBoatsAsync();
+                // Return only minimal boat info for registration
+                var publicBoats = boats
+                    .Where(b => b.IsActive && (b.Capacity - b.AssignedUsersCount) > 0)
+                    .Select(b => new
+                    {
+                        b.BoatId,
+                        b.Name,
+                        b.Capacity,
+                        b.AssignedUsersCount
+                    });
+                return Ok(publicBoats);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving boats" });
+            }
+        }
+
+        /// <summary>
+        /// Get all boats (requires authentication)
         /// </summary>
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<List<BoatDTO>>> GetBoats()
         {
             try
@@ -35,7 +63,7 @@ namespace boat_share.Controllers
         }
 
         /// <summary>
-        /// Get boat by ID
+        /// Get boat by ID (requires authentication)
         /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<BoatDTO>> GetBoat(int id)

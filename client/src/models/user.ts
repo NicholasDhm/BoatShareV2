@@ -1,18 +1,19 @@
 export interface IUser {
-	userId: string;
+	userId: number;
 	name: string;
 	email: string;
 	role: 'Member' | 'Admin';
 	standardQuota: number;
 	substitutionQuota: number;
 	contingencyQuota: number;
-	boatId: string;
+	boatId: number;
+	boatName?: string;
 	passwordHash?: string;
 }
 
 export interface UserDTO {
 	name: string;
 	email: string;
-	boatId: string;
+	boatId: number;
 	password: string;
 }

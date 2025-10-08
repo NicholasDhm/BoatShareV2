@@ -21,8 +21,8 @@ export class AuthService {
     return this._httpClient.post<{ token: string; user: IUser }>(`${this.apiUrl}/login`, { email, password })
       .subscribe(response => {
         const token = response.token; // Get the token from the response
-        localStorage.setItem('authToken', token); // Store token in localStorage
-  
+        sessionStorage.setItem('authToken', token); // Store token in sessionStorage (more secure)
+
         const userViewModel: IUser = {
           userId: response.user.userId, // Access user properties from the response
           name: response.user.name,
@@ -31,10 +31,11 @@ export class AuthService {
           standardQuota: response.user.standardQuota,
           substitutionQuota: response.user.substitutionQuota,
           contingencyQuota: response.user.contingencyQuota,
-          boatId: response.user.boatId
+          boatId: response.user.boatId,
+          boatName: response.user.boatName
         };
         this._userService.setCurrentUser(userViewModel);
-  
+
         this._router.navigate(['/dashboard']); // Redirect after login
       }, error => {
         console.error('Login failed', error);
@@ -42,20 +43,23 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('authToken'); // Clear token from localStorage
+    sessionStorage.removeItem('authToken'); // Clear token from sessionStorage
+    localStorage.removeItem('currentUser'); // Clear user data from localStorage
     this._userService.clearCurrentUser(); // Clear user data in UserService
     this._router.navigate(['/login']); // Redirect to login page
   }
 
   initializeSession(): void {
-    const token = localStorage.getItem('authToken');
+    const token = sessionStorage.getItem('authToken');
     if (token) {
       // Restore user data from localStorage if available
       const user = localStorage.getItem('currentUser');
       if (user) {
         this._userService.setCurrentUser(JSON.parse(user));
+        this._router.navigate(['/dashboard']);
+      } else {
+        this._router.navigate(['/login']);
       }
-      // Optionally set the token in a service if necessary
     } else {
       this._router.navigate(['/login']);
     }

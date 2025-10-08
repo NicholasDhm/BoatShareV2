@@ -17,9 +17,9 @@ export class BoatService {
     private _httpClient: HttpClient
   ) {}
 
-  // Method to fetch boats from the API
+  // Method to fetch boats from the API (public - for registration)
   fetchBoats(): void {
-    this._httpClient.get<IBoat[]>(this.baseUrl).subscribe({
+    this._httpClient.get<IBoat[]>(`${this.baseUrl}/public`).subscribe({
       next: boats => {
         this._boatsSubject.next(boats); // Update the BehaviorSubject
       },

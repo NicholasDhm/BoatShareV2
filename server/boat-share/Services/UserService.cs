@@ -88,8 +88,10 @@ namespace boat_share.Services
 
         public async Task<UserInfoDTO?> UpdateUserAsync(int userId, UserUpdateDTO userUpdateDto)
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.Users.Include(u => u.Boat).FirstOrDefaultAsync(u => u.UserId == userId);
             if (user == null) return null;
+
+            var oldBoatId = user.BoatId;
 
             if (!string.IsNullOrEmpty(userUpdateDto.Email))
             {
@@ -104,13 +106,26 @@ namespace boat_share.Services
             if (!string.IsNullOrEmpty(userUpdateDto.Name))
                 user.Name = userUpdateDto.Name;
 
-            if (userUpdateDto.BoatId.HasValue)
+            if (userUpdateDto.BoatId.HasValue && userUpdateDto.BoatId.Value != oldBoatId)
             {
                 // Check if boat exists
-                if (!await _context.Boats.AnyAsync(b => b.BoatId == userUpdateDto.BoatId.Value))
+                var newBoat = await _context.Boats.FindAsync(userUpdateDto.BoatId.Value);
+                if (newBoat == null)
                 {
                     return null; // Boat doesn't exist
                 }
+
+                // Update boat counts
+                var oldBoat = user.Boat;
+                if (oldBoat != null)
+                {
+                    oldBoat.AssignedUsersCount--;
+                    oldBoat.MarkAsUpdated();
+                }
+
+                newBoat.AssignedUsersCount++;
+                newBoat.MarkAsUpdated();
+
                 user.BoatId = userUpdateDto.BoatId.Value;
             }
 
@@ -137,8 +152,15 @@ namespace boat_share.Services
 
         public async Task<bool> DeleteUserAsync(int userId)
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.Users.Include(u => u.Boat).FirstOrDefaultAsync(u => u.UserId == userId);
             if (user == null) return false;
+
+            // Update boat's assigned users count
+            if (user.Boat != null)
+            {
+                user.Boat.AssignedUsersCount--;
+                user.Boat.MarkAsUpdated();
+            }
 
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
@@ -155,6 +177,25 @@ namespace boat_share.Services
             await _context.SaveChangesAsync();
 
             return await GetUserByIdAsync(userId);
+        }
+
+        public async Task<List<UserListDTO>> SearchUsersByNameAsync(string partialName)
+        {
+            return await _context.Users
+                .Include(u => u.Boat)
+                .Where(u => u.Name.Contains(partialName))
+                .Select(u => new UserListDTO
+                {
+                    UserId = u.UserId,
+                    Email = u.Email,
+                    Name = u.Name,
+                    Role = u.Role,
+                    BoatId = u.BoatId,
+                    BoatName = u.Boat != null ? u.Boat.Name : null,
+                    IsActive = u.IsActive,
+                    CreatedAt = u.CreatedAt
+                })
+                .ToListAsync();
         }
     }
 }

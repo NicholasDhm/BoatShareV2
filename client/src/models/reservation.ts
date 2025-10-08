@@ -1,11 +1,11 @@
 export interface IReservation {
-	reservationId?: string;
+	reservationId?: number;
 	status?: 'Pending' | 'Confirmed' | 'Unconfirmed';
 	createdAtIsoDate?: string;
-	
+
 	type: ReservationType;
-	userId: string;
-	boatId: string;
+	userId: number;
+	boatId: number;
 	year: number;
 	month: number;
 	day: number;

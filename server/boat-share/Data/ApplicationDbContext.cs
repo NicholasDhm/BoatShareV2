@@ -35,7 +35,10 @@ namespace boat_share.Data
                     .HasForeignKey(u => u.BoatId)
                     .OnDelete(DeleteBehavior.Restrict);
 
+                // Indexes
                 entity.HasIndex(e => e.Email).IsUnique();
+                entity.HasIndex(e => e.BoatId);
+                entity.HasIndex(e => e.Role);
             });
 
             // Boat entity configuration
@@ -81,6 +84,11 @@ namespace boat_share.Data
                     .HasForeignKey(r => r.BoatId)
                     .OnDelete(DeleteBehavior.Restrict);
 
+                // Indexes for performance
+                entity.HasIndex(e => e.UserId);
+                entity.HasIndex(e => e.BoatId);
+                entity.HasIndex(e => e.Status);
+                entity.HasIndex(e => e.StartTime);
                 entity.HasIndex(e => new { e.BoatId, e.StartTime, e.EndTime });
             });
 

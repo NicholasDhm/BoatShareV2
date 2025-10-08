@@ -17,7 +17,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     }
     else
     {
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+        // Use environment variable first, fall back to config
+        var connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")
+            ?? builder.Configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Database connection string not configured");
+        options.UseNpgsql(connectionString);
     }
 });
 
@@ -39,6 +43,10 @@ builder.Services.AddCors(options =>
 });
 
 // Add JWT Authentication
+var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
+    ?? builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException("JWT secret key not configured");
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -48,9 +56,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "BoatShare",
-            ValidAudience = "BoatShare",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-secret-key-that-is-at-least-32-characters-long"))
+            ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "BoatShare",
+            ValidAudience = builder.Configuration["Jwt:Audience"] ?? "BoatShare",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ClockSkew = TimeSpan.FromMinutes(5)
         };
     });
 
@@ -60,6 +69,13 @@ builder.Services.AddControllers();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
+
+// Add global exception handler
+if (!app.Environment.IsDevelopment())
+{
+    app.UseMiddleware<boat_share.Middleware.GlobalExceptionMiddleware>();
+}
+
 app.UseCors("AllowAngular");
 app.UseRouting();
 app.UseAuthentication();

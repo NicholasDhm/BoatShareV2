@@ -48,6 +48,66 @@ client/
 └── package.json
 ```
 
+### Backend (.NET 9)
+```
+server/
+├── boat-share/                  # Main API project
+│   ├── Controllers/             # API controllers
+│   ├── Models/                  # Entity models
+│   ├── Services/                # Business logic
+│   ├── DTOs/                    # Data transfer objects
+│   └── Data/                    # Database context
+├── boat-shareTests/             # Integration tests
+└── boat-share.sln
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+- **Node.js** 18+ and npm
+- **.NET 9.0 SDK**
+- **PostgreSQL** (or use the provided Railway connection)
+
+### Quick Start
+
+**Backend (.NET API):**
+```bash
+cd server/boat-share
+dotnet restore
+dotnet run
+```
+
+**Frontend (Angular):**
+```bash
+cd "client copy"
+npm install
+npm start
+```
+
+**Running Both Together:**
+```bash
+# Terminal 1 - Backend
+cd server/boat-share && dotnet run
+
+# Terminal 2 - Frontend  
+cd "client copy" && npm start
+```
+
+### Access Points
+- **Frontend:** http://localhost:4200
+- **Backend API:** https://localhost:7122
+- **Swagger UI:** https://localhost:7122/swagger
+
+### Testing
+```bash
+# Backend integration tests
+cd server/boat-shareTests && dotnet test
+
+# Frontend tests
+cd "client copy" && npm test
+```
+```
+
 ### Backend (.NET 8)
 ```
 server/

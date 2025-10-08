@@ -68,22 +68,15 @@ const routes: Routes = [
     pathMatch: 'full'
   },
 
-  // Development/Testing routes (remove in production)
-  {
-    path: 'test',
-    loadComponent: () => import('../testing-page/testing-page.component').then(m => m.TestingPageComponent),
-    title: 'Testing - BoatShare'
-  },
-
   // Default routes
   {
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'login',
     pathMatch: 'full'
   },
   {
     path: '**',
-    redirectTo: 'dashboard',
+    redirectTo: 'login',
     pathMatch: 'full'
   }
 ];

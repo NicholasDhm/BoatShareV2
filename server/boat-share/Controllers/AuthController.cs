@@ -83,6 +83,92 @@ namespace boat_share.Controllers
             }
         }
 
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] UserDTO userDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                // Check if user with this email already exists
+                var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userDto.Email);
+                if (existingUser != null)
+                {
+                    return BadRequest(new { message = "A user with this email already exists" });
+                }
+
+                // Verify boat exists
+                var boat = await _context.Boats.FindAsync(userDto.BoatId);
+                if (boat == null)
+                {
+                    return BadRequest(new { message = "Invalid boat ID" });
+                }
+
+                // Check boat capacity
+                var assignedUsers = await _context.Users.CountAsync(u => u.BoatId == userDto.BoatId && u.IsActive);
+                if (assignedUsers >= boat.Capacity)
+                {
+                    return BadRequest(new { message = "This boat has reached its capacity" });
+                }
+
+                // Create new user with default quotas
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
+                var newUser = new User
+                {
+                    Email = userDto.Email,
+                    Name = userDto.Name,
+                    Role = userDto.Role,
+                    PasswordHash = hashedPassword,
+                    BoatId = userDto.BoatId,
+                    StandardQuota = 10,
+                    SubstitutionQuota = 5,
+                    ContingencyQuota = 3,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Users.Add(newUser);
+
+                // Update boat's assigned users count
+                boat.AssignedUsersCount++;
+                boat.MarkAsUpdated();
+
+                await _context.SaveChangesAsync();
+
+                // Generate JWT token for automatic login
+                var token = GenerateJwtToken(newUser);
+
+                // Return the same response format as login
+                var response = new AuthResponseDTO
+                {
+                    Token = token,
+                    User = new UserInfoDTO
+                    {
+                        UserId = newUser.UserId,
+                        Email = newUser.Email,
+                        Name = newUser.Name,
+                        Role = newUser.Role,
+                        BoatId = newUser.BoatId,
+                        BoatName = boat.Name,
+                        StandardQuota = newUser.StandardQuota,
+                        SubstitutionQuota = newUser.SubstitutionQuota,
+                        ContingencyQuota = newUser.ContingencyQuota,
+                        TotalQuotas = newUser.TotalQuotas,
+                        IsActive = newUser.IsActive
+                    }
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred during registration" });
+            }
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
         {
@@ -138,6 +224,36 @@ namespace boat_share.Controllers
             }
         }
 
+        [HttpPut("new-password")]
+        public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordDTO updatePasswordDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var user = await _context.Users.FindAsync(updatePasswordDto.UserId);
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                // Hash the new password
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updatePasswordDto.NewPassword);
+                user.MarkAsUpdated();
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Password updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating password" });
+            }
+        }
+
         private bool VerifyPassword(string password, string hash)
         {
             // Use BCrypt for proper password verification
@@ -146,7 +262,11 @@ namespace boat_share.Controllers
 
         private string GenerateJwtToken(User user)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-secret-key-that-is-at-least-32-characters-long"));
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
+                ?? _configuration["Jwt:Key"]
+                ?? throw new InvalidOperationException("JWT secret key not configured");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -158,10 +278,10 @@ namespace boat_share.Controllers
             };
 
             var token = new JwtSecurityToken(
-                issuer: "BoatShare",
-                audience: "BoatShare",
+                issuer: _configuration["Jwt:Issuer"] ?? "BoatShare",
+                audience: _configuration["Jwt:Audience"] ?? "BoatShare",
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.UtcNow.AddHours(1), // Reduced from 1 day to 1 hour
                 signingCredentials: credentials
             );
 

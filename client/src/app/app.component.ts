@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { TestingPageComponent } from '../testing-page/testing-page.component';
 import { UiNavigationComponent } from '../components/ui-navigation/ui-navigation.component';
 import { UiCardComponent } from '../components/ui-card/ui-card.component';
 import { LogoutComponent } from '../pages/logout/logout.component';
@@ -21,7 +20,6 @@ import { UserService } from '../services/user.service';
     CommonModule,
     RouterOutlet,
     RouterModule,
-    TestingPageComponent,
     UiNavigationComponent,
     UiCardComponent,
     LogoutComponent,

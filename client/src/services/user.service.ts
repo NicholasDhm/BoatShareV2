@@ -29,10 +29,13 @@ export class UserService {
 
 	updateCurrentUser(): void {
 		const userId = this.getCurrentUser()?.userId;
+		if (!userId) {
+			return; // Don't make API call if no user is logged in
+		}
 		this._httpClient.get<IUser>(`${this.baseUrl}/${userId}`).subscribe(updatedUser => {
 			this._currentUserSubject.next(updatedUser);
 			this.setCurrentUser(updatedUser); // Refresh the user information
-		});		
+		});
 	}
 
   constructor(

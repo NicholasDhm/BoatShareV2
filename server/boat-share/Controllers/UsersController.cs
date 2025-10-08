@@ -186,6 +186,29 @@ namespace boat_share.Controllers
             }
         }
 
+        /// <summary>
+        /// Search users by partial name (Admin only for now, but could be opened up for members)
+        /// </summary>
+        [HttpGet("search/{partialName}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<UserListDTO>>> SearchUsersByName(string partialName)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(partialName) || partialName.Length < 2)
+                {
+                    return BadRequest(new { message = "Search term must be at least 2 characters" });
+                }
+
+                var users = await _userService.SearchUsersByNameAsync(partialName);
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while searching users" });
+            }
+        }
+
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
