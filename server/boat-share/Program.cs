@@ -26,8 +26,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     {
         // Use PostgreSQL for production
         var connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")
+            ?? Environment.GetEnvironmentVariable("DATABASE_URL")
             ?? builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Database connection string not configured");
+
+        // Convert PostgreSQL URI format (from Railway) to Npgsql format if needed
+        if (connectionString.StartsWith("postgresql://") || connectionString.StartsWith("postgres://"))
+        {
+            connectionString = ConvertPostgresUrlToConnectionString(connectionString);
+        }
+
         options.UseNpgsql(connectionString);
     }
 });
@@ -116,6 +124,21 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+// Helper method to convert PostgreSQL URI to Npgsql connection string
+static string ConvertPostgresUrlToConnectionString(string postgresUrl)
+{
+    var uri = new Uri(postgresUrl);
+    var userInfo = uri.UserInfo.Split(':');
+
+    var host = uri.Host;
+    var port = uri.Port > 0 ? uri.Port : 5432;
+    var database = uri.AbsolutePath.TrimStart('/');
+    var username = userInfo.Length > 0 ? userInfo[0] : "";
+    var password = userInfo.Length > 1 ? userInfo[1] : "";
+
+    return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Prefer;Trust Server Certificate=true";
+}
 
 // Expose Program class for WebApplicationFactory in integration tests
 public partial class Program { }
