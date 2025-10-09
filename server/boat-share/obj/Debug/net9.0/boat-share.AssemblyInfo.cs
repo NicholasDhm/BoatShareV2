@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("boat-share")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cc4737b3e9e3ffb6e117d79636da1fef6395a2d8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8f1cb12c988ee3995d9e9443744f2df090e4972c")]
 [assembly: System.Reflection.AssemblyProductAttribute("boat-share")]
 [assembly: System.Reflection.AssemblyTitleAttribute("boat-share")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
