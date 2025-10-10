@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "dgSpecHash": "TrpT7te1FZI=",
-  "success": false,
+  "dgSpecHash": "LT3CBRO3Mnc=",
+  "success": true,
   "projectFilePath": "/Users/nickdhm/Desktop/Projects/BoatShareV2/server/boat-shareTests/boat-shareTests.csproj",
   "expectedPackageFiles": [
     "/Users/nickdhm/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
@@ -26,7 +26,7 @@
     "/Users/nickdhm/.nuget/packages/microsoft.entityframeworkcore.abstractions/9.0.9/microsoft.entityframeworkcore.abstractions.9.0.9.nupkg.sha512",
     "/Users/nickdhm/.nuget/packages/microsoft.entityframeworkcore.analyzers/9.0.9/microsoft.entityframeworkcore.analyzers.9.0.9.nupkg.sha512",
     "/Users/nickdhm/.nuget/packages/microsoft.entityframeworkcore.design/9.0.9/microsoft.entityframeworkcore.design.9.0.9.nupkg.sha512",
-    "/Users/nickdhm/.nuget/packages/microsoft.entityframeworkcore.inmemory/9.0.0/microsoft.entityframeworkcore.inmemory.9.0.0.nupkg.sha512",
+    "/Users/nickdhm/.nuget/packages/microsoft.entityframeworkcore.inmemory/9.0.9/microsoft.entityframeworkcore.inmemory.9.0.9.nupkg.sha512",
     "/Users/nickdhm/.nuget/packages/microsoft.entityframeworkcore.relational/9.0.9/microsoft.entityframeworkcore.relational.9.0.9.nupkg.sha512",
     "/Users/nickdhm/.nuget/packages/microsoft.entityframeworkcore.sqlite/9.0.9/microsoft.entityframeworkcore.sqlite.9.0.9.nupkg.sha512",
     "/Users/nickdhm/.nuget/packages/microsoft.entityframeworkcore.sqlite.core/9.0.9/microsoft.entityframeworkcore.sqlite.core.9.0.9.nupkg.sha512",
@@ -113,17 +113,5 @@
     "/Users/nickdhm/.nuget/packages/system.text.json/9.0.9/system.text.json.9.0.9.nupkg.sha512",
     "/Users/nickdhm/.nuget/packages/system.threading.channels/7.0.0/system.threading.channels.7.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1605",
-      "level": "Error",
-      "message": "Warning As Error: Detected package downgrade: Microsoft.EntityFrameworkCore.InMemory from 9.0.9 to 9.0.0. Reference the package directly from the project to select a different version. \n boat-shareTests -> boat-share -> Microsoft.EntityFrameworkCore.InMemory (>= 9.0.9) \n boat-shareTests -> Microsoft.EntityFrameworkCore.InMemory (>= 9.0.0)",
-      "projectPath": "/Users/nickdhm/Desktop/Projects/BoatShareV2/server/boat-shareTests/boat-shareTests.csproj",
-      "filePath": "/Users/nickdhm/Desktop/Projects/BoatShareV2/server/boat-shareTests/boat-shareTests.csproj",
-      "libraryId": "Microsoft.EntityFrameworkCore.InMemory",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    }
-  ]
+  "logs": []
 }
