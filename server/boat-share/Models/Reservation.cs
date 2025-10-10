@@ -75,6 +75,12 @@ namespace boat_share.Models
         public bool IsCancelled => Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
+        /// Checks if the reservation is a contingency reservation
+        /// </summary>
+        [NotMapped]
+        public bool IsContingency => ReservationType.Equals("Contingency", StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
         /// Checks if the reservation is in the past
         /// </summary>
         [NotMapped]

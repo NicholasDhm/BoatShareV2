@@ -289,6 +289,11 @@ namespace boat_share.Controllers
 
                 return NoContent();
             }
+            catch (InvalidOperationException ex)
+            {
+                // Handle business rule violations (e.g., trying to delete confirmed reservation)
+                return BadRequest(new { message = ex.Message });
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while deleting the reservation", error = ex.Message });

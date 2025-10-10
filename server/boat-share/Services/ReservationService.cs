@@ -179,8 +179,12 @@ namespace boat_share.Services
                 var duration = (createReservationDto.EndTime - createReservationDto.StartTime).TotalHours;
                 var totalCost = (decimal)duration * boat.HourlyRate;
 
-                // Determine initial status based on business rules
-                var initialStatus = await DetermineReservationStatus(createReservationDto.StartTime, createReservationDto.BoatId, userId);
+                // Determine initial status based on business rules (Contingency auto-confirms)
+                var initialStatus = await DetermineReservationStatus(
+                    createReservationDto.StartTime,
+                    createReservationDto.BoatId,
+                    userId,
+                    createReservationDto.ReservationType);
 
                 // Deduct quota from user (now safe from race conditions)
                 if (!user.DeductQuota(createReservationDto.ReservationType))
@@ -230,19 +234,25 @@ namespace boat_share.Services
         /// <summary>
         /// Determines the initial status of a reservation based on business rules
         /// </summary>
-        private async Task<string> DetermineReservationStatus(DateTime reservationDate, int boatId, int userId)
+        private async Task<string> DetermineReservationStatus(DateTime reservationDate, int boatId, int userId, string reservationType)
         {
+            // Contingency reservations always auto-confirm
+            if (reservationType == "Contingency")
+            {
+                return "Confirmed";
+            }
+
             // Check if there's already a reservation for this date and boat
             var existingReservation = await _context.Reservations
-                .FirstOrDefaultAsync(r => r.BoatId == boatId && 
-                                         r.StartTime.Date == reservationDate.Date && 
+                .FirstOrDefaultAsync(r => r.BoatId == boatId &&
+                                         r.StartTime.Date == reservationDate.Date &&
                                          r.Status != "Cancelled");
 
             if (existingReservation == null)
             {
                 // No existing reservation - check if we're in confirmation period (7 days before)
                 var daysUntilReservation = (reservationDate.Date - DateTime.UtcNow.Date).TotalDays;
-                
+
                 if (daysUntilReservation <= 7)
                 {
                     // Within confirmation period - set to Unconfirmed for the owner to confirm
@@ -326,6 +336,12 @@ namespace boat_share.Services
         {
             var reservation = await _context.Reservations.FindAsync(reservationId);
             if (reservation == null) return false;
+
+            // Prevent deletion of confirmed reservations
+            if (reservation.Status == "Confirmed")
+            {
+                throw new InvalidOperationException("Cannot delete a confirmed reservation. Please cancel it first if allowed.");
+            }
 
             // Get user to restore quota
             var user = await _context.Users.FindAsync(reservation.UserId);
