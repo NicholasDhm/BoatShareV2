@@ -8,10 +8,6 @@
       day.status === 'Unconfirmed' ? 'status-unconfirmed' : ''
     ]"
     (click)="day.isCurrentMonth && day.state !== 'Greyish' && onDaySelected()">
-    @if (day.state !== 'Greyish' && (day.status === 'Confirmed' || day.status === 'Pending' || day.status === 'Unconfirmed')) {
-      <ui-svg [type]="day.status" class="confirmation"></ui-svg>
-    }
-
     <span>{{ day.date }}</span>
 
     <ui-svg [state]="day.state" [width]="18" [height]="18"></ui-svg>
