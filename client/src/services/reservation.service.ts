@@ -15,8 +15,8 @@ interface ReservationResponseDTO {
 	endTime: string;
 	durationHours: number;
 	totalCost: number;
-	status: string;
-	reservationType: string;
+	status: 'Pending' | 'Confirmed' | 'Unconfirmed' | 'Cancelled' | 'Legacy';
+	reservationType: 'Standard' | 'Substitution' | 'Contingency';
 	notes: string;
 	createdAt: string;
 	updatedAt: string;
@@ -40,10 +40,10 @@ export class ReservationService {
 		const startDate = new Date(dto.startTime);
 		return {
 			reservationId: dto.reservationId,
-			status: dto.status as 'Pending' | 'Confirmed' | 'Unconfirmed',
+			status: dto.status,
 			createdAtIsoDate: dto.createdAt,
 			userName: dto.userName,
-			type: dto.reservationType as 'Standard' | 'Substitution' | 'Contingency',
+			type: dto.reservationType,
 			userId: dto.userId,
 			boatId: dto.boatId,
 			year: startDate.getFullYear(),
@@ -253,6 +253,46 @@ export class ReservationService {
 				error: err => {
 					console.warn(`updateReservations: url ${this.baseUrl}/update-reservations`, err);
 					reject(err);
+				}
+			});
+		});
+	}
+
+	getLegacyReservationsByUserId(userId: number): Promise<IReservation[]> {
+		return new Promise((resolve, reject) => {
+			this._httpClient.get<ReservationResponseDTO[]>(`${this.baseUrl}/legacy/user/${userId}`).subscribe({
+				next: result => {
+					console.debug(`getLegacyReservationsByUserId: url ${this.baseUrl}/legacy/user/${userId} result`, result);
+					const mappedReservations = result.map(dto => this.mapResponseToReservation(dto));
+					resolve(mappedReservations);
+				},
+				error: err => {
+					console.warn(`getLegacyReservationsByUserId: url ${this.baseUrl}/legacy/user/${userId}`, err);
+					if (err.status === 403) {
+						reject(new Error('You do not have permission to view these reservations.'));
+					} else {
+						reject(err);
+					}
+				}
+			});
+		});
+	}
+
+	getLegacyReservationsByBoatId(boatId: number): Promise<IReservation[]> {
+		return new Promise((resolve, reject) => {
+			this._httpClient.get<ReservationResponseDTO[]>(`${this.baseUrl}/legacy/boat/${boatId}`).subscribe({
+				next: result => {
+					console.debug(`getLegacyReservationsByBoatId: url ${this.baseUrl}/legacy/boat/${boatId} result`, result);
+					const mappedReservations = result.map(dto => this.mapResponseToReservation(dto));
+					resolve(mappedReservations);
+				},
+				error: err => {
+					console.warn(`getLegacyReservationsByBoatId: url ${this.baseUrl}/legacy/boat/${boatId}`, err);
+					if (err.status === 403) {
+						reject(new Error('You do not have permission to view this boat\'s history.'));
+					} else {
+						reject(err);
+					}
 				}
 			});
 		});

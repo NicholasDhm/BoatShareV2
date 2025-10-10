@@ -27,6 +27,12 @@ const routes: Routes = [
     title: 'Profile - BoatShare',
     // canActivate: [AuthGuard]
   },
+  {
+    path: 'history',
+    loadComponent: () => import('../pages/history/history.component').then(m => m.HistoryComponent),
+    title: 'Histórico - BoatShare',
+    // canActivate: [AuthGuard]
+  },
 
   // Admin routes
   {

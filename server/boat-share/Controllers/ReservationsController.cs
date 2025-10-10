@@ -259,6 +259,49 @@ namespace boat_share.Controllers
         }
 
         /// <summary>
+        /// Get legacy (historical) reservations by user ID
+        /// </summary>
+        [HttpGet("legacy/user/{userId}")]
+        public async Task<ActionResult<List<ReservationResponseDTO>>> GetLegacyReservationsByUserId(int userId)
+        {
+            try
+            {
+                var currentUserId = GetCurrentUserId();
+                var currentUserRole = GetCurrentUserRole();
+
+                // Users can only access their own legacy reservations unless they're admin
+                if (currentUserRole != "Admin" && currentUserId != userId)
+                {
+                    return Forbid();
+                }
+
+                var reservations = await _reservationService.GetLegacyReservationsByUserIdAsync(userId);
+                return Ok(reservations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving legacy reservations", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get legacy (historical) reservations by boat ID
+        /// </summary>
+        [HttpGet("legacy/boat/{boatId}")]
+        public async Task<ActionResult<List<ReservationResponseDTO>>> GetLegacyReservationsByBoatId(int boatId)
+        {
+            try
+            {
+                var reservations = await _reservationService.GetLegacyReservationsByBoatIdAsync(boatId);
+                return Ok(reservations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving legacy boat reservations", error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Delete reservation
         /// </summary>
         [HttpDelete("{id}")]

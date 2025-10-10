@@ -1,0 +1,101 @@
+<div class="history-container">
+	<!-- Header -->
+	<div class="history-header">
+		<h1>Histórico de Reservas</h1>
+		<p class="subtitle">Visualize suas reservas arquivadas</p>
+	</div>
+
+	<!-- Toggle Buttons -->
+	<div class="view-toggle">
+		<button
+			class="toggle-btn"
+			[class.active]="viewMode === 'user'"
+			(click)="toggleView('user')">
+			<i class="bi bi-person"></i>
+			Minhas Reservas
+		</button>
+		<button
+			class="toggle-btn"
+			[class.active]="viewMode === 'boat'"
+			(click)="toggleView('boat')">
+			<i class="bi bi-ship"></i>
+			Histórico do Barco
+		</button>
+	</div>
+
+	<!-- Error Message -->
+	@if (errorMessage) {
+		<div class="error-message">
+			<i class="bi bi-exclamation-triangle"></i>
+			{{ errorMessage }}
+		</div>
+	}
+
+	<!-- Loading State -->
+	@if (isLoading()) {
+		<div class="loading-state">
+			<ui-loading-spinner></ui-loading-spinner>
+			<p>Carregando histórico...</p>
+		</div>
+	}
+
+	<!-- Reservations List -->
+	@if (!isLoading() && !errorMessage) {
+		<div class="reservations-list">
+			@if (getDisplayedReservations().length === 0) {
+				<div class="empty-state">
+					<i class="bi bi-archive"></i>
+					<h3>Nenhuma reserva arquivada</h3>
+					<p>
+						@if (viewMode === 'user') {
+							Você não tem reservas arquivadas no momento.
+						} @else {
+							Este barco não tem reservas arquivadas no momento.
+						}
+					</p>
+				</div>
+			} @else {
+				@for (reservation of getDisplayedReservations(); track reservation.reservationId) {
+					<ui-card class="reservation-card">
+						<div class="reservation-content">
+							<div class="reservation-date">
+								<i class="bi bi-calendar-event"></i>
+								<span>{{ formatDate(reservation.year, reservation.month, reservation.day) }}</span>
+							</div>
+
+							<div class="reservation-details">
+								<div class="detail-row">
+									<span class="label">Tipo:</span>
+									<span class="value" [ngClass]="reservation.type">
+										{{ getReservationTypeLabel(reservation.type) }}
+									</span>
+								</div>
+
+								@if (viewMode === 'boat' && reservation.userName) {
+									<div class="detail-row">
+										<span class="label">Usuário:</span>
+										<span class="value">{{ reservation.userName }}</span>
+									</div>
+								}
+
+								<div class="detail-row">
+									<span class="label">Status Final:</span>
+									<span class="value status" [ngClass]="reservation.status">
+										{{ getStatusLabel(reservation.status || 'Legacy') }}
+									</span>
+								</div>
+
+								@if (reservation.createdAtIsoDate) {
+									<div class="detail-row">
+										<span class="label">Criada em:</span>
+										<span class="value">{{ reservation.createdAtIsoDate | date: 'short':'':'pt-BR' }}</span>
+									</div>
+								}
+							</div>
+						</div>
+					</ui-card>
+				}
+			}
+		</div>
+	}
+</div>

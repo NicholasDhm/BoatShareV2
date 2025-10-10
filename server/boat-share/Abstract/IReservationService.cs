@@ -14,5 +14,7 @@ namespace boat_share.Abstract
 		Task<ReservationResponseDTO?> UpdateReservationAsync(int reservationId, ReservationDTO reservationDto);
 		Task<bool> DeleteReservationAsync(int reservationId);
 		Task UpdateReservationStatusesAsync();
+		Task<List<ReservationResponseDTO>> GetLegacyReservationsByUserIdAsync(int userId);
+		Task<List<ReservationResponseDTO>> GetLegacyReservationsByBoatIdAsync(int boatId);
 	}
 }

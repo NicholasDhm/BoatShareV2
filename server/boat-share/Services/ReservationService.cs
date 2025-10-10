@@ -3,6 +3,7 @@ using boat_share.Data;
 using boat_share.DTOs;
 using boat_share.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace boat_share.Services
 {
@@ -15,80 +16,85 @@ namespace boat_share.Services
             _context = context;
         }
 
+        /// <summary>
+        /// Centralized DTO mapping expression to eliminate code duplication
+        /// </summary>
+        private static Expression<Func<Reservation, ReservationResponseDTO>> MapToResponseDTO()
+        {
+            return r => new ReservationResponseDTO
+            {
+                ReservationId = r.ReservationId,
+                UserId = r.UserId,
+                UserName = r.User != null ? r.User.Name : null,
+                BoatId = r.BoatId,
+                BoatName = r.Boat != null ? r.Boat.Name : null,
+                StartTime = r.StartTime,
+                EndTime = r.EndTime,
+                DurationHours = r.DurationHours,
+                TotalCost = r.TotalCost,
+                Status = r.Status,
+                ReservationType = r.ReservationType,
+                Notes = r.Notes,
+                CreatedAt = r.CreatedAt,
+                UpdatedAt = r.UpdatedAt
+            };
+        }
+
+        /// <summary>
+        /// Get base query with includes for common use
+        /// </summary>
+        private IQueryable<Reservation> GetBaseReservationsQuery()
+        {
+            return _context.Reservations
+                .Include(r => r.User)
+                .Include(r => r.Boat);
+        }
+
         public async Task<List<ReservationResponseDTO>> GetReservationsAsync()
         {
-            return await _context.Reservations
-                .Include(r => r.User)
-                .Include(r => r.Boat)
-                .Select(r => new ReservationResponseDTO
-                {
-                    ReservationId = r.ReservationId,
-                    UserId = r.UserId,
-                    UserName = r.User != null ? r.User.Name : null,
-                    BoatId = r.BoatId,
-                    BoatName = r.Boat != null ? r.Boat.Name : null,
-                    StartTime = r.StartTime,
-                    EndTime = r.EndTime,
-                    DurationHours = r.DurationHours,
-                    TotalCost = r.TotalCost,
-                    Status = r.Status,
-                    ReservationType = r.ReservationType,
-                    Notes = r.Notes,
-                    CreatedAt = r.CreatedAt,
-                    UpdatedAt = r.UpdatedAt
-                })
+            return await GetBaseReservationsQuery()
+                .Select(MapToResponseDTO())
                 .ToListAsync();
         }
 
         public async Task<List<ReservationResponseDTO>> GetReservationsByUserIdAsync(int userId)
         {
-            return await _context.Reservations
-                .Include(r => r.User)
-                .Include(r => r.Boat)
+            return await GetBaseReservationsQuery()
                 .Where(r => r.UserId == userId)
-                .Select(r => new ReservationResponseDTO
-                {
-                    ReservationId = r.ReservationId,
-                    UserId = r.UserId,
-                    UserName = r.User != null ? r.User.Name : null,
-                    BoatId = r.BoatId,
-                    BoatName = r.Boat != null ? r.Boat.Name : null,
-                    StartTime = r.StartTime,
-                    EndTime = r.EndTime,
-                    DurationHours = r.DurationHours,
-                    TotalCost = r.TotalCost,
-                    Status = r.Status,
-                    ReservationType = r.ReservationType,
-                    Notes = r.Notes,
-                    CreatedAt = r.CreatedAt,
-                    UpdatedAt = r.UpdatedAt
-                })
+                .Select(MapToResponseDTO())
                 .ToListAsync();
         }
 
         public async Task<List<ReservationResponseDTO>> GetReservationsByBoatIdAsync(int boatId)
         {
-            return await _context.Reservations
-                .Include(r => r.User)
-                .Include(r => r.Boat)
-                .Where(r => r.BoatId == boatId)
-                .Select(r => new ReservationResponseDTO
-                {
-                    ReservationId = r.ReservationId,
-                    UserId = r.UserId,
-                    UserName = r.User != null ? r.User.Name : null,
-                    BoatId = r.BoatId,
-                    BoatName = r.Boat != null ? r.Boat.Name : null,
-                    StartTime = r.StartTime,
-                    EndTime = r.EndTime,
-                    DurationHours = r.DurationHours,
-                    TotalCost = r.TotalCost,
-                    Status = r.Status,
-                    ReservationType = r.ReservationType,
-                    Notes = r.Notes,
-                    CreatedAt = r.CreatedAt,
-                    UpdatedAt = r.UpdatedAt
-                })
+            // Filter out Legacy and Cancelled for calendar views
+            return await GetBaseReservationsQuery()
+                .Where(r => r.BoatId == boatId && r.Status != "Legacy" && r.Status != "Cancelled")
+                .Select(MapToResponseDTO())
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Get legacy (historical) reservations by user ID
+        /// </summary>
+        public async Task<List<ReservationResponseDTO>> GetLegacyReservationsByUserIdAsync(int userId)
+        {
+            return await GetBaseReservationsQuery()
+                .Where(r => r.UserId == userId && r.Status == "Legacy")
+                .OrderByDescending(r => r.StartTime)
+                .Select(MapToResponseDTO())
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Get legacy (historical) reservations by boat ID
+        /// </summary>
+        public async Task<List<ReservationResponseDTO>> GetLegacyReservationsByBoatIdAsync(int boatId)
+        {
+            return await GetBaseReservationsQuery()
+                .Where(r => r.BoatId == boatId && r.Status == "Legacy")
+                .OrderByDescending(r => r.StartTime)
+                .Select(MapToResponseDTO())
                 .ToListAsync();
         }
 
@@ -122,32 +128,17 @@ namespace boat_share.Services
 
         public async Task<ReservationResponseDTO?> GetReservationByDateAndBoatIdAsync(DateTime date, int boatId)
         {
-            var reservation = await _context.Reservations
-                .Include(r => r.User)
-                .Include(r => r.Boat)
-                .Where(r => r.BoatId == boatId && r.StartTime.Date == date.Date && r.Status != "Cancelled")
-                .OrderBy(r => r.CreatedAt) // Get the first reservation for this date
+            var reservation = await GetBaseReservationsQuery()
+                .Where(r => r.BoatId == boatId &&
+                           r.StartTime.Date == date.Date &&
+                           r.Status != "Cancelled" &&
+                           r.Status != "Legacy")  // Exclude Legacy from calendar lookups
+                .OrderBy(r => r.CreatedAt)
                 .FirstOrDefaultAsync();
 
             if (reservation == null) return null;
 
-            return new ReservationResponseDTO
-            {
-                ReservationId = reservation.ReservationId,
-                UserId = reservation.UserId,
-                UserName = reservation.User?.Name,
-                BoatId = reservation.BoatId,
-                BoatName = reservation.Boat?.Name,
-                StartTime = reservation.StartTime,
-                EndTime = reservation.EndTime,
-                DurationHours = reservation.DurationHours,
-                TotalCost = reservation.TotalCost,
-                Status = reservation.Status,
-                ReservationType = reservation.ReservationType,
-                Notes = reservation.Notes,
-                CreatedAt = reservation.CreatedAt,
-                UpdatedAt = reservation.UpdatedAt
-            };
+            return MapToResponseDTO().Compile()(reservation);
         }
 
         public async Task<Reservation> CreateReservationAsync(CreateReservationDTO createReservationDto, int userId)
@@ -273,33 +264,63 @@ namespace boat_share.Services
 
         /// <summary>
         /// Updates reservation statuses based on current date and business rules
+        /// Includes Legacy archival for past reservations
         /// </summary>
         public async Task UpdateReservationStatusesAsync()
         {
-            var pendingReservations = await _context.Reservations
-                .Where(r => r.Status == "Pending" && r.StartTime > DateTime.UtcNow)
+            var now = DateTime.UtcNow;
+
+            // 1. Archive completed reservations to Legacy status
+            var completedReservations = await _context.Reservations
+                .Where(r => r.EndTime < now &&
+                           r.Status != "Legacy" &&
+                           r.Status != "Cancelled")
                 .ToListAsync();
 
-            foreach (var reservation in pendingReservations)
+            foreach (var reservation in completedReservations)
             {
-                var daysUntilReservation = (reservation.StartTime.Date - DateTime.UtcNow.Date).TotalDays;
-                
-                // Check if reservation owner and within confirmation period
-                if (daysUntilReservation <= 7)
-                {
-                    // Check if this user is the "first" reservation (not in queue)
-                    var isFirstReservation = await _context.Reservations
-                        .Where(r => r.BoatId == reservation.BoatId && 
-                                   r.StartTime.Date == reservation.StartTime.Date &&
-                                   r.Status != "Cancelled")
-                        .OrderBy(r => r.CreatedAt)
-                        .FirstOrDefaultAsync();
+                reservation.Status = "Legacy";
+                reservation.MarkAsUpdated();
+            }
 
-                    if (isFirstReservation?.ReservationId == reservation.ReservationId)
+            // 2. Update Pending → Unconfirmed (optimized to avoid N+1 queries)
+            var pendingReservations = await _context.Reservations
+                .Where(r => r.Status == "Pending" && r.StartTime > now)
+                .ToListAsync();
+
+            if (pendingReservations.Any())
+            {
+                // Pre-fetch first reservations for all boat/date combinations in ONE query
+                var boatDatePairs = pendingReservations
+                    .Select(r => new { r.BoatId, Date = r.StartTime.Date })
+                    .Distinct()
+                    .ToList();
+
+                var firstReservationMap = await _context.Reservations
+                    .Where(r => r.Status != "Cancelled" && r.Status != "Legacy")
+                    .GroupBy(r => new { r.BoatId, Date = r.StartTime.Date })
+                    .Select(g => new
                     {
-                        // This is the primary reservation and within confirmation period
-                        reservation.Status = "Unconfirmed";
-                        reservation.MarkAsUpdated();
+                        g.Key.BoatId,
+                        g.Key.Date,
+                        FirstReservationId = g.OrderBy(r => r.CreatedAt).First().ReservationId
+                    })
+                    .ToDictionaryAsync(x => new { x.BoatId, x.Date }, x => x.FirstReservationId);
+
+                foreach (var reservation in pendingReservations)
+                {
+                    var daysUntilReservation = (reservation.StartTime.Date - now.Date).TotalDays;
+
+                    if (daysUntilReservation <= 7)
+                    {
+                        var key = new { reservation.BoatId, Date = reservation.StartTime.Date };
+
+                        if (firstReservationMap.TryGetValue(key, out var firstId) &&
+                            firstId == reservation.ReservationId)
+                        {
+                            reservation.Status = "Unconfirmed";
+                            reservation.MarkAsUpdated();
+                        }
                     }
                 }
             }
@@ -311,6 +332,18 @@ namespace boat_share.Services
         {
             var reservation = await _context.Reservations.FindAsync(reservationId);
             if (reservation == null) return null;
+
+            // Prevent modifications to Legacy reservations
+            if (reservation.Status == "Legacy")
+            {
+                throw new InvalidOperationException("Cannot modify a Legacy reservation. Historical data is read-only.");
+            }
+
+            // Prevent manual transition TO Legacy status
+            if (reservationDto.Status == "Legacy" && reservation.Status != "Legacy")
+            {
+                throw new InvalidOperationException("Cannot manually set reservation to Legacy status. Use automated archival process.");
+            }
 
             reservation.StartTime = reservationDto.StartTime;
             reservation.EndTime = reservationDto.EndTime;
@@ -341,6 +374,12 @@ namespace boat_share.Services
             if (reservation.Status == "Confirmed")
             {
                 throw new InvalidOperationException("Cannot delete a confirmed reservation. Please cancel it first if allowed.");
+            }
+
+            // Prevent deletion of legacy reservations (historical data protection)
+            if (reservation.Status == "Legacy")
+            {
+                throw new InvalidOperationException("Cannot delete a Legacy reservation. Historical records are immutable.");
             }
 
             // Get user to restore quota

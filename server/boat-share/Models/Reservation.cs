@@ -28,8 +28,8 @@ namespace boat_share.Models
         public decimal TotalCost { get; set; } = 0;
 
         [Required]
-        [RegularExpression("^(Confirmed|Unconfirmed|Pending|Cancelled)$", 
-            ErrorMessage = "Status must be 'Confirmed', 'Unconfirmed', 'Pending', or 'Cancelled'")]
+        [RegularExpression("^(Confirmed|Unconfirmed|Pending|Cancelled|Legacy)$",
+            ErrorMessage = "Status must be 'Confirmed', 'Unconfirmed', 'Pending', 'Cancelled', or 'Legacy'")]
         public required string Status { get; set; }
 
         [Required]
@@ -75,6 +75,12 @@ namespace boat_share.Models
         public bool IsCancelled => Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
+        /// Checks if the reservation is archived as legacy
+        /// </summary>
+        [NotMapped]
+        public bool IsLegacy => Status.Equals("Legacy", StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
         /// Checks if the reservation is a contingency reservation
         /// </summary>
         [NotMapped]
@@ -87,10 +93,16 @@ namespace boat_share.Models
         public bool IsInPast => EndTime < DateTime.UtcNow;
 
         /// <summary>
-        /// Checks if the reservation is currently active
+        /// Checks if the reservation is currently active (happening now)
         /// </summary>
         [NotMapped]
         public bool IsActive => DateTime.UtcNow >= StartTime && DateTime.UtcNow <= EndTime && IsConfirmed;
+
+        /// <summary>
+        /// Checks if the reservation is active in the system (not cancelled or legacy)
+        /// </summary>
+        [NotMapped]
+        public bool IsActiveReservation => !IsCancelled && !IsLegacy;
 
         /// <summary>
         /// Gets the number of days from now until the reservation starts
