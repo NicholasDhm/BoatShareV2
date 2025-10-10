@@ -83,7 +83,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 // Add services
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Configure JSON serialization to use Brazil timezone for all DateTime values
+        options.JsonSerializerOptions.Converters.Add(new boat_share.Converters.BrazilTimeZoneDateTimeConverter());
+    });
 
 // Configure port for Railway (uses PORT env var)
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";

@@ -122,13 +122,12 @@ export class ReservationService {
 	createReservation(reservation: IReservation): Promise<string> {
 		return new Promise((resolve, reject) => {
 			// Transform IReservation to CreateReservationDTO format
-			const startTime = new Date(reservation.year, reservation.month - 1, reservation.day, 6, 0, 0); // 6:00 AM
-			const endTime = new Date(reservation.year, reservation.month - 1, reservation.day, 18, 0, 0); // 6:00 PM
-			
+			// Format dates as local datetime strings (YYYY-MM-DDTHH:mm:ss) without timezone
+			// Backend will interpret these as Brazil time
 			const createReservationDto = {
 				boatId: reservation.boatId,
-				startTime: startTime.toISOString(),
-				endTime: endTime.toISOString(),
+				startTime: this.formatLocalDateTime(reservation.year, reservation.month, reservation.day, 6, 0, 0),
+				endTime: this.formatLocalDateTime(reservation.year, reservation.month, reservation.day, 18, 0, 0),
 				reservationType: reservation.type,
 				notes: ''
 			};
@@ -159,8 +158,8 @@ export class ReservationService {
 				reservationId: reservation.reservationId,
 				userId: reservation.userId,
 				boatId: reservation.boatId,
-				startTime: new Date(reservation.year, reservation.month - 1, reservation.day, 6, 0, 0).toISOString(),
-				endTime: new Date(reservation.year, reservation.month - 1, reservation.day, 18, 0, 0).toISOString(),
+				startTime: this.formatLocalDateTime(reservation.year, reservation.month, reservation.day, 6, 0, 0),
+				endTime: this.formatLocalDateTime(reservation.year, reservation.month, reservation.day, 18, 0, 0),
 				reservationType: reservation.type,
 				status: 'Confirmed',
 				notes: ''
@@ -256,5 +255,14 @@ export class ReservationService {
 				}
 			});
 		});
+	}
+
+	/**
+	 * Formats a date/time as a local datetime string (YYYY-MM-DDTHH:mm:ss) without timezone
+	 * This format allows the backend to interpret it as Brazil time, regardless of user's timezone
+	 */
+	private formatLocalDateTime(year: number, month: number, day: number, hours: number, minutes: number, seconds: number): string {
+		const pad = (n: number) => n.toString().padStart(2, '0');
+		return `${year}-${pad(month)}-${pad(day)}T${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 	}
 }

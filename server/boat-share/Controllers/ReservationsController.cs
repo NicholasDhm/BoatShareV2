@@ -180,7 +180,7 @@ namespace boat_share.Controllers
         {
             try
             {
-                var date = new DateTime(year, month, day);
+                var date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc);
                 var reservation = await _reservationService.GetReservationByDateAndBoatIdAsync(date, boatId);
                 
                 if (reservation == null)
