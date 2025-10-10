@@ -42,6 +42,7 @@ export class ReservationService {
 			reservationId: dto.reservationId,
 			status: dto.status as 'Pending' | 'Confirmed' | 'Unconfirmed',
 			createdAtIsoDate: dto.createdAt,
+			userName: dto.userName,
 			type: dto.reservationType as 'Standard' | 'Substitution' | 'Contingency',
 			userId: dto.userId,
 			boatId: dto.boatId,

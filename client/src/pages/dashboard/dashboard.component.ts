@@ -31,7 +31,7 @@ import { ValidationService } from '../../services/validation.service';
 })
 export class DashboardComponent {
   currentUser: IUser | null = null;
-	firstReservationUser: IUser | null = null;
+	firstReservationUserName: string | null = null;
 
   boat: IBoat | null = null;
 	calendarViewModel: ICalendarViewModel | null = null;
@@ -96,19 +96,13 @@ export class DashboardComponent {
 			if (reservationsToDisplay.length === 1) {
 				this.userReservationToDisplay = reservationsToDisplay[0];
 				this.firstReservationToDisplay = null;
+				this.firstReservationUserName = null;
 			} else {
 				this.userReservationToDisplay = reservationsToDisplay[1];
 				this.firstReservationToDisplay = reservationsToDisplay[0];
+				this.firstReservationUserName = this.firstReservationToDisplay?.userName || null;
 			}
-			if (this.firstReservationToDisplay) {
-				this._userService.getUserById(this.firstReservationToDisplay?.userId).then(user => {
-					this.firstReservationUser = user;
-					this.showModal = true;
-				});
-			} else {
-				this.firstReservationUser = null;
-				this.showModal = true;
-			}
+			this.showModal = true;
 		});
 	}
 

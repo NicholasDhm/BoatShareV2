@@ -2,6 +2,7 @@ export interface IReservation {
 	reservationId?: number;
 	status?: 'Pending' | 'Confirmed' | 'Unconfirmed';
 	createdAtIsoDate?: string;
+	userName?: string;
 
 	type: ReservationType;
 	userId: number;

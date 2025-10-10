@@ -12,7 +12,7 @@
         &nbsp;
         <p> {{ reservationDate | date: 'longDate':'':'pt-BR'}} </p>
       </span>
-      @if (status === "Pending" && !firstReservationUser) {
+      @if (status === "Pending" && !firstReservationUserName) {
         <span class="confirmation_period">
           <p>O Período de Confirmação será entre: </p>
           &nbsp;
@@ -27,13 +27,13 @@
 
     <ui-card layout="vertical">
       @if (reservationType === "Substitution" && status) {
-        @if (firstReservationUser && firstReservationUser !== activeUser) {
-          <p>Você já fez uma reserva para esta data. Se {{ firstReservationUser.name }} cancelar a reserva, ela será sua. Você pode aguardar ou cancelar sua reserva.</p>
+        @if (firstReservationUserName && firstReservationUserName !== activeUser?.name) {
+          <p>Você já fez uma reserva para esta data. Se {{ firstReservationUserName }} cancelar a reserva, ela será sua. Você pode aguardar ou cancelar sua reserva.</p>
         } @else {
           <p>Você já fez uma reserva para esta data. Deseja cancelar?</p>
         }
       } @else if (reservationType === "Substitution" && !status) {
-        <p>Uma reserva já foi feita por {{ firstReservationUser?.name }} para esta data. Escolha outra data ou entre na fila.</p> 
+        <p>Uma reserva já foi feita por {{ firstReservationUserName }} para esta data. Escolha outra data ou entre na fila.</p> 
       } @else if (status) {
         <p>Você já fez uma reserva para esta data. Deseja cancelar?</p>
       } @else {

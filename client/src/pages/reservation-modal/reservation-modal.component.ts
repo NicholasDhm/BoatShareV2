@@ -21,7 +21,7 @@ export class ReservationModalComponent implements OnInit, OnChanges {
   @Input() firstReservationToDisplay: IReservation | null = null;
 
   @Input() activeUser: IUser | null = null;
-  @Input() firstReservationUser: IUser | null = null;
+  @Input() firstReservationUserName: string | null = null;
   
   @Output() close = new EventEmitter<void>();
   @Output() newReservation = new EventEmitter<IReservation | null>();

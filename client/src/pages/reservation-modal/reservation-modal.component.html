@@ -19,12 +19,12 @@
     [status]="userReservationToDisplay.status ?? ''"
 
     [activeUser]="activeUser"
-    [firstReservationUser]="firstReservationUser"
+    [firstReservationUserName]="firstReservationUserName"
 
     [weekday]="weekday"
     (cancel)="onCancelReservation()"
     (close)="closeModal()"
-    (reserve)="makeReservation()">    
+    (reserve)="makeReservation()">
   </app-standard-modal>
 }
 
