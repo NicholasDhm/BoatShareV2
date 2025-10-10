@@ -72,8 +72,8 @@ export class DashboardCommonService {
   }
 
   isDateReserved(day: IDay, currentUser: IUser): Promise<boolean> {
-    return this._reservationService.getAllReservations().then(reservations => {
-      return reservations.some((reservation) => reservation.day === day.date && reservation.month === day.month && reservation.year === day.year && reservation.boatId === currentUser.boatId);
+    return this._reservationService.getReservationsByBoatId(currentUser.boatId).then(reservations => {
+      return reservations.some((reservation) => reservation.day === day.date && reservation.month === day.month && reservation.year === day.year);
     });
   }
 }

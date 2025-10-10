@@ -42,17 +42,17 @@
     position: absolute;
     bottom: 0.375rem;
     right: 0.375rem;
-    width: 1.125rem;
-    height: 1.125rem;
-    opacity: 0.7;
+    width: 16px;
+    height: 16px;
+    opacity: 0.95;
     z-index: 1;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.1));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 
     &:hover {
-      opacity: 0.9;
-      transform: scale(1.1);
-      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15));
+      opacity: 1;
+      transform: scale(1.15);
+      filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.25));
     }
   }
 
@@ -213,10 +213,10 @@
     }
 
     ui-svg {
-      width: 14px;
-      height: 14px;
-      bottom: 0.125rem;
-      right: 0.125rem;
+      width: 16px;
+      height: 16px;
+      bottom: 0.3rem;
+      right: 0.3rem;
     }
   }
 }
@@ -232,8 +232,8 @@
     }
 
     ui-svg {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
     }
   }
 }
