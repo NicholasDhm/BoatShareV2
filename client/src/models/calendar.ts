@@ -14,5 +14,5 @@ export interface IDay {
 	year: number;
 	isCurrentMonth: boolean;
 	state: string; // Standard | Substitution | Contingency
-	status?: 'Pending' | 'Unconfirmed' | 'Confirmed';
+	status?: 'Pending' | 'Unconfirmed' | 'Confirmed' | 'Cancelled' | 'Legacy';
 }

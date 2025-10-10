@@ -31,12 +31,67 @@
   }
 
   .navbar-toggler {
-    border: 1px solid var(--gray-300);
+    border: none;
+    background: transparent;
     border-radius: var(--radius-md);
     padding: var(--space-2);
+    position: relative;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+
+    &:hover {
+      background-color: var(--primary-50);
+      transform: scale(1.05);
+    }
 
     &:focus {
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    // Custom hamburger icon
+    .hamburger-icon {
+      width: 24px;
+      height: 18px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      .line {
+        width: 100%;
+        height: 2.5px;
+        background-color: var(--primary-600);
+        border-radius: 2px;
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        transform-origin: center;
+      }
+    }
+
+    // Animated X when menu is open
+    &.active {
+      .hamburger-icon {
+        .line:nth-child(1) {
+          transform: translateY(7.75px) rotate(45deg);
+        }
+
+        .line:nth-child(2) {
+          opacity: 0;
+          transform: scaleX(0);
+        }
+
+        .line:nth-child(3) {
+          transform: translateY(-7.75px) rotate(-45deg);
+        }
+      }
     }
   }
 
@@ -166,6 +221,20 @@
 
       &:hover {
         color: var(--primary-300);
+      }
+    }
+
+    .navbar-toggler {
+      &:hover {
+        background-color: var(--gray-800);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+      }
+
+      .hamburger-icon .line {
+        background-color: var(--primary-400);
       }
     }
 

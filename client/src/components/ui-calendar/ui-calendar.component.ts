@@ -103,7 +103,7 @@ export class UiCalendarComponent {
 		this.monthToDisplay = this.months[this.calendarViewModel!.displayDate.month - 1];
 	}
 
-	getReservationStatus(day: number, month: number, year: number): 'Confirmed' | 'Pending' | 'Unconfirmed' | undefined {
+	getReservationStatus(day: number, month: number, year: number): 'Confirmed' | 'Pending' | 'Unconfirmed' | 'Cancelled' | 'Legacy' | undefined {
 		if (!this.calendarViewModel) {
 			return;
 		}
