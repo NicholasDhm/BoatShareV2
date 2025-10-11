@@ -186,7 +186,7 @@
   &.status-confirmed {
     border-width: 3px;
     border-style: solid;
-    border-color: #10b981 !important; // Soft green for confirmed
+    border-color: #34d399 !important; // Softer green for confirmed
   }
 
   &.status-pending {
@@ -196,7 +196,7 @@
 
   &.status-unconfirmed {
     border-width: 3px;
-    border-style: solid;
+    border-style: dotted;
     border-color: #ef4444 !important; // Soft red alert for unconfirmed
   }
 }
