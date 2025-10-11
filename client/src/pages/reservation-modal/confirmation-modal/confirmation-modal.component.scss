@@ -58,6 +58,7 @@
     font-size: 0.95rem;
     line-height: 1.6;
     color: var(--gray-700);
+    font-weight: 400;
   }
 
   > ui-card {
@@ -79,17 +80,16 @@
         display: flex;
         align-items: baseline;
         flex-wrap: nowrap;
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: var(--gray-900);
         gap: 0.25rem;
         margin-top: 0.25rem;
 
         p {
+          margin: 0;
           font-size: 1.05rem;
-          font-weight: 700;
-          color: var(--gray-900);
+          font-weight: 600;
+          color: var(--gray-800);
           white-space: nowrap;
+          line-height: 1.2;
         }
       }
     }
