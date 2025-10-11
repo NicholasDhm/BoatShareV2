@@ -16,5 +16,16 @@ namespace boat_share.Abstract
 		Task UpdateReservationStatusesAsync();
 		Task<List<ReservationResponseDTO>> GetLegacyReservationsByUserIdAsync(int userId);
 		Task<List<ReservationResponseDTO>> GetLegacyReservationsByBoatIdAsync(int boatId);
+		Task<QuotaRestorationResult> RestoreLegacyQuotasAsync();
+	}
+
+	/// <summary>
+	/// Result of legacy quota restoration operation
+	/// </summary>
+	public class QuotaRestorationResult
+	{
+		public int ReservationsProcessed { get; set; }
+		public int QuotasRestored { get; set; }
+		public List<string> Details { get; set; } = new();
 	}
 }

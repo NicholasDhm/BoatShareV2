@@ -40,6 +40,12 @@ namespace boat_share.Models
         [StringLength(500, ErrorMessage = "Notes cannot exceed 500 characters")]
         public string Notes { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Tracks if quota was restored when reservation became Legacy
+        /// Prevents double-restoration of quotas
+        /// </summary>
+        public bool QuotaRestored { get; set; } = false;
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

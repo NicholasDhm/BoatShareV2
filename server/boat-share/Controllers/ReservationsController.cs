@@ -214,6 +214,31 @@ namespace boat_share.Controllers
         }
 
         /// <summary>
+        /// Admin-only: Restore quotas for existing Legacy reservations (one-time fix)
+        /// This endpoint fixes Legacy reservations that were created before the QuotaRestored flag was added
+        /// </summary>
+        [HttpPost("admin/restore-legacy-quotas")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RestoreLegacyQuotas()
+        {
+            try
+            {
+                var result = await _reservationService.RestoreLegacyQuotasAsync();
+                return Ok(new
+                {
+                    message = "Legacy quota restoration completed successfully",
+                    reservationsProcessed = result.ReservationsProcessed,
+                    quotasRestored = result.QuotasRestored,
+                    details = result.Details
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while restoring legacy quotas", error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Confirm a reservation
         /// </summary>
         [HttpPut("confirm-reservation")]

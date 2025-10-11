@@ -283,10 +283,11 @@ namespace boat_share.Services
                 reservation.Status = "Legacy";
                 reservation.MarkAsUpdated();
 
-                // Restore quota when reservation completes
-                if (reservation.User != null)
+                // Restore quota when reservation completes (only if not already restored)
+                if (reservation.User != null && !reservation.QuotaRestored)
                 {
                     reservation.User.RestoreQuota(reservation.ReservationType);
+                    reservation.QuotaRestored = true;
                 }
             }
 
@@ -333,6 +334,39 @@ namespace boat_share.Services
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// One-time operation to restore quotas for existing Legacy reservations
+        /// This fixes reservations that were marked Legacy before the QuotaRestored flag was added
+        /// </summary>
+        public async Task<QuotaRestorationResult> RestoreLegacyQuotasAsync()
+        {
+            var result = new QuotaRestorationResult();
+
+            // Find all Legacy reservations that haven't had quotas restored
+            var legacyReservationsNeedingRestore = await _context.Reservations
+                .Include(r => r.User)
+                .Where(r => r.Status == "Legacy" && !r.QuotaRestored)
+                .ToListAsync();
+
+            result.ReservationsProcessed = legacyReservationsNeedingRestore.Count;
+
+            foreach (var reservation in legacyReservationsNeedingRestore)
+            {
+                if (reservation.User != null)
+                {
+                    reservation.User.RestoreQuota(reservation.ReservationType);
+                    reservation.QuotaRestored = true;
+                    result.QuotasRestored++;
+
+                    result.Details.Add($"Restored {reservation.ReservationType} quota for User {reservation.UserId} from Reservation {reservation.ReservationId} (Date: {reservation.StartTime:yyyy-MM-dd})");
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return result;
         }
 
         public async Task<ReservationResponseDTO?> UpdateReservationAsync(int reservationId, ReservationDTO reservationDto)
