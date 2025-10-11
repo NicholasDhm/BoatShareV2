@@ -1,25 +1,26 @@
-<ui-card layout="vertical" justifyContent="space-between" class="modal">
-  
-  <ui-card layout="vertical">
-    <h3>Confirmar Reserva!</h3>
-    <span class="d-flex">
-      <p> {{ weekday + ','}} </p>
-      &nbsp;
-      <p> {{ reservationDate | date: 'longDate':'':'pt-BR'}} </p>
-    </span>
+<ui-card layout="vertical" justifyContent="space-between" class="modal" [ngClass]="reservationType">
+
+  <ui-card layout="vertical" gapStyle="large">
+    <ui-card layout="vertical">
+      <h3>Confirmar Reserva!</h3>
+      <span class="d-flex date-display">
+        <p> {{ weekday + ','}} </p>
+        &nbsp;
+        <p> {{ reservationDate | date: 'longDate':'':'pt-BR'}} </p>
+      </span>
+    </ui-card>
 
     <ui-card layout="vertical">
       <p>Por favor, confirme sua reserva. Não confirme se não tiver certeza.</p>
       <span class="d-flex justify-content-between w-100 align-items-center">
         <p>Tipo de Reserva:</p>
         &nbsp;
-        <p [ngClass]="(reservationType + '__text')"> {{ reservationTypeInPt }}</p>
+        <p class="reservation-type-value" [ngClass]="reservationType + '__text'"> {{ reservationTypeInPt }}</p>
       </span>
-  
     </ui-card>
   </ui-card>
 
-  <ui-card gapStyle="medium" alignItems="flex-end">
+  <ui-card gapStyle="medium">
     <button type="button" class="btn btn-success" (click)="onConfirmReservation()">Confirmar</button>
     <button type="button" class="btn btn-danger" (click)="onCancelReservation()">Cancelar</button>
     <button type="button" class="btn btn-secondary" (click)="closeModal()">Fechar</button>
