@@ -146,34 +146,34 @@
   }
 
   &.Substitution {
-    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
-    border-color: #f97316;
+    background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
+    border-color: #0891b2;
 
     &::before {
-      background: linear-gradient(90deg, #f97316, #ea580c);
+      background: linear-gradient(90deg, #06b6d4, #0891b2);
     }
 
     &:hover {
-      background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
-      border-color: #ea580c;
+      background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%);
+      border-color: #0e7490;
       box-shadow:
-        0 8px 25px rgba(249, 115, 22, 0.2),
-        0 4px 10px rgba(249, 115, 22, 0.1);
+        0 8px 25px rgba(6, 182, 212, 0.2),
+        0 4px 10px rgba(8, 145, 178, 0.1);
     }
 
     span {
-      color: #9a3412;
+      color: #164e63;
     }
   }
 
   &.other-month {
-    background: linear-gradient(135deg, rgba(156, 163, 175, 0.08) 0%, rgba(156, 163, 175, 0.12) 100%);
+    background: linear-gradient(135deg, rgba(156, 163, 175, 0.15) 0%, rgba(156, 163, 175, 0.20) 100%);
     border-color: var(--gray-400);
-    opacity: 0.6;
+    opacity: 0.85;
     cursor: default;
 
     span {
-      color: var(--gray-500);
+      color: var(--gray-600);
     }
 
     &:hover {
