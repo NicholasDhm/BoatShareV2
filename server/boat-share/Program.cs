@@ -45,6 +45,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBoatService, BoatService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 
+// Register background services
+builder.Services.AddHostedService<ReservationCleanupBackgroundService>();
+
 // Add CORS
 builder.Services.AddCors(options =>
 {

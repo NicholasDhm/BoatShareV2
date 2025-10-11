@@ -270,8 +270,9 @@ namespace boat_share.Services
         {
             var now = DateTime.UtcNow;
 
-            // 1. Archive completed reservations to Legacy status
+            // 1. Archive completed reservations to Legacy status and restore quotas
             var completedReservations = await _context.Reservations
+                .Include(r => r.User)  // Include user to restore quota
                 .Where(r => r.EndTime < now &&
                            r.Status != "Legacy" &&
                            r.Status != "Cancelled")
@@ -281,6 +282,12 @@ namespace boat_share.Services
             {
                 reservation.Status = "Legacy";
                 reservation.MarkAsUpdated();
+
+                // Restore quota when reservation completes
+                if (reservation.User != null)
+                {
+                    reservation.User.RestoreQuota(reservation.ReservationType);
+                }
             }
 
             // 2. Update Pending → Unconfirmed (optimized to avoid N+1 queries)
