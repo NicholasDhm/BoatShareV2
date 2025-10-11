@@ -62,23 +62,37 @@
 
   .confirmation_period {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
-    padding: 0.75rem 1rem;
-    background: linear-gradient(135deg, var(--warning-50) 0%, rgba(251, 191, 36, 0.1) 100%);
+    flex-direction: column;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, var(--warning-50) 0%, rgba(251, 191, 36, 0.08) 100%);
     border-radius: 12px;
-    border: 1px solid var(--warning-200);
+    border: 1px solid var(--warning-300);
     margin-top: 0.75rem;
 
-    span {
-      min-width: 160px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.25rem;
+    > p:first-child {
       font-weight: 600;
-      color: var(--warning-700);
+      color: var(--gray-800);
+      margin: 0;
+    }
+
+    span {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      border: 1px solid var(--warning-200);
+
+      p {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--warning-800);
+        margin: 0;
+      }
     }
   }
 
@@ -107,16 +121,18 @@
         span.date-display {
           display: flex;
           align-items: baseline;
-          font-size: 1.3rem;
-          font-weight: 700;
-          color: var(--gray-900);
+          flex-wrap: nowrap;
+          font-size: 1.05rem;
+          font-weight: 600;
+          color: var(--gray-800);
           gap: 0.25rem;
           margin-top: 0.25rem;
 
           p {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--gray-900);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            white-space: nowrap;
           }
         }
       }
@@ -221,18 +237,18 @@
 }
 
 .Contingency__text {
-  color: var(--contingency-colour);
-  font-weight: 700;
+  color: var(--contingency-colour) !important;
+  font-weight: 700 !important;
 }
 
 .Standard__text {
-  color: var(--standard-colour);
-  font-weight: 700;
+  color: var(--standard-colour) !important;
+  font-weight: 700 !important;
 }
 
 .Substitution__text {
-  color: var(--substitution-colour);
-  font-weight: 700;
+  color: var(--substitution-colour) !important;
+  font-weight: 700 !important;
 }
 
 .Greyish {

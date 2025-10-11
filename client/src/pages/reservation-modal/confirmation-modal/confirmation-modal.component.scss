@@ -78,16 +78,18 @@
       span.date-display {
         display: flex;
         align-items: baseline;
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--gray-900);
+        flex-wrap: nowrap;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--gray-800);
         gap: 0.25rem;
         margin-top: 0.25rem;
 
         p {
-          font-size: 1.3rem;
-          font-weight: 700;
-          color: var(--gray-900);
+          font-size: 1.05rem;
+          font-weight: 600;
+          color: var(--gray-800);
+          white-space: nowrap;
         }
       }
     }
@@ -181,18 +183,18 @@
 }
 
 .Contingency__text {
-  color: var(--contingency-colour);
-  font-weight: 700;
+  color: var(--contingency-colour) !important;
+  font-weight: 700 !important;
 }
 
 .Standard__text {
-  color: var(--standard-colour);
-  font-weight: 700;
+  color: var(--standard-colour) !important;
+  font-weight: 700 !important;
 }
 
 .Substitution__text {
-  color: var(--substitution-colour);
-  font-weight: 700;
+  color: var(--substitution-colour) !important;
+  font-weight: 700 !important;
 }
 
 button {
