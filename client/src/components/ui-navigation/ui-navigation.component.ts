@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common';
 export class UiNavigationComponent {
   @Input() role: 'Admin' | 'Member' | 'Unknown' = 'Member';
   isMenuOpen = false;
+  isAdminDropdownOpen = false;
 
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
@@ -22,5 +23,14 @@ export class UiNavigationComponent {
 
   closeMenu(): void {
     this.isMenuOpen = false;
+    this.isAdminDropdownOpen = false;
+  }
+
+  toggleAdminDropdown(): void {
+    this.isAdminDropdownOpen = !this.isAdminDropdownOpen;
+  }
+
+  closeAdminDropdown(): void {
+    this.isAdminDropdownOpen = false;
   }
 }

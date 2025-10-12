@@ -43,6 +43,11 @@
     justify-content: center;
     transition: all var(--transition-fast);
 
+    // Hide on desktop/large screens (992px and above)
+    @media (min-width: 992px) {
+      display: none;
+    }
+
     &:hover {
       background-color: var(--primary-50);
       transform: scale(1.05);
@@ -121,12 +126,23 @@
     }
   }
 
+  .dropdown {
+    position: relative;
+  }
+
   .dropdown-menu {
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
     padding: var(--space-2);
     margin-top: var(--space-2);
+    display: none;
+    position: absolute;
+    z-index: 1000;
+
+    &.show {
+      display: block;
+    }
 
     .dropdown-item {
       padding: var(--space-2) var(--space-3);

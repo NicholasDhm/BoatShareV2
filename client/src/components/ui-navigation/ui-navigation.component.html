@@ -74,23 +74,28 @@
           <!-- Admin Section -->
           @if (role === 'Admin') {
             <li class="nav-item dropdown" role="none">
-              <a 
-                class="nav-link dropdown-toggle" 
-                href="#" 
-                id="adminDropdown" 
+              <a
+                class="nav-link dropdown-toggle"
+                (click)="toggleAdminDropdown(); $event.preventDefault()"
+                [class.show]="isAdminDropdownOpen"
+                href="#"
+                id="adminDropdown"
                 role="menuitem"
-                data-bs-toggle="dropdown" 
-                aria-expanded="false"
+                [attr.aria-expanded]="isAdminDropdownOpen"
                 aria-haspopup="true"
                 aria-label="Admin options">
                 <i class="bi bi-gear me-1" aria-hidden="true"></i>
                 Administração
               </a>
-              <ul class="dropdown-menu" aria-labelledby="adminDropdown" role="menu">
+              <ul class="dropdown-menu"
+                  [class.show]="isAdminDropdownOpen"
+                  aria-labelledby="adminDropdown"
+                  role="menu">
                 <li role="none">
-                  <a 
-                    class="dropdown-item" 
+                  <a
+                    class="dropdown-item"
                     routerLink="/admin/users"
+                    (click)="closeAdminDropdown()"
                     role="menuitem"
                     aria-label="Manage users">
                     <i class="bi bi-people me-2" aria-hidden="true"></i>
@@ -98,9 +103,10 @@
                   </a>
                 </li>
                 <li role="none">
-                  <a 
-                    class="dropdown-item" 
+                  <a
+                    class="dropdown-item"
                     routerLink="/admin/boats"
+                    (click)="closeAdminDropdown()"
                     role="menuitem"
                     aria-label="Manage boats">
                     <i class="bi bi-sailboat me-2" aria-hidden="true"></i>
@@ -111,8 +117,9 @@
                   <hr class="dropdown-divider">
                 </li>
                 <li role="none">
-                  <a 
-                    class="dropdown-item" 
+                  <a
+                    class="dropdown-item"
+                    (click)="closeAdminDropdown(); $event.preventDefault()"
                     href="#"
                     role="menuitem"
                     aria-label="View analytics">
@@ -143,47 +150,13 @@
       <!-- Right side actions -->
       <div class="navbar-nav">
         @if (role === 'Unknown') {
-          <a 
-            class="btn btn-primary nav-cta" 
+          <a
+            class="btn btn-primary nav-cta"
             routerLink="/register"
             aria-label="Create new account">
             <i class="bi bi-person-plus me-1" aria-hidden="true"></i>
             Criar Conta
           </a>
-        } @else {
-          <!-- Quick actions for authenticated users -->
-          <div class="nav-item dropdown">
-            <button 
-              class="btn btn-outline-primary dropdown-toggle" 
-              type="button" 
-              id="quickActionsDropdown" 
-              data-bs-toggle="dropdown" 
-              aria-expanded="false"
-              aria-label="Quick actions">
-              <i class="bi bi-plus-circle me-1" aria-hidden="true"></i>
-              Ações
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quickActionsDropdown">
-              <li>
-                <button 
-                  class="dropdown-item" 
-                  type="button"
-                  aria-label="Create new reservation">
-                  <i class="bi bi-calendar-plus me-2" aria-hidden="true"></i>
-                  Nova Reserva
-                </button>
-              </li>
-              <li>
-                <button 
-                  class="dropdown-item" 
-                  type="button"
-                  aria-label="View my reservations">
-                  <i class="bi bi-list-check me-2" aria-hidden="true"></i>
-                  Minhas Reservas
-                </button>
-              </li>
-            </ul>
-          </div>
         }
       </div>
     </div>

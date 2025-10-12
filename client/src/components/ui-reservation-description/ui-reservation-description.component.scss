@@ -171,13 +171,33 @@ a.reservation_type__contingency {
 }
 
 // Responsive adjustments
+@media (max-width: 768px) {
+  .description_container {
+    align-items: center;
+  }
+
+  .quota-header {
+    text-align: center;
+  }
+
+  .quota-items {
+    justify-content: center;
+  }
+}
+
 @media (max-width: 480px) {
   .description_container {
     gap: 0.5rem;
+    align-items: center;
+  }
+
+  .quota-header {
+    text-align: center;
   }
 
   .quota-items {
     gap: 0.25rem;
+    justify-content: center;
   }
 
   .quota-header h3 {
