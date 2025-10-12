@@ -126,4 +126,28 @@ export class HistoryComponent implements OnInit {
 	isLoading(): boolean {
 		return this.viewMode === 'user' ? this.isLoadingUserHistory : this.isLoadingBoatHistory;
 	}
+
+	formatCreatedDate(isoDate: string | undefined): string {
+		if (!isoDate || isoDate.trim() === '') {
+			return 'Data não disponível';
+		}
+
+		try {
+			const date = new Date(isoDate);
+			// Check if date is valid
+			if (isNaN(date.getTime())) {
+				return 'Data inválida';
+			}
+			return date.toLocaleString('pt-BR', {
+				day: '2-digit',
+				month: '2-digit',
+				year: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit'
+			});
+		} catch (error) {
+			console.error('Error formatting date:', error);
+			return 'Data inválida';
+		}
+	}
 }

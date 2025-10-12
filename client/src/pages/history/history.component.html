@@ -85,12 +85,10 @@
 									</span>
 								</div>
 
-								@if (reservation.createdAtIsoDate) {
-									<div class="detail-row">
-										<span class="label">Criada em:</span>
-										<span class="value">{{ reservation.createdAtIsoDate | date: 'short':'':'pt-BR' }}</span>
-									</div>
-								}
+								<div class="detail-row">
+									<span class="label">Criada em:</span>
+									<span class="value">{{ formatCreatedDate(reservation.createdAtIsoDate) }}</span>
+								</div>
 							</div>
 						</div>
 					</ui-card>
