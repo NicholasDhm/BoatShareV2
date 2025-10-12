@@ -7,21 +7,23 @@
       <span>BoatShare</span>
     </a>
 
-    <!-- Mobile toggle button -->
-    <button
-      class="navbar-toggler"
-      type="button"
-      (click)="toggleMenu()"
-      [attr.aria-expanded]="isMenuOpen"
-      [class.active]="isMenuOpen"
-      aria-controls="navbarNav"
-      aria-label="Toggle navigation">
-      <span class="hamburger-icon">
-        <span class="line"></span>
-        <span class="line"></span>
-        <span class="line"></span>
-      </span>
-    </button>
+    <!-- Mobile toggle button - only show when logged in -->
+    @if (role !== 'Unknown') {
+      <button
+        class="navbar-toggler"
+        type="button"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="isMenuOpen"
+        [class.active]="isMenuOpen"
+        aria-controls="navbarNav"
+        aria-label="Toggle navigation">
+        <span class="hamburger-icon">
+          <span class="line"></span>
+          <span class="line"></span>
+          <span class="line"></span>
+        </span>
+      </button>
+    }
 
     <!-- Navigation Links -->
     <div class="collapse navbar-collapse"

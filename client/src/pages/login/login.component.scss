@@ -14,16 +14,21 @@
 }
 
 .login-container {
-  background: var(--background-secondary);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
   border-radius: var(--radius-xl);
   padding: var(--space-8);
-  box-shadow: var(--shadow-xl);
-  border: 1px solid var(--gray-200);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.15),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   width: 100%;
 
   @media (max-width: 480px) {
     padding: var(--space-6);
     border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.85);
   }
 }
 

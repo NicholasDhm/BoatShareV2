@@ -36,6 +36,10 @@ p {
   border: none;
   box-shadow: none;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    align-items: center !important;
+  }
 }
 
 span {

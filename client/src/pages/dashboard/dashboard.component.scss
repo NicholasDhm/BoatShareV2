@@ -480,6 +480,14 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    gap: 0.4rem;
+  }
+
+  @media (max-width: 480px) {
+    gap: 0.35rem;
+  }
 }
 
 .legend-item {
@@ -489,11 +497,33 @@
   font-size: 0.875rem;
   color: var(--gray-700);
 
+  @media (max-width: 768px) {
+    gap: 0.4rem;
+    font-size: 0.85rem;
+  }
+
+  @media (max-width: 480px) {
+    gap: 0.35rem;
+    font-size: 0.8rem;
+  }
+
   .legend-dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
     border: 2px solid;
+    flex-shrink: 0;
+
+    @media (max-width: 768px) {
+      width: 11px;
+      height: 11px;
+    }
+
+    @media (max-width: 480px) {
+      width: 10px;
+      height: 10px;
+      border-width: 1.5px;
+    }
 
     &.standard {
       background: rgba(34, 197, 94, 0.2);
@@ -586,8 +616,8 @@
   }
 
   .stats-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
   }
 
   .quota-card, .stats-card, .legend-card {
@@ -599,12 +629,14 @@
   }
 
   .stats-grid .stat-item {
+    padding: 0.75rem;
+
     .stat-number {
-      font-size: 3rem !important;
+      font-size: 2rem !important;
     }
 
     .stat-label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
     }
   }
 
@@ -614,7 +646,6 @@
 
   .legend-item {
     justify-content: center;
-    font-size: 0.9rem;
   }
 }
 
@@ -637,16 +668,24 @@
 
     h3 {
       justify-content: center;
+      font-size: 1rem;
     }
   }
 
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
   .stats-grid .stat-item {
+    padding: 0.5rem;
+
     .stat-number {
-      font-size: 2.5rem !important;
+      font-size: 1.75rem !important;
     }
 
     .stat-label {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
     }
   }
 
@@ -656,7 +695,6 @@
 
   .legend-item {
     justify-content: center;
-    font-size: 0.85rem;
   }
 
   .calendar-section {
