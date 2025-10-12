@@ -38,6 +38,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
         options.UseNpgsql(connectionString);
     }
+
+    // Suppress PendingModelChangesWarning during migration application
+    // This warning appears when applying multiple migrations at once where intermediate states differ from final model
+    options.ConfigureWarnings(warnings =>
+        warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
 });
 
 // Register services
