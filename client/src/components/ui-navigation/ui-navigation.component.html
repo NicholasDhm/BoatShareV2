@@ -25,12 +25,12 @@
       </button>
     }
 
-    <!-- Navigation Links -->
-    <div class="collapse navbar-collapse"
-         [ngClass]="{'show': isMenuOpen}"
-         id="navbarNav">
-      <ul class="navbar-nav me-auto" role="menubar">
-        @if (role !== 'Unknown') {
+    <!-- Navigation Links - Only show when logged in -->
+    @if (role !== 'Unknown') {
+      <div class="collapse navbar-collapse"
+           [ngClass]="{'show': isMenuOpen}"
+           id="navbarNav">
+        <ul class="navbar-nav me-auto" role="menubar">
           <!-- Dashboard -->
           <li class="nav-item" role="none">
             <a
@@ -133,34 +133,13 @@
               </ul>
             </li>
           }
-        } @else {
-          <!-- Public navigation for non-authenticated users -->
-          <li class="nav-item" role="none">
-            <a 
-              class="nav-link" 
-              routerLink="/login" 
-              routerLinkActive="active"
-              role="menuitem"
-              aria-label="Sign in to your account">
-              <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>
-              Entrar
-            </a>
-          </li>
-        }
-      </ul>
+        </ul>
 
-      <!-- Right side actions -->
-      <div class="navbar-nav">
-        @if (role === 'Unknown') {
-          <a
-            class="btn btn-primary nav-cta"
-            routerLink="/register"
-            aria-label="Create new account">
-            <i class="bi bi-person-plus me-1" aria-hidden="true"></i>
-            Criar Conta
-          </a>
-        }
+        <!-- Right side actions -->
+        <div class="navbar-nav">
+          <!-- Actions only shown when logged in -->
+        </div>
       </div>
-    </div>
+    }
   </div>
 </nav>
