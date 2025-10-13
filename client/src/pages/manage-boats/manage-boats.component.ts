@@ -94,4 +94,17 @@ export class ManageBoatsComponent implements OnInit {
       this.onSelectBoatId(this.boats[0]?.boatId);
     });
   }
+
+  getBoatReservations(): IReservation[] {
+    if (!this.boat) return [];
+    return this.reservationsByBoatId.filter(r => r.boatId === this.boat?.boatId);
+  }
+
+  formatReservationDate(day: number, month: number, year: number): string {
+    const monthNames = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    return `${day} de ${monthNames[month - 1]} de ${year}`;
+  }
 }

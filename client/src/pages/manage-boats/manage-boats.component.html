@@ -1,58 +1,85 @@
-<ui-card layout="vertical" class="manage_boats_container" justifyContent="space-between" gapStyle="large">
-  <ui-card alignItems="center">
-    <h4 class="m-0">Todos os Barcos</h4>
-    <select [ngModel]="boatId" (ngModelChange)="onSelectBoatId(+$event)">
+<div class="manage-boats-container">
+  <!-- Header -->
+  <div class="boats-header">
+    <h1>Gerenciar Barcos</h1>
+    <p class="subtitle">Visualize e gerencie todos os barcos do sistema</p>
+  </div>
+
+  <!-- Boat Selector -->
+  <div class="boat-selector">
+    <label for="boatSelect">Selecionar Barco:</label>
+    <select id="boatSelect" class="form-select" [ngModel]="boatId" (ngModelChange)="onSelectBoatId(+$event)">
       @for (boat of boats; track boat.boatId) {
-        <option value="{{ boat.boatId }}" [selected]="boat.boatId === boatId">{{ boat.name }}</option>
+        <option [value]="boat.boatId" [selected]="boat.boatId === boatId">{{ boat.name }}</option>
       }
     </select>
-  </ui-card>
+  </div>
 
   @if (boat) {
-    <ui-card gapStyle="large" class="w-100" [flexWrap]="true"> 
-      <ui-card layout="vertical" class="boat_container">
-        <div class="display_row">
-          <p>ID do Barco:</p>
-          <p>&nbsp;</p>
-          <span>{{ boat.boatId }}</span>
+    <!-- Boat Details Grid -->
+    <div class="boat-details-grid">
+      <!-- Boat Information Card -->
+      <ui-card class="boat-info-card">
+        <div class="card-header">
+          <i class="bi bi-ship"></i>
+          <h3>Informações do Barco</h3>
         </div>
-        <div class="display_row">
-          <p>Nome do Barco:</p>
-          <p>&nbsp;</p>
-          <span>{{ boat.name }}</span>
-        </div>
-        <div class="display_row">
-          <p>Capacidade do Barco:</p>
-          <p>&nbsp;</p>
-          <span>{{ boat.capacity }}</span>
-        </div>
-        <div class="display_row">
-          <p>Quantidade Atual de Usuários Atribuídos ao Barco:</p>
-          <p>&nbsp;</p>
-          <span>{{ boat.assignedUsersCount }}</span>
+        <div class="card-content">
+          <div class="detail-row">
+            <span class="label">ID do Barco:</span>
+            <span class="value">{{ boat.boatId }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Nome do Barco:</span>
+            <span class="value">{{ boat.name }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Capacidade do Barco:</span>
+            <span class="value">{{ boat.capacity }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Usuários Atribuídos:</span>
+            <span class="value capacity-indicator" [class.at-capacity]="boat.assignedUsersCount >= boat.capacity">
+              {{ boat.assignedUsersCount }} / {{ boat.capacity }}
+            </span>
+          </div>
         </div>
       </ui-card>
-      
-      <ui-card layout="vertical" class="boat_container">
-        <div>Reservas:</div>
-        @for (reservation of reservationsByBoatId; track reservation) {
-          @if (reservation.boatId === boat.boatId) {
-            <div class="display_row">
-              <p>Data da Reserva:</p>
-              <p>&nbsp;</p>
-              <span>{{ reservation.day + '/' + reservation.month + '/' + reservation.year }}</span>
+
+      <!-- Reservations Card -->
+      <ui-card class="reservations-card">
+        <div class="card-header">
+          <i class="bi bi-calendar-check"></i>
+          <h3>Reservas</h3>
+        </div>
+        <div class="card-content">
+          @if (getBoatReservations().length === 0) {
+            <div class="empty-reservations">
+              <i class="bi bi-calendar-x"></i>
+              <p>Nenhuma reserva encontrada</p>
             </div>
+          } @else {
+            @for (reservation of getBoatReservations(); track reservation.reservationId) {
+              <div class="reservation-item">
+                <i class="bi bi-calendar-event"></i>
+                <span>{{ formatReservationDate(reservation.day, reservation.month, reservation.year) }}</span>
+              </div>
+            }
           }
-        }
+        </div>
       </ui-card>
-    </ui-card>
+    </div>
   }
 
-  <ui-card layout="vertical" class="add_boat_container">
-    <button class="btn btn-primary" (click)="changeBoatModalState()">{{ addBoatModal ? "Fechar Formulário de Barco" : "Abrir Formulário de Barco" }}</button>
-  </ui-card>
+  <!-- Action Button -->
+  <div class="action-section">
+    <button class="btn btn-primary btn-action" (click)="changeBoatModalState()">
+      <i class="bi" [class.bi-x-circle]="addBoatModal" [class.bi-plus-circle]="!addBoatModal"></i>
+      {{ addBoatModal ? "Fechar Formulário de Barco" : "Abrir Formulário de Barco" }}
+    </button>
+  </div>
 
-</ui-card>
+</div>
 
 @if (addBoatModal) {
   <ui-card [flexWrap]="true">

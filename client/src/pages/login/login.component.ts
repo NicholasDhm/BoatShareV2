@@ -43,6 +43,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       const emailInput = document.getElementById('email');
       emailInput?.focus();
     }, 100);
+    console.log(new Date().toISOString())
   }
 
   ngOnDestroy(): void {

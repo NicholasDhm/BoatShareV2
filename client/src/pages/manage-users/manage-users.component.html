@@ -1,76 +1,126 @@
-<ui-card layout="vertical" class="manage_users_container" justifyContent="space-between" gapStyle="large">
-  <ui-card alignItems="center">
-    <h4 class="m-0">Todos os Usuários</h4>
-    <select [ngModel]="userId" (ngModelChange)="onSelectUserId(+$event)">
+<div class="manage-users-container">
+  <!-- Header -->
+  <div class="users-header">
+    <h1>Gerenciar Usuários</h1>
+    <p class="subtitle">Visualize e gerencie todos os usuários do sistema</p>
+  </div>
+
+  <!-- User Selector -->
+  <div class="user-selector">
+    <label for="userSelect">Selecionar Usuário:</label>
+    <select id="userSelect" class="form-select" [ngModel]="userId" (ngModelChange)="onSelectUserId(+$event)">
       @for (user of users; track user.userId) {
-        <option value="{{ user.userId }}" [selected]="user.userId === userId">{{ user.name }}</option>
+        <option [value]="user.userId" [selected]="user.userId === userId">{{ user.name }}</option>
       }
     </select>
-  </ui-card>
+  </div>
 
   @if (user) {
-    <ui-card gapStyle="large" class="w-100" [flexWrap]="true"> 
-      <ui-card layout="vertical" class="user_container">
-        <div class="display_row">
-          <p>ID do Usuário:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.userId }}</span>
+    <!-- User Details Grid -->
+    <div class="user-details-grid">
+      <!-- User Information Card -->
+      <ui-card class="user-info-card">
+        <div class="card-header">
+          <i class="bi bi-person-circle"></i>
+          <h3>Informações do Usuário</h3>
         </div>
-        <div class="display_row">
-          <p>Nome do Usuário:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.name }}</span>
-        </div>
-        <div class="display_row">
-          <p>Cargo:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.role }}</span>
-        </div>
-        <div class="display_row">
-          <p>Cotas Padrões:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.standardQuota }}</span>
-        </div>
-        <div class="display_row">
-          <p>Cotas Suplentes:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.substitutionQuota }}</span>
-        </div>
-        <div class="display_row">
-          <p>Cotas Contingentes:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.contingencyQuota }}</span>
-        </div>
-        <div class="display_row">
-          <p>ID do Barco:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.boatId }}</span>
+        <div class="card-content">
+          <div class="detail-row">
+            <span class="label">ID do Usuário:</span>
+            <span class="value">{{ user.userId }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Nome:</span>
+            <span class="value">{{ user.name }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Email:</span>
+            <span class="value">{{ user.email }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Cargo:</span>
+            <span class="value role-badge" [class.admin]="user.role === 'Admin'" [class.member]="user.role === 'Member'">
+              <i class="bi" [class.bi-shield-check]="user.role === 'Admin'" [class.bi-person]="user.role === 'Member'"></i>
+              {{ getRoleLabel(user.role) }}
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="label">ID do Barco:</span>
+            <span class="value">{{ getBoatName(user.boatId) }}</span>
+          </div>
         </div>
       </ui-card>
-      
-      <ui-card layout="vertical" class="user_container">
-        <div>Reservas:</div>
-        @for (reservation of reservationsByUserId; track reservation) {
-          @if (reservation.userId === user.userId) {
-            <div class="display_row">
-              <p>Data da Reserva:</p>
-              <p>&nbsp;</p>
-              <span>{{ reservation.day + '/' + reservation.month + '/' + reservation.year }}</span>
-            </div>
-          }
-        }
-      </ui-card>
-    </ui-card>
-  }
 
-  <!-- botão para tornar o usuário administrador se for membro ou torná-lo membro se for administrador -->
-  @if (userId !== currentUser?.userId) {
-    <ui-card layout="vertical" class="add_user_container">
-      @if (user && user.role === 'Member') {
-        <button class="btn btn-warning" (click)="changeUserRole()">Tornar Usuário Administrador</button>
-      } @else if (user && user.role === 'Admin') {
-        <button class="btn btn-warning" (click)="changeUserRole()">Tornar Usuário Membro</button>
-      }
-    </ui-card>  
+      <!-- Quotas Card -->
+      <ui-card class="quotas-card">
+        <div class="card-header">
+          <i class="bi bi-calendar3"></i>
+          <h3>Cotas de Reserva</h3>
+        </div>
+        <div class="card-content">
+          <div class="quota-item standard">
+            <div class="quota-info">
+              <i class="bi bi-calendar-check"></i>
+              <span class="quota-label">Cotas Padrões</span>
+            </div>
+            <span class="quota-value">{{ user.standardQuota }}</span>
+          </div>
+          <div class="quota-item substitution">
+            <div class="quota-info">
+              <i class="bi bi-calendar-event"></i>
+              <span class="quota-label">Cotas Suplentes</span>
+            </div>
+            <span class="quota-value">{{ user.substitutionQuota }}</span>
+          </div>
+          <div class="quota-item contingency">
+            <div class="quota-info">
+              <i class="bi bi-calendar-plus"></i>
+              <span class="quota-label">Cotas Contingentes</span>
+            </div>
+            <span class="quota-value">{{ user.contingencyQuota }}</span>
+          </div>
+        </div>
+      </ui-card>
+
+      <!-- Reservations Card -->
+      <ui-card class="reservations-card">
+        <div class="card-header">
+          <i class="bi bi-calendar-check"></i>
+          <h3>Reservas</h3>
+        </div>
+        <div class="card-content">
+          @if (getUserReservations().length === 0) {
+            <div class="empty-reservations">
+              <i class="bi bi-calendar-x"></i>
+              <p>Nenhuma reserva encontrada</p>
+            </div>
+          } @else {
+            @for (reservation of getUserReservations(); track reservation.reservationId) {
+              <div class="reservation-item">
+                <i class="bi bi-calendar-event"></i>
+                <span>{{ formatReservationDate(reservation.day, reservation.month, reservation.year) }}</span>
+              </div>
+            }
+          }
+        </div>
+      </ui-card>
+    </div>
+
+    <!-- Role Change Action -->
+    @if (userId !== currentUser?.userId) {
+      <div class="action-section">
+        @if (user.role === 'Member') {
+          <button class="btn btn-warning btn-action" (click)="changeUserRole()">
+            <i class="bi bi-shield-check"></i>
+            Tornar Usuário Administrador
+          </button>
+        } @else if (user.role === 'Admin') {
+          <button class="btn btn-warning btn-action" (click)="changeUserRole()">
+            <i class="bi bi-person"></i>
+            Tornar Usuário Membro
+          </button>
+        }
+      </div>
+    }
   }
-</ui-card>
+</div>

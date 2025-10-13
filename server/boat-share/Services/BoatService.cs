@@ -18,6 +18,7 @@ namespace boat_share.Services
         public async Task<List<BoatDTO>> GetBoatsAsync()
         {
             return await _context.Boats
+                .Include(b => b.Users)
                 .Select(b => new BoatDTO
                 {
                     BoatId = b.BoatId,
@@ -37,7 +38,10 @@ namespace boat_share.Services
 
         public async Task<BoatDTO?> GetBoatByIdAsync(int boatId)
         {
-            var boat = await _context.Boats.FindAsync(boatId);
+            var boat = await _context.Boats
+                .Include(b => b.Users)
+                .FirstOrDefaultAsync(b => b.BoatId == boatId);
+
             if (boat == null) return null;
 
             return new BoatDTO
