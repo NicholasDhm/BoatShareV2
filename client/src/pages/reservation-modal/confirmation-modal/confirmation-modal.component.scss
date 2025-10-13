@@ -14,7 +14,8 @@
   width: 480px;
   min-height: 380px;
   max-height: 90vh;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -248,9 +249,14 @@ button {
 
 @media (max-width: 768px) {
   .modal {
-    width: 90vw;
+    width: calc(100vw - 2rem);
     max-width: 420px;
     min-height: auto;
+    max-height: calc(100vh - 2rem);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
 
     > ui-card {
       padding: 1.5rem !important;
@@ -258,6 +264,41 @@ button {
 
     h3 {
       font-size: 1.5rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .modal {
+    width: calc(100vw - 1.5rem);
+    max-width: none;
+    max-height: calc(100vh - 1.5rem);
+    border-radius: 16px;
+
+    > ui-card {
+      padding: 1.25rem !important;
+      gap: 1.25rem;
+
+      > ui-card:first-child {
+        padding: 1.25rem !important;
+      }
+
+      > ui-card:nth-child(2) {
+        padding: 1.25rem !important;
+      }
+    }
+
+    h3 {
+      font-size: 1.35rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+    }
+
+    button {
+      height: 44px;
+      font-size: 0.95rem;
     }
   }
 }

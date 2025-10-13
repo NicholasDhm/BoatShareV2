@@ -271,9 +271,10 @@ namespace boat_share.Services
             var now = DateTime.UtcNow;
 
             // 1. Archive completed reservations to Legacy status and restore quotas
+            // Only mark as Legacy after the entire reservation date has passed (next day)
             var completedReservations = await _context.Reservations
                 .Include(r => r.User)  // Include user to restore quota
-                .Where(r => r.EndTime < now &&
+                .Where(r => r.StartTime.Date < now.Date &&
                            r.Status != "Legacy" &&
                            r.Status != "Cancelled")
                 .ToListAsync();
