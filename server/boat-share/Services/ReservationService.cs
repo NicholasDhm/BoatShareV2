@@ -387,6 +387,9 @@ namespace boat_share.Services
                 throw new InvalidOperationException("Cannot manually set reservation to Legacy status. Use automated archival process.");
             }
 
+            // Track if status is changing to Confirmed
+            var isBeingConfirmed = reservationDto.Status == "Confirmed" && reservation.Status != "Confirmed";
+
             reservation.StartTime = reservationDto.StartTime;
             reservation.EndTime = reservationDto.EndTime;
             reservation.ReservationType = reservationDto.ReservationType;
@@ -402,6 +405,32 @@ namespace boat_share.Services
             }
 
             reservation.MarkAsUpdated();
+
+            // When a reservation is confirmed, delete all other pending substitution reservations
+            // for the same boat and date, and restore quotas to those users
+            if (isBeingConfirmed)
+            {
+                var substitutionReservations = await _context.Reservations
+                    .Include(r => r.User)
+                    .Where(r => r.ReservationId != reservationId &&
+                               r.BoatId == reservation.BoatId &&
+                               r.StartTime.Date == reservation.StartTime.Date &&
+                               r.Status == "Pending")
+                    .ToListAsync();
+
+                foreach (var subReservation in substitutionReservations)
+                {
+                    // Restore quota to the user who made the substitution reservation
+                    if (subReservation.User != null)
+                    {
+                        subReservation.User.RestoreQuota(subReservation.ReservationType);
+                    }
+
+                    // Remove the substitution reservation
+                    _context.Reservations.Remove(subReservation);
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             return await GetReservationByIdAsync(reservationId);

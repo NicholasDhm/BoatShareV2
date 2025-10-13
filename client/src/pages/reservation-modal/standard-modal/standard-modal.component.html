@@ -34,6 +34,8 @@
         }
       } @else if (reservationType === "Substitution" && !status) {
         <p>Uma reserva já foi feita por <strong class="user-name">{{ firstReservationUserName }}</strong> para esta data. Escolha outra data ou entre na fila.</p> 
+      } @else if (status === "Confirmed") {
+        <p>Você já confirmou uma reserva para esta data. Reservas confirmadas não podem ser canceladas.</p>
       } @else if (status) {
         <p>Você já fez uma reserva para esta data. Deseja cancelar?</p>
       } @else {
@@ -49,9 +51,9 @@
   </ui-card>
 
   <ui-card gapStyle="medium">
-    @if (status) {
+    @if (status && status !== "Confirmed") {
       <button type="button" class="btn btn-danger" (click)="onCancelReservation()">Cancelar Reserva</button>
-    } @else {
+    } @else if (!status) {
       <button type="button" class="btn" [ngClass]="reservationType" (click)="makeReservation()">Fazer Reserva</button>
     }
     <button type="button" class="btn btn-secondary" (click)="closeModal()">Fechar</button>

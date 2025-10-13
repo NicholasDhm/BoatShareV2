@@ -66,9 +66,9 @@ namespace boat_share.Controllers
                     Role = "Member",
                     PasswordHash = hashedPassword,
                     BoatId = testBoat.BoatId,
-                    StandardQuota = 10,
-                    SubstitutionQuota = 5,
-                    ContingencyQuota = 3,
+                    StandardQuota = 2,
+                    SubstitutionQuota = 2,
+                    ContingencyQuota = 1,
                     IsActive = true
                 };
 
@@ -123,9 +123,9 @@ namespace boat_share.Controllers
                     Role = userDto.Role,
                     PasswordHash = hashedPassword,
                     BoatId = userDto.BoatId,
-                    StandardQuota = 10,
-                    SubstitutionQuota = 5,
-                    ContingencyQuota = 3,
+                    StandardQuota = 2,
+                    SubstitutionQuota = 2,
+                    ContingencyQuota = 1,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow
                 };
