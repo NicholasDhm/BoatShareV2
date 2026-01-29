@@ -23,6 +23,9 @@ namespace boat_share.Models
         [StringLength(200, ErrorMessage = "Location cannot exceed 200 characters")]
         public string Location { get; set; } = string.Empty;
 
+        [StringLength(500, ErrorMessage = "ImageUrl cannot exceed 500 characters")]
+        public string? ImageUrl { get; set; }
+
         [Required]
         [Range(1, 50, ErrorMessage = "Capacity must be between 1 and 50")]
         public int Capacity { get; set; }

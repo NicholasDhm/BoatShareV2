@@ -1,105 +1,123 @@
-<ui-card layout="vertical" class="profile_container" justifyContent="space-between" gapStyle="large">
-  <ui-card
-    class="w-100"
-    layout="horizontal"
-    [flexWrap]="true"
-    alignItems="center"
-    justifyContent="space-between">
-    <h5>Informações do Usuário</h5>
+<div class="profile-container">
+  <!-- Header -->
+  <div class="profile-header">
+    <div class="header-content">
+      <h1>Meu Perfil</h1>
+      <p class="subtitle">Gerencie suas informações pessoais e veja suas reservas</p>
+    </div>
     @if (user && boat) {
-      @if (!isEditing) {
-        <p (click)="changeEditState()">
-          <i class="bi bi-pencil-square"></i>
-          Editar
-        </p>
-      } @else {
-        <ui-card>
-          <p (click)="confirmChanges()" class="cursor-pointer">
-            <i class="bi bi-floppy"></i>
+      <div class="header-actions">
+        @if (!isEditing) {
+          <button class="btn btn-secondary" (click)="changeEditState()">
+            <i class="bi bi-pencil-square"></i>
+            Editar Perfil
+          </button>
+        } @else {
+          <button class="btn btn-primary" (click)="confirmChanges()">
+            <i class="bi bi-check-lg"></i>
             Salvar
-          </p>
-          <p (click)="changeEditState()">
+          </button>
+          <button class="btn btn-secondary" (click)="changeEditState()">
             <i class="bi bi-x-lg"></i>
             Cancelar
-          </p>
-        </ui-card>
-      }
+          </button>
+        }
+      </div>
     }
-  </ui-card>
+  </div>
+
   @if (user && boat) {
-    <ui-card gapStyle="large" class="w-100" [flexWrap]="true"> 
-      <ui-card layout="vertical" class="data_container" gapStyle="medium">
-        <div class="display_row">
-          <p>Nome de Usuário:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.name }}</span>
+    <!-- User Info Section -->
+    <ui-card layout="vertical" class="profile-card" gapStyle="none">
+      <div class="card-header">
+        <i class="bi bi-person-circle"></i>
+        <h3>Informações Pessoais</h3>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Nome</span>
+          <span class="info-value">{{ user.name }}</span>
         </div>
-        <div class="display_row">
-          <p>ID de Usuário:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.userId }}</span>
+        <div class="info-item">
+          <span class="info-label">Email</span>
+          <span class="info-value">{{ user.email }}</span>
         </div>
-        <div class="display_row">
-          <p>Email:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.email }}</span>
+        <div class="info-item">
+          <span class="info-label">Cargo</span>
+          <span class="info-value">
+            <span class="badge" [class.badge-admin]="user.role === 'Admin'" [class.badge-member]="user.role === 'Member'">
+              <i class="bi" [class.bi-shield-check]="user.role === 'Admin'" [class.bi-person]="user.role === 'Member'"></i>
+              {{ user.role === 'Admin' ? 'Administrador' : 'Membro' }}
+            </span>
+          </span>
         </div>
-        <div class="display_row">
-          <p>Cargo:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.role }}</span>
+        <div class="info-item">
+          <span class="info-label">Barco</span>
+          <span class="info-value">
+            <span class="badge badge-boat">
+              <i class="bi bi-water"></i>
+              {{ boat.name }}
+            </span>
+          </span>
         </div>
-        <div class="display_row">
-          <p>Cotas Padrões:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.standardQuota }}</span>
-        </div>
-        <div class="display_row">
-          <p>Cotas Suplentes:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.substitutionQuota }}</span>
-        </div>
-        <div class="display_row">
-          <p>Cotas Contingentes:</p>
-          <p>&nbsp;</p>
-          <span>{{ user.contingencyQuota }}</span>
-        </div>
-        <div class="display_row">
-          <p>Seu Barco:</p>
-          <p>&nbsp;</p>
-          <span>{{ boat.name }}</span>
-        </div>
-        <div class="display_row">
-          <p>Senha:</p>
-          <p>&nbsp;</p>
+        <div class="info-item">
+          <span class="info-label">Senha</span>
           @if (isEditing) {
-            <form [formGroup]="newPasswordForm">
-              <div class="form">
-                <input type="text" class="form-control" formControlName="password" id="password" placeholder="Nova Senha">
-              </div>
+            <form [formGroup]="newPasswordForm" class="password-form">
+              <input type="password" class="form-control" formControlName="password" placeholder="Nova Senha">
             </form>
           } @else {
-            <span>********</span>
+            <span class="info-value password-dots">••••••••</span>
           }
         </div>
-      </ui-card>
-        
-      <ui-card layout="vertical" class="data_container">
-        <div>Suas Reservas:</div>
+      </div>
+    </ui-card>
+
+    <!-- Quotas Section -->
+    <ui-card layout="vertical" class="profile-card" gapStyle="none">
+      <div class="card-header">
+        <i class="bi bi-calendar3"></i>
+        <h3>Minhas Cotas</h3>
+      </div>
+      <div class="quotas-grid">
+        <div class="quota-card standard">
+          <span class="quota-number">{{ user.standardQuota }}</span>
+          <span class="quota-label">Padrões</span>
+        </div>
+        <div class="quota-card substitution">
+          <span class="quota-number">{{ user.substitutionQuota }}</span>
+          <span class="quota-label">Suplentes</span>
+        </div>
+        <div class="quota-card contingency">
+          <span class="quota-number">{{ user.contingencyQuota }}</span>
+          <span class="quota-label">Contingentes</span>
+        </div>
+      </div>
+    </ui-card>
+
+    <!-- Reservations Section -->
+    <ui-card layout="vertical" class="profile-card" gapStyle="none">
+      <div class="card-header">
+        <i class="bi bi-calendar-check"></i>
+        <h3>Minhas Reservas</h3>
+      </div>
+      <div class="reservations-content">
         @if (reservations.length === 0) {
-          <div class="display_row">
+          <div class="empty-state">
+            <i class="bi bi-calendar-x"></i>
             <p>Nenhuma reserva encontrada</p>
           </div>
         } @else {
-          @for (reservation of reservations; track reservation) {
-            <div class="display_row">
-              <p>Data da Reserva:</p>
-              <p>&nbsp;</p>
-              <span>{{ reservation.day + '/' + reservation.month + '/' + reservation.year }}</span>
-            </div>
-          }
+          <div class="reservations-grid">
+            @for (reservation of reservations; track reservation) {
+              <div class="reservation-chip">
+                <i class="bi bi-calendar-event"></i>
+                <span>{{ reservation.day }}/{{ reservation.month }}/{{ reservation.year }}</span>
+              </div>
+            }
+          </div>
         }
-      </ui-card>
+      </div>
     </ui-card>
   }
-</ui-card>
+</div>

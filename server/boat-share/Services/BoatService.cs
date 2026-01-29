@@ -26,6 +26,7 @@ namespace boat_share.Services
                     Type = b.Type,
                     Description = b.Description,
                     Location = b.Location,
+                    ImageUrl = b.ImageUrl,
                     Capacity = b.Capacity,
                     HourlyRate = b.HourlyRate,
                     IsActive = b.IsActive,
@@ -51,6 +52,7 @@ namespace boat_share.Services
                 Type = boat.Type,
                 Description = boat.Description,
                 Location = boat.Location,
+                ImageUrl = boat.ImageUrl,
                 Capacity = boat.Capacity,
                 HourlyRate = boat.HourlyRate,
                 IsActive = boat.IsActive,
@@ -68,6 +70,7 @@ namespace boat_share.Services
                 Type = boatCreateDto.Type,
                 Description = boatCreateDto.Description,
                 Location = boatCreateDto.Location,
+                ImageUrl = boatCreateDto.ImageUrl,
                 Capacity = boatCreateDto.Capacity,
                 HourlyRate = boatCreateDto.HourlyRate
             };
@@ -94,6 +97,9 @@ namespace boat_share.Services
 
             if (!string.IsNullOrEmpty(boatUpdateDto.Location))
                 boat.Location = boatUpdateDto.Location;
+
+            if (boatUpdateDto.ImageUrl != null)
+                boat.ImageUrl = boatUpdateDto.ImageUrl;
 
             if (boatUpdateDto.Capacity.HasValue)
                 boat.Capacity = boatUpdateDto.Capacity.Value;

@@ -6,6 +6,7 @@ export interface IBoat {
 	type?: string;
 	description?: string;
 	location?: string;
+	imageUrl?: string;
 	hourlyRate?: number;
 	isActive?: boolean;
 }

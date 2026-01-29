@@ -16,72 +16,125 @@
   </div>
 
   @if (boat) {
-    <!-- Boat Details Grid -->
-    <div class="boat-details-grid">
-      <!-- Boat Information Card -->
-      <ui-card class="boat-info-card">
-        <div class="card-header">
-          <i class="bi bi-ship"></i>
-          <h3>Informações do Barco</h3>
+    <!-- Boat Image Card -->
+    <ui-card layout="vertical" class="profile-card" gapStyle="none">
+      <div class="card-header">
+        <i class="bi bi-image"></i>
+        <h3>Imagem do Barco</h3>
+        @if (canEditBoat) {
+          <div class="header-actions">
+            @if (!isEditingImage) {
+              <button class="btn btn-sm btn-secondary" (click)="toggleEditImage()">
+                <i class="bi bi-pencil"></i>
+                Editar
+              </button>
+            } @else {
+              <button class="btn btn-sm btn-primary" (click)="saveImageUrl()">
+                <i class="bi bi-check-lg"></i>
+                Salvar
+              </button>
+              <button class="btn btn-sm btn-secondary" (click)="toggleEditImage()">
+                <i class="bi bi-x-lg"></i>
+                Cancelar
+              </button>
+            }
+          </div>
+        }
+      </div>
+      @if (isEditingImage) {
+        <div class="edit-image-form">
+          <label for="editImageUrl" class="form-label">URL da Imagem:</label>
+          <input
+            type="url"
+            id="editImageUrl"
+            class="form-control"
+            [(ngModel)]="editImageUrl"
+            placeholder="https://exemplo.com/imagem.jpg"
+          />
         </div>
-        <div class="card-content">
-          <div class="detail-row">
-            <span class="label">ID do Barco:</span>
-            <span class="value">{{ boat.boatId }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Nome do Barco:</span>
-            <span class="value">{{ boat.name }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Capacidade do Barco:</span>
-            <span class="value">{{ boat.capacity }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Usuários Atribuídos:</span>
-            <span class="value capacity-indicator" [class.at-capacity]="boat.assignedUsersCount >= boat.capacity">
+      } @else {
+        <div class="boat-image-container">
+          @if (boat.imageUrl) {
+            <img [src]="boat.imageUrl" [alt]="boat.name" class="boat-image">
+          } @else {
+            <div class="boat-image-placeholder">
+              <i class="bi bi-image"></i>
+              <span>Sem imagem</span>
+            </div>
+          }
+        </div>
+      }
+    </ui-card>
+
+    <!-- Boat Information Card -->
+    <ui-card layout="vertical" class="profile-card" gapStyle="none">
+      <div class="card-header">
+        <i class="bi bi-ship"></i>
+        <h3>Informações do Barco</h3>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">ID</span>
+          <span class="info-value">{{ boat.boatId }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Nome</span>
+          <span class="info-value">{{ boat.name }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Capacidade</span>
+          <span class="info-value">{{ boat.capacity }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Usuários Atribuídos</span>
+          <span class="info-value">
+            <span class="badge" [class.badge-success]="boat.assignedUsersCount < boat.capacity" [class.badge-danger]="boat.assignedUsersCount >= boat.capacity">
               {{ boat.assignedUsersCount }} / {{ boat.capacity }}
             </span>
-          </div>
+          </span>
         </div>
-      </ui-card>
+      </div>
+    </ui-card>
 
-      <!-- Reservations Card -->
-      <ui-card class="reservations-card">
-        <div class="card-header">
-          <i class="bi bi-calendar-check"></i>
-          <h3>Reservas</h3>
-        </div>
-        <div class="card-content">
-          @if (getBoatReservations().length === 0) {
-            <div class="empty-reservations">
-              <i class="bi bi-calendar-x"></i>
-              <p>Nenhuma reserva encontrada</p>
-            </div>
-          } @else {
+    <!-- Reservations Card -->
+    <ui-card layout="vertical" class="profile-card" gapStyle="none">
+      <div class="card-header">
+        <i class="bi bi-calendar-check"></i>
+        <h3>Reservas</h3>
+      </div>
+      <div class="reservations-content">
+        @if (getBoatReservations().length === 0) {
+          <div class="empty-state">
+            <i class="bi bi-calendar-x"></i>
+            <p>Nenhuma reserva encontrada</p>
+          </div>
+        } @else {
+          <div class="reservations-grid">
             @for (reservation of getBoatReservations(); track reservation.reservationId) {
-              <div class="reservation-item">
+              <div class="reservation-chip">
                 <i class="bi bi-calendar-event"></i>
                 <span>{{ formatReservationDate(reservation.day, reservation.month, reservation.year) }}</span>
               </div>
             }
-          }
-        </div>
-      </ui-card>
+          </div>
+        }
+      </div>
+    </ui-card>
+  }
+
+  <!-- Action Button (only for users assigned to this boat) -->
+  @if (canEditBoat) {
+    <div class="action-section">
+      <button class="btn btn-primary btn-action" (click)="changeBoatModalState()">
+        <i class="bi" [class.bi-x-circle]="addBoatModal" [class.bi-plus-circle]="!addBoatModal"></i>
+        {{ addBoatModal ? "Fechar Formulário de Barco" : "Abrir Formulário de Barco" }}
+      </button>
     </div>
   }
 
-  <!-- Action Button -->
-  <div class="action-section">
-    <button class="btn btn-primary btn-action" (click)="changeBoatModalState()">
-      <i class="bi" [class.bi-x-circle]="addBoatModal" [class.bi-plus-circle]="!addBoatModal"></i>
-      {{ addBoatModal ? "Fechar Formulário de Barco" : "Abrir Formulário de Barco" }}
-    </button>
-  </div>
-
 </div>
 
-@if (addBoatModal) {
+@if (canEditBoat && addBoatModal) {
   <ui-card [flexWrap]="true">
     <ui-card class="manage_boats_container" layout="vertical">
       Adicionar Novo Barco
@@ -109,7 +162,19 @@
             placeholder="Insira a capacidade do barco"
           />
         </div>
-        
+
+        <!-- Entrada para a URL da Imagem do Barco -->
+        <div class="form-group mb-3 display_row">
+          <label for="boatImageUrl" class="form-label">URL da Imagem:</label>
+          <input
+            type="url"
+            id="boatImageUrl"
+            class="form-control"
+            [(ngModel)]="newBoatImageUrl"
+            placeholder="https://exemplo.com/imagem.jpg"
+          />
+        </div>
+
         <!-- Botão para Adicionar o Barco -->
         <div class="d-flex justify-content-end">
           <button

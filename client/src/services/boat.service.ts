@@ -97,5 +97,24 @@ export class BoatService {
       });
     });
   }
-  
+
+  updateBoat(boatId: number, updates: Partial<IBoat>): Promise<IBoat> {
+    return new Promise((resolve, reject) => {
+      this._httpClient.put<IBoat>(`${this.baseUrl}/${boatId}`, updates).subscribe({
+        next: result => {
+          console.debug(`updateBoat: url ${this.baseUrl}/${boatId} result`, result);
+
+          const currentBoats = this._boatsSubject.getValue();
+          const updatedBoats = currentBoats.map(b => b.boatId === boatId ? result : b);
+          this._boatsSubject.next(updatedBoats);
+
+          resolve(result);
+        },
+        error: err => {
+          console.warn(`updateBoat: url ${this.baseUrl}/${boatId}`, err);
+          reject(err);
+        }
+      });
+    });
+  }
 }
