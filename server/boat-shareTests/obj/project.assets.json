@@ -7033,11 +7033,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/nickdhm/Desktop/Projects/BoatShareV2/server/boat-shareTests/boat-shareTests.csproj",
+      "projectUniqueName": "/Users/nickdhm/Desktop/Projects/Active/BoatShareV2/server/boat-shareTests/boat-shareTests.csproj",
       "projectName": "boat-shareTests",
-      "projectPath": "/Users/nickdhm/Desktop/Projects/BoatShareV2/server/boat-shareTests/boat-shareTests.csproj",
+      "projectPath": "/Users/nickdhm/Desktop/Projects/Active/BoatShareV2/server/boat-shareTests/boat-shareTests.csproj",
       "packagesPath": "/Users/nickdhm/.nuget/packages/",
-      "outputPath": "/Users/nickdhm/Desktop/Projects/BoatShareV2/server/boat-shareTests/obj/",
+      "outputPath": "/Users/nickdhm/Desktop/Projects/Active/BoatShareV2/server/boat-shareTests/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/nickdhm/.nuget/NuGet/NuGet.Config"
@@ -7052,8 +7052,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "/Users/nickdhm/Desktop/Projects/BoatShareV2/server/boat-share/boat-share.csproj": {
-              "projectPath": "/Users/nickdhm/Desktop/Projects/BoatShareV2/server/boat-share/boat-share.csproj"
+            "/Users/nickdhm/Desktop/Projects/Active/BoatShareV2/server/boat-share/boat-share.csproj": {
+              "projectPath": "/Users/nickdhm/Desktop/Projects/Active/BoatShareV2/server/boat-share/boat-share.csproj"
             }
           }
         }

@@ -111,6 +111,10 @@ namespace boat_share.DTOs
         public required string Role { get; set; }
         public int BoatId { get; set; }
         public string? BoatName { get; set; }
+        public int StandardQuota { get; set; }
+        public int SubstitutionQuota { get; set; }
+        public int ContingencyQuota { get; set; }
+        public int TotalQuotas { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
     }

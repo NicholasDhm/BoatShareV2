@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "uMlb04gBNTk=",
+  "dgSpecHash": "EfAZfhvc0go=",
   "success": true,
-  "projectFilePath": "/Users/nickdhm/Desktop/Projects/BoatShareV2/server/boat-share/boat-share.csproj",
+  "projectFilePath": "/Users/nickdhm/Desktop/Projects/Active/BoatShareV2/server/boat-share/boat-share.csproj",
   "expectedPackageFiles": [
     "/Users/nickdhm/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/Users/nickdhm/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",

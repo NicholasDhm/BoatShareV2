@@ -4156,11 +4156,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/nickdhm/Desktop/Projects/BoatShareV2/server/boat-share/boat-share.csproj",
+      "projectUniqueName": "/Users/nickdhm/Desktop/Projects/Active/BoatShareV2/server/boat-share/boat-share.csproj",
       "projectName": "boat-share",
-      "projectPath": "/Users/nickdhm/Desktop/Projects/BoatShareV2/server/boat-share/boat-share.csproj",
+      "projectPath": "/Users/nickdhm/Desktop/Projects/Active/BoatShareV2/server/boat-share/boat-share.csproj",
       "packagesPath": "/Users/nickdhm/.nuget/packages/",
-      "outputPath": "/Users/nickdhm/Desktop/Projects/BoatShareV2/server/boat-share/obj/",
+      "outputPath": "/Users/nickdhm/Desktop/Projects/Active/BoatShareV2/server/boat-share/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/nickdhm/.nuget/NuGet/NuGet.Config"

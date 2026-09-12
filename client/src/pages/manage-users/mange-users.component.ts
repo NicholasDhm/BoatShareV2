@@ -4,12 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { IUser } from '../../models/user';
 import { IReservation } from '../../models/reservation';
 import { IBoat } from '../../models/boat';
-import { IChartSlice } from '../../models/chart';
+import { IChartBar, IChartSlice } from '../../models/chart';
 import { UserService } from '../../services/user.service';
 import { ReservationService } from '../../services/reservation.service';
 import { BoatService } from '../../services/boat.service';
 import { UiStatTileComponent } from '../../components/charts/ui-stat-tile/ui-stat-tile.component';
 import { UiDonutChartComponent } from '../../components/charts/ui-donut-chart/ui-donut-chart.component';
+import { UiBarChartComponent } from '../../components/charts/ui-bar-chart/ui-bar-chart.component';
 
 const MONTHS_LONG = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
@@ -21,6 +22,7 @@ const MONTHS_LONG = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
 		FormsModule,
 		UiStatTileComponent,
 		UiDonutChartComponent,
+		UiBarChartComponent,
 	],
 	templateUrl: './manage-users.component.html',
 	styleUrls: ['./manage-users.component.scss']
@@ -95,21 +97,29 @@ export class ManageUsersComponent implements OnInit {
 		return this.users.filter(user => user.role === 'Admin').length;
 	}
 
-	/** Embarcação com mais cotistas: valor e nome. */
-	get largestGroup(): { count: number; boatName: string } {
-		const perBoat = new Map<number, number>();
-		this.users.forEach(user => perBoat.set(user.boatId, (perBoat.get(user.boatId) ?? 0) + 1));
+	/** APIs anteriores a esta versão não devolvem cotas na listagem — sem isso os
+	    agregados seriam zeros silenciosos, então eles somem da tela. */
+	get hasQuotaData(): boolean {
+		return this.users.some(user => Number.isFinite(user.standardQuota));
+	}
 
-		let boatId = 0;
-		let count = 0;
-		perBoat.forEach((value, key) => {
-			if (value > count) {
-				count = value;
-				boatId = key;
-			}
-		});
+	get totalQuotasInPlay(): number {
+		return this.users.reduce(
+			(total, user) => total + (user.standardQuota ?? 0) + (user.substitutionQuota ?? 0) + (user.contingencyQuota ?? 0),
+			0
+		);
+	}
 
-		return { count, boatName: count > 0 ? this.getBoatName(boatId) : '—' };
+	/** Saldo de cotas por cotista — uma série, do maior para o menor. */
+	get quotasPerUserBars(): IChartBar[] {
+		return this.users
+			.map(user => ({
+				label: user.name.split(' ')[0],
+				fullLabel: user.name,
+				value: (user.standardQuota ?? 0) + (user.substitutionQuota ?? 0) + (user.contingencyQuota ?? 0)
+			}))
+			.sort((a, b) => b.value - a.value)
+			.slice(0, 12);
 	}
 
 	get quotaSlices(): IChartSlice[] {

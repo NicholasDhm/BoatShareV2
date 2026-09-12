@@ -27,6 +27,10 @@ namespace boat_share.Services
                     Role = u.Role,
                     BoatId = u.BoatId,
                     BoatName = u.Boat != null ? u.Boat.Name : null,
+                    StandardQuota = u.StandardQuota,
+                    SubstitutionQuota = u.SubstitutionQuota,
+                    ContingencyQuota = u.ContingencyQuota,
+                    TotalQuotas = u.StandardQuota + u.SubstitutionQuota + u.ContingencyQuota,
                     IsActive = u.IsActive,
                     CreatedAt = u.CreatedAt
                 })
@@ -182,6 +186,10 @@ namespace boat_share.Services
                     Role = u.Role,
                     BoatId = u.BoatId,
                     BoatName = u.Boat != null ? u.Boat.Name : null,
+                    StandardQuota = u.StandardQuota,
+                    SubstitutionQuota = u.SubstitutionQuota,
+                    ContingencyQuota = u.ContingencyQuota,
+                    TotalQuotas = u.StandardQuota + u.SubstitutionQuota + u.ContingencyQuota,
                     IsActive = u.IsActive,
                     CreatedAt = u.CreatedAt
                 })
