@@ -6,14 +6,16 @@
 
       <div class="profile__identity">
         <h1>{{ user.name }}</h1>
-        <p class="page__lead">{{ user.email }}</p>
+        @if (user.email !== user.name) {
+          <p class="page__lead">{{ user.email }}</p>
+        }
         <div class="profile__tags">
           <span class="chip">
             <i class="bi" [class.bi-shield-check]="user.role === 'Admin'" [class.bi-person]="user.role === 'Member'" aria-hidden="true"></i>
             {{ roleLabel }}
           </span>
           @if (boat) {
-            <span class="chip"><i class="bi bi-sailboat" aria-hidden="true"></i>{{ boat.name }}</span>
+            <span class="chip"><i class="bi bi-life-preserver" aria-hidden="true"></i>{{ boat.name }}</span>
           }
           <span class="chip"><i class="bi bi-ticket-perforated" aria-hidden="true"></i>{{ totalQuotas }} cotas disponíveis</span>
         </div>

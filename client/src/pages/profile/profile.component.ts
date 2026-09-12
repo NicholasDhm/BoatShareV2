@@ -89,7 +89,7 @@ export class ProfileComponent implements OnInit {
 
   get totalQuotas(): number {
     if (!this.user) return 0;
-    return this.user.standardQuota + this.user.substitutionQuota + this.user.contingencyQuota;
+    return (this.user.standardQuota ?? 0) + (this.user.substitutionQuota ?? 0) + (this.user.contingencyQuota ?? 0);
   }
 
   get currentYear(): number {
@@ -181,9 +181,9 @@ export class ProfileComponent implements OnInit {
 
   private buildQuotaSlices(): void {
     this.quotaSlices = this.user ? [
-      { label: 'Padrão', value: this.user.standardQuota, color: 'var(--series-standard)' },
-      { label: 'Suplência', value: this.user.substitutionQuota, color: 'var(--series-substitution)' },
-      { label: 'Contingência', value: this.user.contingencyQuota, color: 'var(--series-contingency)' },
+      { label: 'Padrão', value: this.user.standardQuota ?? 0, color: 'var(--series-standard)' },
+      { label: 'Suplência', value: this.user.substitutionQuota ?? 0, color: 'var(--series-substitution)' },
+      { label: 'Contingência', value: this.user.contingencyQuota ?? 0, color: 'var(--series-contingency)' },
     ] : [];
   }
 

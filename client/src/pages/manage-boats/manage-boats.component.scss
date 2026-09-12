@@ -141,3 +141,12 @@
   .fleet__reservation-user,
   .fleet__reservation-type { grid-column: 2; }
 }
+
+.fleet__head-actions { align-items: flex-end; }
+
+.fleet__picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 240px;
+}

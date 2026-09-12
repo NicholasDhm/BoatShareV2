@@ -145,7 +145,7 @@ export class DashboardComponent implements OnInit {
 
 	get availableQuotas(): number {
 		if (!this.currentUser) return 0;
-		return this.currentUser.standardQuota + this.currentUser.substitutionQuota + this.currentUser.contingencyQuota;
+		return (this.currentUser.standardQuota ?? 0) + (this.currentUser.substitutionQuota ?? 0) + (this.currentUser.contingencyQuota ?? 0);
 	}
 
 	// --- Calendar / reservation flow ----------------------------------------

@@ -6,19 +6,40 @@
       <p class="page__lead">Ocupação, imagem e agenda de cada barco da frota.</p>
     </div>
 
-    @if (canEditBoat) {
-      <div class="page__actions">
+    <div class="page__actions fleet__head-actions">
+      @if (boats.length > 0) {
+        <div class="fleet__picker">
+          <label for="boatSelect" class="field__label">Selecionar embarcação</label>
+          <select id="boatSelect" class="form-select" [ngModel]="boatId" (ngModelChange)="onSelectBoatId(+$event)">
+            @for (item of boats; track item.boatId) {
+              <option [value]="item.boatId">{{ item.name }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      @if (canEditBoat) {
         <button type="button" class="btn" [class.btn-primary]="!addBoatModal" [class.btn-secondary]="addBoatModal" (click)="changeBoatModalState()">
           <i class="bi" [class.bi-plus-lg]="!addBoatModal" [class.bi-x-lg]="addBoatModal" aria-hidden="true"></i>
           {{ addBoatModal ? 'Fechar formulário' : 'Gerenciar frota' }}
         </button>
-      </div>
-    }
+      }
+    </div>
   </header>
+
+  @if (boats.length === 0) {
+    <div class="panel">
+      <div class="empty-state">
+        <i class="bi bi-life-preserver" aria-hidden="true"></i>
+        <h3>Nenhuma embarcação carregada</h3>
+        <p>A lista de barcos veio vazia. Se você acabou de entrar, verifique se a sessão ainda é válida — entrar novamente costuma resolver.</p>
+      </div>
+    </div>
+  }
 
   <!-- Overview -->
   <section class="fleet__kpis">
-    <ui-stat-tile label="Embarcações" [value]="boats.length" icon="bi-sailboat" tone="accent" hint="Barcos cadastrados"></ui-stat-tile>
+    <ui-stat-tile label="Embarcações" [value]="boats.length" icon="bi-life-preserver" tone="accent" hint="Barcos cadastrados"></ui-stat-tile>
     <ui-stat-tile label="Cotistas alocados" [value]="totalAssigned" icon="bi-people" tone="neutral" hint="Em todas as embarcações"></ui-stat-tile>
     <ui-stat-tile label="Vagas em aberto" [value]="openSeats" icon="bi-person-plus" [tone]="openSeats > 0 ? 'good' : 'warning'" hint="Capacidade não utilizada"></ui-stat-tile>
     <ui-stat-tile label="Ocupação da frota" [value]="occupancyRate" unit="%" icon="bi-pie-chart" tone="accent" hint="Cotistas ÷ capacidade"></ui-stat-tile>
@@ -96,7 +117,7 @@
           @if (item.imageUrl) {
             <img [src]="item.imageUrl" [alt]="item.name" loading="lazy">
           } @else {
-            <i class="bi bi-sailboat" aria-hidden="true"></i>
+            <i class="bi bi-life-preserver" aria-hidden="true"></i>
           }
         </span>
         <span class="fleet__card-meta">

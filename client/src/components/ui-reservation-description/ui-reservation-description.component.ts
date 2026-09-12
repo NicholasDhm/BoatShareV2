@@ -34,21 +34,21 @@ export class UiReservationDescriptionComponent implements AfterViewInit, OnChang
 				key: 'standard',
 				label: 'Padrão',
 				title: 'Reserva — Padrão',
-				value: this.user.standardQuota,
+				value: this.user.standardQuota ?? 0,
 				content: '• Consome 1 cota padrão.<br/>• Pode ser feita em qualquer dia livre do calendário.<br/>• Se a reserva for cancelada ou o dia passar, a cota volta automaticamente.'
 			},
 			{
 				key: 'substitution',
 				label: 'Suplência',
 				title: 'Reserva — Suplência',
-				value: this.user.substitutionQuota,
+				value: this.user.substitutionQuota ?? 0,
 				content: '• Consome 1 cota suplente.<br/>• Pode ser feita em um dia já reservado por outro membro.<br/>• Se o titular cancelar, a data passa a ser sua; se o dia passar, a cota volta.'
 			},
 			{
 				key: 'contingency',
 				label: 'Contingência',
 				title: 'Reserva — Contingência',
-				value: this.user.contingencyQuota,
+				value: this.user.contingencyQuota ?? 0,
 				content: '• Não consome cota padrão.<br/>• Só pode ser feita no mesmo dia, a partir das 6:00.<br/>• Vale para dias em aberto, sem conflito com outras reservas.'
 			}
 		];

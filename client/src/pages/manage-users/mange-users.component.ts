@@ -4,13 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { IUser } from '../../models/user';
 import { IReservation } from '../../models/reservation';
 import { IBoat } from '../../models/boat';
-import { IChartBar, IChartSlice } from '../../models/chart';
+import { IChartSlice } from '../../models/chart';
 import { UserService } from '../../services/user.service';
 import { ReservationService } from '../../services/reservation.service';
 import { BoatService } from '../../services/boat.service';
 import { UiStatTileComponent } from '../../components/charts/ui-stat-tile/ui-stat-tile.component';
 import { UiDonutChartComponent } from '../../components/charts/ui-donut-chart/ui-donut-chart.component';
-import { UiBarChartComponent } from '../../components/charts/ui-bar-chart/ui-bar-chart.component';
 
 const MONTHS_LONG = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
@@ -22,7 +21,6 @@ const MONTHS_LONG = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
 		FormsModule,
 		UiStatTileComponent,
 		UiDonutChartComponent,
-		UiBarChartComponent,
 	],
 	templateUrl: './manage-users.component.html',
 	styleUrls: ['./manage-users.component.scss']
@@ -32,6 +30,8 @@ export class ManageUsersComponent implements OnInit {
 	boats: IBoat[] = [];
 	reservationsByUserId: IReservation[] = [];
 	user: IUser | null = null;
+	/** GET /users devolve UserListDTO, que não traz cotas — o detalhe vem de GET /users/{id}. */
+	userDetail: IUser | null = null;
 	userId: number | null = null;
 	currentUser: IUser | null = null;
 
@@ -60,13 +60,24 @@ export class ManageUsersComponent implements OnInit {
 	// --- Selection -----------------------------------------------------------
 
 	onSelectUserId(userId: number | null): void {
-		if (userId) {
-			this.userId = userId;
-			this.user = this.users?.find(x => x.userId === userId) || null;
-			this.getReservationsByUserId(userId);
-		} else {
+		if (!userId) {
 			this.user = null;
+			this.userDetail = null;
+			return;
 		}
+
+		this.userId = userId;
+		this.user = this.users?.find(x => x.userId === userId) || null;
+		this.userDetail = null;
+		this.getReservationsByUserId(userId);
+
+		this._userService.getUserById(userId)
+			.then(detail => {
+				if (this.userId === detail.userId) {
+					this.userDetail = detail;
+				}
+			})
+			.catch(error => console.warn('Error loading user detail:', error));
 	}
 
 	get filteredUsers(): IUser[] {
@@ -84,36 +95,40 @@ export class ManageUsersComponent implements OnInit {
 		return this.users.filter(user => user.role === 'Admin').length;
 	}
 
-	get totalQuotasInPlay(): number {
-		return this.users.reduce((total, user) => total + user.standardQuota + user.substitutionQuota + user.contingencyQuota, 0);
+	/** Embarcação com mais cotistas: valor e nome. */
+	get largestGroup(): { count: number; boatName: string } {
+		const perBoat = new Map<number, number>();
+		this.users.forEach(user => perBoat.set(user.boatId, (perBoat.get(user.boatId) ?? 0) + 1));
+
+		let boatId = 0;
+		let count = 0;
+		perBoat.forEach((value, key) => {
+			if (value > count) {
+				count = value;
+				boatId = key;
+			}
+		});
+
+		return { count, boatName: count > 0 ? this.getBoatName(boatId) : '—' };
 	}
 
 	get quotaSlices(): IChartSlice[] {
-		if (!this.user) {
+		if (!this.userDetail) {
 			return [];
 		}
 		return [
-			{ label: 'Padrão', value: this.user.standardQuota, color: 'var(--series-standard)' },
-			{ label: 'Suplência', value: this.user.substitutionQuota, color: 'var(--series-substitution)' },
-			{ label: 'Contingência', value: this.user.contingencyQuota, color: 'var(--series-contingency)' },
+			{ label: 'Padrão', value: this.userDetail.standardQuota ?? 0, color: 'var(--series-standard)' },
+			{ label: 'Suplência', value: this.userDetail.substitutionQuota ?? 0, color: 'var(--series-substitution)' },
+			{ label: 'Contingência', value: this.userDetail.contingencyQuota ?? 0, color: 'var(--series-contingency)' },
 		];
 	}
 
-	/** Saldo de cotas por cotista — uma série, ordenada do maior para o menor. */
-	get quotasPerUserBars(): IChartBar[] {
-		return [...this.users]
-			.map(user => ({
-				label: this.shortName(user.name),
-				fullLabel: user.name,
-				value: user.standardQuota + user.substitutionQuota + user.contingencyQuota
-			}))
-			.sort((a, b) => b.value - a.value)
-			.slice(0, 12);
+	get userTotalQuotas(): number {
+		return this.quotaSlices.reduce((total, slice) => total + slice.value, 0);
 	}
 
-	get userTotalQuotas(): number {
-		if (!this.user) return 0;
-		return this.user.standardQuota + this.user.substitutionQuota + this.user.contingencyQuota;
+	get isQuotaDetailLoading(): boolean {
+		return this.user !== null && this.userDetail === null;
 	}
 
 	// --- Actions -------------------------------------------------------------
@@ -190,9 +205,5 @@ export class ManageUsersComponent implements OnInit {
 				}
 			});
 		});
-	}
-
-	private shortName(name: string): string {
-		return name.split(' ')[0];
 	}
 }

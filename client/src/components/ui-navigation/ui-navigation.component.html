@@ -26,7 +26,7 @@
             <i class="bi bi-people" aria-hidden="true"></i><span>Usuários</span>
           </a>
           <a class="nav__link" routerLink="/admin/boats" routerLinkActive="is-active" (click)="closeAll()">
-            <i class="bi bi-sailboat" aria-hidden="true"></i><span>Barcos</span>
+            <i class="bi bi-life-preserver" aria-hidden="true"></i><span>Barcos</span>
           </a>
         }
       </nav>
@@ -54,7 +54,7 @@
                 <div>
                   <div class="menu__name">{{ userName }}</div>
                   @if (boatName) {
-                    <div class="menu__sub"><i class="bi bi-sailboat" aria-hidden="true"></i> {{ boatName }}</div>
+                    <div class="menu__sub"><i class="bi bi-life-preserver" aria-hidden="true"></i> {{ boatName }}</div>
                   }
                 </div>
               </div>
@@ -102,7 +102,7 @@
           <i class="bi bi-people" aria-hidden="true"></i> Usuários
         </a>
         <a class="drawer__link" routerLink="/admin/boats" routerLinkActive="is-active" (click)="closeAll()">
-          <i class="bi bi-sailboat" aria-hidden="true"></i> Barcos
+          <i class="bi bi-life-preserver" aria-hidden="true"></i> Barcos
         </a>
       }
       <button type="button" class="drawer__link drawer__link--danger" (click)="logout()">
