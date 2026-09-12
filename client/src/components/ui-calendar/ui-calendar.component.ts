@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
-import { UiCardComponent } from '../ui-card/ui-card.component';
 import { DateTime } from 'luxon';
 import { CommonModule } from '@angular/common';
 import { ICalendarViewModel, IDay } from '../../models/calendar';
@@ -8,7 +7,7 @@ import { UiCalendarDayComponent } from "../ui-calendar-day/ui-calendar-day.compo
 @Component({
 	selector: 'ui-calendar',
 	standalone: true,
-	imports: [UiCardComponent, CommonModule, UiCalendarDayComponent],
+	imports: [CommonModule, UiCalendarDayComponent],
 	templateUrl: './ui-calendar.component.html',
 	styleUrls: ['./ui-calendar.component.scss']
 })
@@ -73,6 +72,7 @@ export class UiCalendarComponent {
 				isCurrentMonth: true,
 				state: this.getDayClass({ date: i, isCurrentMonth: true } as IDay),
 				status: this.getReservationStatus(i, month, year),
+				isToday: this.isToday({ date: i, isCurrentMonth: true } as IDay),
 			};
 			week.push(day);
 			if (week.length === 7) {

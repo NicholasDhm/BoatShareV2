@@ -1,0 +1,21 @@
+<div class="stat" [attr.data-tone]="tone">
+  <div class="stat__head">
+    <span class="stat__label">{{ label }}</span>
+    <span class="stat__icon"><i class="bi" [ngClass]="icon"></i></span>
+  </div>
+
+  <div class="stat__value">
+    {{ value }}@if (unit) {<span class="stat__unit">{{ unit }}</span>}
+  </div>
+
+  @if (trend && linePath) {
+    <svg class="stat__spark" viewBox="0 0 120 32" preserveAspectRatio="none" aria-hidden="true">
+      <path class="stat__spark-line" [attr.d]="linePath"></path>
+      <circle class="stat__spark-dot" [attr.cx]="endX" [attr.cy]="endY" r="4"></circle>
+    </svg>
+  }
+
+  @if (hint) {
+    <span class="stat__hint">{{ hint }}</span>
+  }
+</div>

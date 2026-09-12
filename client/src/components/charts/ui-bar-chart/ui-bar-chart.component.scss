@@ -1,0 +1,30 @@
+:host { display: block; }
+
+.bar-chart__plot {
+  position: relative;
+  width: 100%;
+}
+
+.bar-chart__plot svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.bar-chart__bar {
+  transition: opacity var(--t-fast);
+}
+
+.bar-chart__bar.is-dimmed { opacity: 0.4; }
+
+.bar-chart__hit {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.bar-chart__hit:focus-visible {
+  fill: var(--accent-soft);
+  outline: none;
+}
+
+.viz-tooltip--below { transform: translate(-50%, 14%); }

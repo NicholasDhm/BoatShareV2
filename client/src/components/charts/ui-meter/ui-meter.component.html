@@ -1,0 +1,25 @@
+<div class="meter">
+  <div class="meter__head">
+    <span class="meter__label">
+      <span class="series-dot" [style.background]="color"></span>
+      {{ label }}
+    </span>
+    <span class="meter__value">
+      {{ value }}<span class="meter__max">/{{ max }}</span>
+    </span>
+  </div>
+
+  <div
+    class="meter__track"
+    role="meter"
+    [attr.aria-valuenow]="value"
+    [attr.aria-valuemin]="0"
+    [attr.aria-valuemax]="max"
+    [attr.aria-label]="label">
+    <div class="meter__fill" [style.width.%]="percent" [style.background]="color"></div>
+  </div>
+
+  @if (hint) {
+    <span class="meter__hint">{{ hint }}</span>
+  }
+</div>

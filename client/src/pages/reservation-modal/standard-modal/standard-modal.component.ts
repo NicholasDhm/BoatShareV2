@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { UiCardComponent } from '../../../components/ui-card/ui-card.component';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { IUser } from '../../../models/user';
 import { LOCALE_ID } from '@angular/core';
@@ -8,7 +7,7 @@ import localePt from '@angular/common/locales/pt';
 @Component({
   selector: 'app-standard-modal',
   standalone: true,
-  imports: [UiCardComponent, CommonModule],
+  imports: [CommonModule],
   providers: [{ provide: LOCALE_ID, useValue: 'pt-BR' }],
   templateUrl: './standard-modal.component.html',
   styleUrls: ['./standard-modal.component.scss']
@@ -28,6 +27,10 @@ export class StandardModalComponent implements OnInit {
   @Output() cancel = new EventEmitter<void>();
 
   reservationTypeInPt: string = '';
+
+  get typeKey(): string {
+    return (this.reservationType || 'standard').toLowerCase();
+  }
 
   constructor() {
     registerLocaleData(localePt);

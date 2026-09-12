@@ -1,15 +1,25 @@
 @if (day) {
-  <div class="day"
-    [ngClass]="[
-      day.state,
-      !day.isCurrentMonth ? 'other-month' : '',
-      day.status === 'Confirmed' ? 'status-confirmed' : '',
-      day.status === 'Pending' ? 'status-pending' : '',
-      day.status === 'Unconfirmed' ? 'status-unconfirmed' : ''
-    ]"
-    (click)="day.isCurrentMonth && day.state !== 'Greyish' && onDaySelected()">
-    <span>{{ day.date }}</span>
+  <button
+    type="button"
+    class="day"
+    [class.is-outside]="!day.isCurrentMonth"
+    [class.is-past]="day.state === 'Greyish'"
+    [class.is-today]="day.isToday"
+    [class.is-mine]="!!day.status"
+    [class.is-taken]="!day.status && day.state === 'Substitution'"
+    [attr.data-type]="day.state"
+    [disabled]="!isSelectable"
+    [attr.aria-label]="ariaLabel"
+    (click)="onDaySelected()">
 
-    <ui-svg [state]="day.state" [width]="18" [height]="18"></ui-svg>
-  </div>
+    <span class="day__num">{{ day.date }}</span>
+
+    @if (day.status) {
+      <span class="day__status" [ngClass]="'status--' + statusTone">
+        <i class="bi" [ngClass]="statusIcon" aria-hidden="true"></i>
+      </span>
+    } @else if (isSelectable) {
+      <span class="day__dot"></span>
+    }
+  </button>
 }

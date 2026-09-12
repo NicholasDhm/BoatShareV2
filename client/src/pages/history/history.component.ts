@@ -1,11 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IReservation } from '../../models/reservation';
+import { IReservation, ReservationType } from '../../models/reservation';
 import { IUser } from '../../models/user';
+import { IChartBar, IChartSlice } from '../../models/chart';
 import { ReservationService } from '../../services/reservation.service';
 import { UserService } from '../../services/user.service';
 import { UiLoadingSpinnerComponent } from '../../components/ui-loading-spinner/ui-loading-spinner.component';
-import { UiCardComponent } from '../../components/ui-card/ui-card.component';
+import { UiStatTileComponent } from '../../components/charts/ui-stat-tile/ui-stat-tile.component';
+import { UiBarChartComponent } from '../../components/charts/ui-bar-chart/ui-bar-chart.component';
+import { UiDonutChartComponent } from '../../components/charts/ui-donut-chart/ui-donut-chart.component';
+
+const MONTHS_SHORT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+const MONTHS_LONG = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+type TypeFilter = 'All' | ReservationType;
 
 @Component({
 	selector: 'app-history',
@@ -13,7 +21,9 @@ import { UiCardComponent } from '../../components/ui-card/ui-card.component';
 	imports: [
 		CommonModule,
 		UiLoadingSpinnerComponent,
-		UiCardComponent
+		UiStatTileComponent,
+		UiBarChartComponent,
+		UiDonutChartComponent,
 	],
 	templateUrl: './history.component.html',
 	styleUrls: ['./history.component.scss']
@@ -21,6 +31,7 @@ import { UiCardComponent } from '../../components/ui-card/ui-card.component';
 export class HistoryComponent implements OnInit {
 	currentUser: IUser | null = null;
 	viewMode: 'user' | 'boat' = 'user';
+	typeFilter: TypeFilter = 'All';
 
 	userLegacyReservations: IReservation[] = [];
 	boatLegacyReservations: IReservation[] = [];
@@ -29,6 +40,13 @@ export class HistoryComponent implements OnInit {
 	isLoadingBoatHistory = false;
 
 	errorMessage = '';
+
+	readonly typeFilters: { key: TypeFilter; label: string }[] = [
+		{ key: 'All', label: 'Todos os tipos' },
+		{ key: 'Standard', label: 'Padrão' },
+		{ key: 'Substitution', label: 'Suplência' },
+		{ key: 'Contingency', label: 'Contingência' },
+	];
 
 	constructor(
 		private _reservationService: ReservationService,
@@ -44,11 +62,17 @@ export class HistoryComponent implements OnInit {
 		this.loadUserHistory();
 	}
 
+	// --- Data ----------------------------------------------------------------
+
 	toggleView(mode: 'user' | 'boat'): void {
 		this.viewMode = mode;
 		if (mode === 'boat' && this.boatLegacyReservations.length === 0) {
 			this.loadBoatHistory();
 		}
+	}
+
+	setTypeFilter(filter: TypeFilter): void {
+		this.typeFilter = filter;
 	}
 
 	loadUserHistory(): void {
@@ -89,6 +113,81 @@ export class HistoryComponent implements OnInit {
 			});
 	}
 
+	isLoading(): boolean {
+		return this.viewMode === 'user' ? this.isLoadingUserHistory : this.isLoadingBoatHistory;
+	}
+
+	/** Everything in the current view, before the type filter. */
+	get scopedReservations(): IReservation[] {
+		return this.viewMode === 'user' ? this.userLegacyReservations : this.boatLegacyReservations;
+	}
+
+	/** What the table, the charts and the stats all read from. */
+	getDisplayedReservations(): IReservation[] {
+		const reservations = this.typeFilter === 'All'
+			? this.scopedReservations
+			: this.scopedReservations.filter(reservation => reservation.type === this.typeFilter);
+
+		return [...reservations].sort((a, b) =>
+			new Date(b.year, b.month - 1, b.day).getTime() - new Date(a.year, a.month - 1, a.day).getTime()
+		);
+	}
+
+	// --- Derived insights ----------------------------------------------------
+
+	get totalCount(): number {
+		return this.getDisplayedReservations().length;
+	}
+
+	get monthlyBars(): IChartBar[] {
+		const perMonth = new Array(12).fill(0);
+		this.getDisplayedReservations().forEach(reservation => {
+			perMonth[reservation.month - 1] += 1;
+		});
+
+		return perMonth.map((value, index) => ({
+			label: MONTHS_SHORT[index],
+			fullLabel: `${MONTHS_LONG[index]} (todos os anos)`,
+			value
+		}));
+	}
+
+	get typeSlices(): IChartSlice[] {
+		const reservations = this.typeFilter === 'All' ? this.scopedReservations : this.getDisplayedReservations();
+		const count = (type: ReservationType) => reservations.filter(reservation => reservation.type === type).length;
+
+		return [
+			{ label: 'Padrão', value: count('Standard'), color: 'var(--series-standard)' },
+			{ label: 'Suplência', value: count('Substitution'), color: 'var(--series-substitution)' },
+			{ label: 'Contingência', value: count('Contingency'), color: 'var(--series-contingency)' },
+		];
+	}
+
+	get busiestMonth(): string {
+		const bars = this.monthlyBars;
+		const peak = Math.max(...bars.map(bar => bar.value));
+		if (peak === 0) {
+			return '—';
+		}
+		return MONTHS_LONG[bars.findIndex(bar => bar.value === peak)];
+	}
+
+	get topType(): string {
+		const slices = this.typeSlices;
+		const peak = Math.max(...slices.map(slice => slice.value));
+		if (peak === 0) {
+			return '—';
+		}
+		return slices.find(slice => slice.value === peak)!.label;
+	}
+
+	get distinctMembers(): number {
+		const names = new Set(this.getDisplayedReservations().map(reservation => reservation.userName).filter(Boolean));
+		return names.size;
+	}
+
+	// --- Labels --------------------------------------------------------------
+
 	getReservationTypeLabel(type: string): string {
 		switch (type) {
 			case 'Standard': return 'Padrão';
@@ -98,56 +197,65 @@ export class HistoryComponent implements OnInit {
 		}
 	}
 
+	typeKey(type: string): string {
+		return type.toLowerCase();
+	}
+
 	getStatusLabel(status: string): string {
 		switch (status) {
 			case 'Confirmed': return 'Confirmada';
 			case 'Pending': return 'Pendente';
-			case 'Unconfirmed': return 'Não Confirmada';
+			case 'Unconfirmed': return 'Não confirmada';
 			case 'Cancelled': return 'Cancelada';
 			case 'Legacy': return 'Arquivada';
 			default: return status;
 		}
 	}
 
+	getStatusTone(status: string | undefined): string {
+		switch (status) {
+			case 'Confirmed': return 'good';
+			case 'Pending': return 'warning';
+			case 'Unconfirmed':
+			case 'Cancelled': return 'critical';
+			default: return 'neutral';
+		}
+	}
+
+	getStatusIcon(status: string | undefined): string {
+		switch (status) {
+			case 'Confirmed': return 'bi-check-circle';
+			case 'Pending': return 'bi-hourglass-split';
+			case 'Unconfirmed':
+			case 'Cancelled': return 'bi-x-circle';
+			default: return 'bi-archive';
+		}
+	}
+
 	formatDate(year: number, month: number, day: number): string {
-		const date = new Date(year, month - 1, day);
-		return date.toLocaleDateString('pt-BR', {
-			weekday: 'long',
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric'
-		});
+		return `${day} de ${MONTHS_LONG[month - 1]} de ${year}`;
 	}
 
-	getDisplayedReservations(): IReservation[] {
-		return this.viewMode === 'user' ? this.userLegacyReservations : this.boatLegacyReservations;
-	}
-
-	isLoading(): boolean {
-		return this.viewMode === 'user' ? this.isLoadingUserHistory : this.isLoadingBoatHistory;
+	formatWeekday(year: number, month: number, day: number): string {
+		return new Date(year, month - 1, day).toLocaleDateString('pt-BR', { weekday: 'short' });
 	}
 
 	formatCreatedDate(isoDate: string | undefined): string {
 		if (!isoDate || isoDate.trim() === '') {
-			return 'Data não disponível';
+			return '—';
 		}
 
-		try {
-			const date = new Date(isoDate);
-			// Check if date is valid
-			if (isNaN(date.getTime())) {
-				return 'Data inválida';
-			}
-			return date.toLocaleString('pt-BR', {
-				day: '2-digit',
-				month: '2-digit',
-				year: 'numeric',
-				hour: '2-digit',
-				minute: '2-digit'
-			});
-		} catch (error) {
-			console.error('Error formatting date:', error);
-			return 'Data inválida';
+		const date = new Date(isoDate);
+		if (isNaN(date.getTime())) {
+			return '—';
 		}
+
+		return date.toLocaleString('pt-BR', {
+			day: '2-digit',
+			month: '2-digit',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit'
+		});
 	}
 }

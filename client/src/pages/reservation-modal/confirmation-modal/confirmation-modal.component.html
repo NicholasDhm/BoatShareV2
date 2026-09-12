@@ -1,28 +1,36 @@
-<ui-card layout="vertical" justifyContent="space-between" class="modal" [ngClass]="reservationType">
+<div class="modal-shell" role="dialog" aria-modal="true" [attr.data-type]="reservationType">
+  <header class="modal-shell__head">
+    <span class="modal-shell__type">
+      <span class="series-dot" [ngClass]="'series-dot--' + typeKey"></span>
+      {{ reservationTypeInPt }}
+    </span>
+    <button type="button" class="modal-shell__close" (click)="closeModal()" aria-label="Fechar">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+  </header>
 
-  <ui-card layout="vertical" gapStyle="large">
-    <ui-card layout="vertical">
-      <h3>Confirmar Reserva!</h3>
-      <span class="d-flex date-display">
-        <p> {{ weekday + ','}} </p>
-        &nbsp;
-        <p> {{ reservationDate | date: 'longDate':'':'pt-BR'}} </p>
-      </span>
-    </ui-card>
+  <div class="modal-shell__body">
+    <h2>Confirmar reserva</h2>
 
-    <ui-card layout="vertical">
-      <p>Por favor, confirme sua reserva. Não confirme se não tiver certeza.</p>
-      <span class="d-flex justify-content-between w-100 align-items-center">
-        <p>Tipo de Reserva:</p>
-        &nbsp;
-        <p class="reservation-type-value" [ngClass]="reservationType + '__text'"> {{ reservationTypeInPt }}</p>
-      </span>
-    </ui-card>
-  </ui-card>
+    <p class="modal-shell__date">
+      <i class="bi bi-calendar-event" aria-hidden="true"></i>
+      <span class="modal-shell__weekday">{{ weekday }},</span>
+      {{ reservationDate | date: 'longDate':'':'pt-BR' }}
+    </p>
 
-  <ui-card gapStyle="medium">
-    <button type="button" class="btn btn-success" (click)="onConfirmReservation()">Confirmar</button>
-    <button type="button" class="btn btn-danger" (click)="onCancelReservation()">Cancelar</button>
-    <button type="button" class="btn btn-secondary" (click)="closeModal()">Fechar</button>
-  </ui-card>
-</ui-card>
+    <div class="alert" role="note">
+      <i class="bi bi-info-circle" aria-hidden="true"></i>
+      <span>Confirme apenas se tiver certeza de que vai usar a embarcação. Depois de confirmada, a reserva não pode ser cancelada.</span>
+    </div>
+  </div>
+
+  <footer class="modal-shell__foot">
+    <button type="button" class="btn btn-success" (click)="onConfirmReservation()">
+      <i class="bi bi-check-lg" aria-hidden="true"></i> Confirmar
+    </button>
+    <button type="button" class="btn btn-danger" (click)="onCancelReservation()">
+      <i class="bi bi-x-circle" aria-hidden="true"></i> Cancelar reserva
+    </button>
+    <button type="button" class="btn btn-ghost" (click)="closeModal()">Fechar</button>
+  </footer>
+</div>

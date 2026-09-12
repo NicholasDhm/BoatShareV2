@@ -1,39 +1,43 @@
 @if (calendarViewModel; as calendar) {
-  <ui-card layout="vertical" gapStyle="none" class="calendar-container">
-    <header>
-      <section>
-        <i class="bi bi-chevron-left" (click)="monthClick(-1)"></i>
-        
-        @if (monthToDisplay) {
-          <p>{{ monthToDisplay }}</p>
-          <p>{{ calendar.displayDate.year }}</p>
-        }
+  <section class="calendar panel">
+    <header class="calendar__head">
+      <div>
+        <span class="page__eyebrow">Calendário de reservas</span>
+        <h2 class="calendar__month">
+          {{ monthToDisplay }}<span class="calendar__year">{{ calendar.displayDate.year }}</span>
+        </h2>
+      </div>
 
-        <i class="bi bi-chevron-right" (click)="monthClick(1)"></i>
-      </section>
+      <div class="calendar__nav">
+        <button type="button" class="btn-icon btn btn-secondary" (click)="monthClick(-1)" aria-label="Mês anterior">
+          <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="btn-icon btn btn-secondary" (click)="monthClick(1)" aria-label="Próximo mês">
+          <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </button>
+      </div>
     </header>
 
-    <div class="calendar-body">
-      <!-- Days of week header -->
-      <div class="weekdays-header">
-        @for (day of daysOfWeek; track day) {
-          <div class="weekday">{{ day }}</div>
-        }
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- Calendar grid -->
-      <div class="calendar-grid">
-        @for (week of weeksOfMonth; track week) {
-          @for (day of week; track day) {
-            <ui-calendar-day
-              [day]="day"
-              (daySelected)="onDateSelected(day)">
-            </ui-calendar-day>
-          }
-        }
-      </div>
+    <div class="calendar__weekdays" aria-hidden="true">
+      @for (weekday of daysOfWeek; track weekday) {
+        <span>{{ weekday }}</span>
+      }
     </div>
-  </ui-card>
+
+    <div class="calendar__grid">
+      @for (week of weeksOfMonth; track $index) {
+        @for (day of week; track day.year + '-' + day.month + '-' + day.date) {
+          <ui-calendar-day [day]="day" (daySelected)="onDateSelected(day)"></ui-calendar-day>
+        }
+      }
+    </div>
+
+    <footer class="calendar__legend">
+      <span class="legend__item"><span class="series-dot series-dot--standard"></span>Padrão</span>
+      <span class="legend__item"><span class="series-dot series-dot--substitution"></span>Suplência</span>
+      <span class="legend__item"><span class="series-dot series-dot--contingency"></span>Contingência</span>
+      <span class="legend__item legend__item--hatched"><span class="legend__hatch"></span>Ocupado por outro membro</span>
+      <span class="legend__item"><span class="series-dot series-dot--muted"></span>Indisponível</span>
+    </footer>
+  </section>
 }

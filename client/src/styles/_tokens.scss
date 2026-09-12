@@ -1,0 +1,175 @@
+/* ==========================================================================
+   BoatShare — Design tokens ("Aurora Marina")
+   Dark is the default theme; [data-theme="light"] switches the whole system.
+   Chart series/status hexes are validated (CVD + contrast) against the
+   viz surfaces declared below — do not hand-tune them in isolation.
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* Brand ramp — marine blue */
+  --brand-100: #cfe6ff;
+  --brand-200: #9ecdff;
+  --brand-300: #6db3ff;
+  --brand-400: #3b9dff;
+  --brand-500: #1f7fe0;
+  --brand-600: #1665ba;
+  --brand-700: #0f4d90;
+  --brand-800: #0b3a6d;
+
+  /* Secondary ramp — lagoon */
+  --teal-300: #5fe3d2;
+  --teal-400: #26d0ce;
+  --teal-500: #12aeae;
+  --teal-600: #0d8a8d;
+
+  /* Plane & glass surfaces */
+  --plane: #060b14;
+  --plane-2: #0a1120;
+  --surface-1: rgba(255, 255, 255, 0.055);
+  --surface-2: rgba(255, 255, 255, 0.085);
+  --surface-3: rgba(255, 255, 255, 0.12);
+  --surface-solid: #101a29;
+  --surface-sunken: rgba(3, 7, 14, 0.45);
+  --stroke: rgba(255, 255, 255, 0.10);
+  --stroke-strong: rgba(255, 255, 255, 0.20);
+  --stroke-brand: rgba(59, 157, 255, 0.45);
+  --glass-tint: linear-gradient(160deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.03) 45%, rgba(255, 255, 255, 0.055));
+  --glass-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 55%);
+
+  /* Ink */
+  --ink: #f2f7ff;
+  --ink-2: #a9b8ce;
+  --ink-3: #7a8aa2;
+  --ink-inverted: #06101d;
+  --ink-on-accent: #ffffff;
+
+  /* Accents */
+  --accent: var(--brand-400);
+  --accent-strong: var(--brand-300);
+  --accent-soft: rgba(59, 157, 255, 0.16);
+  --accent-gradient: linear-gradient(135deg, #3b9dff 0%, #26d0ce 100%);
+  --accent-glow: 0 10px 30px -12px rgba(59, 157, 255, 0.75);
+
+  /* Reservation series (categorical — validated for the dark viz surface) */
+  --series-standard: #3987e5;
+  --series-substitution: #199e70;
+  --series-contingency: #d95926;
+  --series-standard-soft: rgba(57, 135, 229, 0.18);
+  --series-substitution-soft: rgba(25, 158, 112, 0.18);
+  --series-contingency-soft: rgba(217, 89, 38, 0.18);
+  --series-neutral: #64748b;
+  --series-track: rgba(255, 255, 255, 0.09);
+
+  /* Status (fixed, never themed — always paired with an icon + label) */
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+  --status-good-soft: rgba(12, 163, 12, 0.16);
+  --status-warning-soft: rgba(250, 178, 25, 0.16);
+  --status-critical-soft: rgba(208, 59, 59, 0.16);
+
+  /* Chart chrome */
+  --viz-surface: #121d2c;
+  --viz-grid: rgba(255, 255, 255, 0.08);
+  --viz-axis: rgba(255, 255, 255, 0.16);
+
+  /* Elevation */
+  --shadow-1: 0 1px 2px rgba(2, 6, 14, 0.40);
+  --shadow-2: 0 10px 24px -12px rgba(2, 6, 14, 0.85);
+  --shadow-3: 0 24px 60px -24px rgba(2, 6, 14, 0.95);
+  --shadow-modal: 0 40px 100px -30px rgba(0, 0, 0, 0.85);
+
+  /* Radii */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --t-fast: 140ms var(--ease);
+  --t-base: 240ms var(--ease);
+  --t-slow: 420ms var(--ease);
+
+  /* Layout */
+  --shell-width: 1320px;
+  --topbar-height: 68px;
+  --blur: 22px;
+
+  /* Legacy aliases kept so untouched markup keeps rendering */
+  --background-primary: var(--plane);
+  --background-secondary: var(--surface-1);
+  --background-tertiary: var(--surface-2);
+  --color-text-primary: var(--ink);
+  --color-text-secondary: var(--ink-2);
+  --color-text-disabled: var(--ink-3);
+  --standard-colour: var(--series-standard);
+  --substitution-colour: var(--series-substitution);
+  --contingency-colour: var(--series-contingency);
+  --confirmed-colour: var(--status-good);
+  --pending-colour: var(--status-warning);
+  --unconfirmed-colour: var(--status-critical);
+  --disabled-colour: var(--ink-3);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --plane: #eef3fa;
+  --plane-2: #e4ecf7;
+  --surface-1: rgba(255, 255, 255, 0.72);
+  --surface-2: rgba(255, 255, 255, 0.88);
+  --surface-3: rgba(255, 255, 255, 0.96);
+  --surface-solid: #ffffff;
+  --surface-sunken: rgba(14, 35, 64, 0.05);
+  --stroke: rgba(12, 35, 64, 0.10);
+  --stroke-strong: rgba(12, 35, 64, 0.18);
+  --stroke-brand: rgba(22, 101, 186, 0.35);
+  --glass-tint: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.62) 55%, rgba(255, 255, 255, 0.80));
+  --glass-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 60%);
+
+  --ink: #0b1726;
+  --ink-2: #4a5a70;
+  --ink-3: #6c7d94;
+  --ink-inverted: #ffffff;
+
+  --accent: var(--brand-500);
+  --accent-strong: var(--brand-600);
+  --accent-soft: rgba(31, 127, 224, 0.12);
+  --accent-gradient: linear-gradient(135deg, #1f7fe0 0%, #12aeae 100%);
+  --accent-glow: 0 12px 28px -14px rgba(22, 101, 186, 0.60);
+
+  --series-standard: #2a78d6;
+  --series-substitution: #1baf7a;
+  --series-contingency: #eb6834;
+  --series-standard-soft: rgba(42, 120, 214, 0.14);
+  --series-substitution-soft: rgba(27, 175, 122, 0.14);
+  --series-contingency-soft: rgba(235, 104, 52, 0.14);
+  --series-track: rgba(12, 35, 64, 0.10);
+
+  --viz-surface: #f7fafd;
+  --viz-grid: rgba(12, 35, 64, 0.10);
+  --viz-axis: rgba(12, 35, 64, 0.20);
+
+  --shadow-1: 0 1px 2px rgba(16, 40, 73, 0.08);
+  --shadow-2: 0 12px 28px -16px rgba(16, 40, 73, 0.45);
+  --shadow-3: 0 28px 60px -30px rgba(16, 40, 73, 0.45);
+  --shadow-modal: 0 40px 90px -30px rgba(16, 40, 73, 0.45);
+}

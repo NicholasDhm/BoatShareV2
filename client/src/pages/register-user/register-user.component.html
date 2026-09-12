@@ -1,140 +1,117 @@
-<!-- Modern Register Page -->
-<div class="register-page animate-fade-in">
-  <div class="register-container">
-    <!-- Header -->
-    <div class="register-header">
-      <h2 class="register-title">Criar Conta</h2>
-      <p class="register-subtitle">Preencha os dados para criar sua conta</p>
-    </div>
+<div class="auth">
+  <!-- Story panel -->
+  <aside class="auth__story panel">
+    <span class="page__eyebrow">BoatShare</span>
+    <h1 class="auth__headline">Entre para a tripulação.</h1>
+    <p class="auth__lead">
+      Crie sua conta, escolha o barco do seu grupo e comece a reservar seus dias com as regras de cota
+      já aplicadas automaticamente.
+    </p>
 
-    @if (boats.length !== 0) {
-      <!-- Register Form -->
-      <form [formGroup]="registerUserForm" (ngSubmit)="registerNewUser()" class="register-form">
-        <!-- Name Field -->
-        <div class="form-group">
-          <label for="name" class="form-label">Nome de Usuário</label>
-          <input
-            type="text"
-            id="name"
-            class="form-control"
-            [class.is-invalid]="isNameInvalid"
-            formControlName="name"
-            placeholder="Digite seu nome"
-            autocomplete="name"
-            [disabled]="isLoading">
+    <ul class="auth__features">
+      <li><i class="bi bi-sailboat" aria-hidden="true"></i><span><strong>Escolha seu barco</strong>Somente embarcações com vaga disponível aparecem na lista.</span></li>
+      <li><i class="bi bi-lightning-charge" aria-hidden="true"></i><span><strong>Acesso imediato</strong>Ao criar a conta você já entra no painel com suas cotas ativas.</span></li>
+      <li><i class="bi bi-people" aria-hidden="true"></i><span><strong>Tudo em grupo</strong>Reservas, suplências e histórico visíveis para todos os cotistas.</span></li>
+    </ul>
 
+    <svg class="auth__waves" viewBox="0 0 480 120" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 70 Q60 40 120 70 T240 70 T360 70 T480 70 V120 H0 Z" opacity="0.35"></path>
+      <path d="M0 86 Q60 58 120 86 T240 86 T360 86 T480 86 V120 H0 Z" opacity="0.22"></path>
+    </svg>
+  </aside>
+
+  <!-- Form -->
+  <section class="auth__form panel">
+    <header class="auth__form-head">
+      <h2>Criar conta</h2>
+      <p class="page__lead">Preencha os dados para começar</p>
+    </header>
+
+    @if (boats.length === 0) {
+      <div class="empty-state">
+        <i class="bi bi-sailboat" aria-hidden="true"></i>
+        <h3>Nenhum barco disponível</h3>
+        <p>Não há embarcações com vaga aberta no momento. Fale com o administrador do seu grupo.</p>
+      </div>
+    } @else {
+      <form [formGroup]="registerUserForm" (ngSubmit)="registerNewUser()" class="auth__fields" novalidate>
+        <div class="field">
+          <label for="name" class="field__label">Nome</label>
+          <div class="input-icon">
+            <i class="bi bi-person" aria-hidden="true"></i>
+            <input type="text" id="name" class="form-control" [class.is-invalid]="isNameInvalid"
+              formControlName="name" placeholder="Como devemos te chamar" autocomplete="name">
+          </div>
           @if (isNameInvalid) {
-            <div class="invalid-feedback">
-              {{ nameErrorMessage }}
-            </div>
+            <span class="invalid-feedback"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ nameErrorMessage }}</span>
           }
         </div>
 
-        <!-- Email Field -->
-        <div class="form-group">
-          <label for="email" class="form-label">Email</label>
-          <input
-            type="email"
-            id="email"
-            class="form-control"
-            [class.is-invalid]="isEmailInvalid"
-            formControlName="email"
-            placeholder="seu.email@exemplo.com"
-            autocomplete="email"
-            [disabled]="isLoading">
-
+        <div class="field">
+          <label for="email" class="field__label">Email</label>
+          <div class="input-icon">
+            <i class="bi bi-envelope" aria-hidden="true"></i>
+            <input type="email" id="email" class="form-control" [class.is-invalid]="isEmailInvalid"
+              formControlName="email" placeholder="seu.email@exemplo.com" autocomplete="email">
+          </div>
           @if (isEmailInvalid) {
-            <div class="invalid-feedback">
-              {{ emailErrorMessage }}
-            </div>
+            <span class="invalid-feedback"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ emailErrorMessage }}</span>
           }
         </div>
 
-        <!-- Boat Selection Field -->
-        <div class="form-group">
-          <label for="boatId" class="form-label">Nome do Barco</label>
-          <select
-            id="boatId"
-            class="form-control form-select"
-            [class.is-invalid]="isBoatIdInvalid"
-            formControlName="boatId"
-            [disabled]="isLoading">
+        <div class="field">
+          <label for="boatId" class="field__label">Barco</label>
+          <select id="boatId" class="form-select" [class.is-invalid]="isBoatIdInvalid" formControlName="boatId">
             <option value="" disabled selected>Selecione um barco</option>
-            @for(boat of getAvailableBoats(); track boat.boatId) {
-              <option [value]="boat.boatId">
-                {{boat.name}} ({{boat.assignedUsersCount}}/{{boat.capacity}})
-              </option>
+            @for (boat of getAvailableBoats(); track boat.boatId) {
+              <option [value]="boat.boatId">{{ boat.name }} — {{ boat.assignedUsersCount }}/{{ boat.capacity }} cotistas</option>
             }
           </select>
-
           @if (isBoatIdInvalid) {
-            <div class="invalid-feedback">
-              {{ boatIdErrorMessage }}
-            </div>
+            <span class="invalid-feedback"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ boatIdErrorMessage }}</span>
           }
         </div>
 
-        <!-- Password Field -->
-        <div class="form-group">
-          <label for="password" class="form-label">Senha</label>
-          <input
-            type="password"
-            id="password"
-            class="form-control"
-            [class.is-invalid]="isPasswordInvalid"
-            formControlName="password"
-            placeholder="Digite sua senha"
-            autocomplete="new-password"
-            [disabled]="isLoading">
-
+        <div class="field">
+          <label for="password" class="field__label">Senha</label>
+          <div class="input-icon">
+            <i class="bi bi-lock" aria-hidden="true"></i>
+            <input [type]="showPassword ? 'text' : 'password'" id="password" class="form-control"
+              [class.is-invalid]="isPasswordInvalid" formControlName="password" placeholder="Crie uma senha" autocomplete="new-password">
+            <button type="button" class="input-icon__action" (click)="showPassword = !showPassword"
+              [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
+              <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword" aria-hidden="true"></i>
+            </button>
+          </div>
           @if (isPasswordInvalid) {
-            <div class="invalid-feedback">
-              {{ passwordErrorMessage }}
-            </div>
+            <span class="invalid-feedback"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ passwordErrorMessage }}</span>
           }
         </div>
 
-        <!-- Error Message -->
         @if (errorMessage) {
           <div class="alert alert-danger" role="alert">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            {{ errorMessage }}
+            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+            <span>{{ errorMessage }}</span>
           </div>
         }
 
-        <!-- Submit Button -->
-        <button
-          type="submit"
-          class="btn btn-primary btn-register"
-          [disabled]="registerUserForm.invalid || isLoading">
-
+        <button type="submit" class="btn btn-primary btn-lg btn-block" [disabled]="registerUserForm.invalid || isLoading">
           @if (isLoading) {
-            <div class="spinner-border spinner-border-sm me-2" role="status">
-              <span class="visually-hidden">Carregando...</span>
-            </div>
-            Criando conta...
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Criando conta…
           } @else {
-            <i class="bi bi-person-plus me-2"></i>
-            Criar Conta e Entrar
+            <i class="bi bi-person-plus" aria-hidden="true"></i>
+            Criar conta e entrar
           }
         </button>
       </form>
 
-      <!-- Divider -->
-      <div class="divider">
-        <span>ou</span>
-      </div>
+      <div class="auth__divider"><span>ou</span></div>
 
-      <!-- Login Link -->
-      <div class="login-section">
-        <p class="login-text">Já tem uma conta?</p>
-        <a
-          class="btn btn-outline-primary btn-login-link"
-          [routerLink]="'/login'">
-          <i class="bi bi-box-arrow-in-right me-2"></i>
-          Entrar
-        </a>
-      </div>
+      <a class="btn btn-secondary btn-block" [routerLink]="'/login'">
+        <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+        Já tenho conta
+      </a>
     }
-  </div>
+  </section>
 </div>

@@ -5,13 +5,12 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { UiNavigationComponent } from '../components/ui-navigation/ui-navigation.component';
-import { UiCardComponent } from '../components/ui-card/ui-card.component';
-import { LogoutComponent } from '../pages/logout/logout.component';
 import { UiLoadingSpinnerComponent } from '../components/ui-loading-spinner/ui-loading-spinner.component';
 
 import { IUser } from '../models/user';
 import { AuthService } from '../auth/auth.service';
 import { UserService } from '../services/user.service';
+import { ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -21,8 +20,6 @@ import { UserService } from '../services/user.service';
     RouterOutlet,
     RouterModule,
     UiNavigationComponent,
-    UiCardComponent,
-    LogoutComponent,
     UiLoadingSpinnerComponent,
   ],
   templateUrl: './app.component.html',
@@ -31,12 +28,13 @@ import { UserService } from '../services/user.service';
 export class AppComponent implements OnInit, OnDestroy {
   readonly title = 'BoatShare v2';
   activeUser: IUser | null = null;
-  
+
   private readonly destroy$ = new Subject<void>();
 
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly themeService: ThemeService,
   ) {
     this.authService.initializeSession();
     this.activeUser = this.userService.getCurrentUser();
@@ -66,5 +64,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   get userName(): string {
     return this.activeUser?.name ?? '';
+  }
+
+  get boatName(): string {
+    return this.activeUser?.boatName ?? '';
   }
 }

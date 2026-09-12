@@ -1,0 +1,60 @@
+<div class="viz bar-chart">
+  <div class="bar-chart__plot">
+    <svg [attr.viewBox]="viewBox" class="viz__plot" role="img">
+      <!-- Hairline grid, recessive -->
+      @for (tick of ticks; track tick.value) {
+        <line class="viz__grid-line" [attr.x1]="plotLeft" [attr.x2]="plotRight" [attr.y1]="tick.y" [attr.y2]="tick.y"></line>
+        <text class="viz__tick" [attr.x]="plotLeft - 10" [attr.y]="tick.y + 4" text-anchor="end">{{ tick.value }}</text>
+      }
+      <line class="viz__axis-line" [attr.x1]="plotLeft" [attr.x2]="plotRight" [attr.y1]="baseline" [attr.y2]="baseline"></line>
+
+      @for (column of columns; track column.label; let i = $index) {
+        @if (column.path) {
+          <path
+            class="bar-chart__bar"
+            [class.is-dimmed]="hovered !== null && hovered !== i"
+            [attr.d]="column.path"
+            [attr.fill]="color"></path>
+        }
+
+        <!-- The value the reader needs without hovering: the peak -->
+        @if (column.isPeak && column.path) {
+          <text class="viz__value" [attr.x]="column.labelX" [attr.y]="column.capY - 8" text-anchor="middle">
+            {{ column.value }}{{ valueSuffix }}
+          </text>
+        }
+
+        <text class="viz__label" [attr.x]="column.labelX" [attr.y]="baseline + 18" text-anchor="middle">{{ column.label }}</text>
+
+        <!-- Hit target spans the whole band, not just the painted pixels -->
+        <rect
+          class="bar-chart__hit"
+          [attr.x]="column.hitX"
+          [attr.width]="column.hitWidth"
+          y="0"
+          [attr.height]="baseline"
+          (mouseenter)="hovered = i"
+          (mouseleave)="hovered = null"
+          tabindex="0"
+          (focus)="hovered = i"
+          (blur)="hovered = null">
+          <title>{{ column.fullLabel || column.label }}: {{ column.value }}{{ valueSuffix }}</title>
+        </rect>
+      }
+    </svg>
+
+    @if (hovered !== null) {
+      <div
+        class="viz-tooltip"
+        [class.viz-tooltip--below]="tooltipFlipped(columns[hovered])"
+        [style.left]="tooltipLeft(columns[hovered])"
+        [style.top]="tooltipTop(columns[hovered])">
+        <div class="viz-tooltip__value">{{ columns[hovered].value }}{{ valueSuffix }}</div>
+        <div class="viz-tooltip__label">
+          <span class="viz-tooltip__key" [style.background]="color"></span>
+          {{ columns[hovered].fullLabel || columns[hovered].label }}
+        </div>
+      </div>
+    }
+  </div>
+</div>

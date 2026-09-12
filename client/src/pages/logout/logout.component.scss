@@ -1,8 +1,4 @@
-:host {
+:host { display: inline-flex; }
 
-  &:hover {
-    color: blue;
-    text-decoration: underline;
-    cursor: pointer;
-  }
-}
+.logout { color: var(--status-critical); }
+.logout:hover { background: var(--status-critical-soft); }

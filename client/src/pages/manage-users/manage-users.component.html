@@ -1,126 +1,137 @@
-<div class="manage-users-container">
-  <!-- Header -->
-  <div class="users-header">
-    <h1>Gerenciar Usuários</h1>
-    <p class="subtitle">Visualize e gerencie todos os usuários do sistema</p>
-  </div>
+<div class="page admin">
+  <header class="page__head">
+    <div>
+      <span class="page__eyebrow"><i class="bi bi-shield-check" aria-hidden="true"></i> Administração</span>
+      <h1>Cotistas</h1>
+      <p class="page__lead">Consulte cotas, reservas e permissões de cada membro.</p>
+    </div>
+  </header>
 
-  <!-- User Selector -->
-  <div class="user-selector">
-    <label for="userSelect">Selecionar Usuário:</label>
-    <select id="userSelect" class="form-select" [ngModel]="userId" (ngModelChange)="onSelectUserId(+$event)">
-      @for (user of users; track user.userId) {
-        <option [value]="user.userId" [selected]="user.userId === userId">{{ user.name }}</option>
-      }
-    </select>
-  </div>
+  <!-- Overview -->
+  <section class="admin__kpis">
+    <ui-stat-tile label="Cotistas cadastrados" [value]="users.length" icon="bi-people" tone="accent" hint="Total de contas"></ui-stat-tile>
+    <ui-stat-tile label="Administradores" [value]="adminCount" icon="bi-shield-check" tone="neutral" hint="Contas com acesso total"></ui-stat-tile>
+    <ui-stat-tile label="Cotas disponíveis" [value]="totalQuotasInPlay" icon="bi-ticket-perforated" [tone]="totalQuotasInPlay > 0 ? 'good' : 'critical'" hint="Somando todos os membros"></ui-stat-tile>
+    <ui-stat-tile label="Embarcações" [value]="boats.length" icon="bi-sailboat" tone="neutral" hint="Barcos no sistema"></ui-stat-tile>
+  </section>
 
-  @if (user) {
-    <!-- User Details Grid -->
-    <div class="user-details-grid">
-      <!-- User Information Card -->
-      <ui-card class="user-info-card">
-        <div class="card-header">
-          <i class="bi bi-person-circle"></i>
-          <h3>Informações do Usuário</h3>
+  <div class="admin__layout">
+    <!-- Directory -->
+    <aside class="panel panel--flush admin__list">
+      <div class="admin__list-head">
+        <div class="input-icon">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input type="text" class="form-control" placeholder="Buscar por nome ou email" [(ngModel)]="searchTerm" aria-label="Buscar cotista">
         </div>
-        <div class="card-content">
-          <div class="detail-row">
-            <span class="label">ID do Usuário:</span>
-            <span class="value">{{ user.userId }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Nome:</span>
-            <span class="value">{{ user.name }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Email:</span>
-            <span class="value">{{ user.email }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Cargo:</span>
-            <span class="value role-badge" [class.admin]="user.role === 'Admin'" [class.member]="user.role === 'Member'">
-              <i class="bi" [class.bi-shield-check]="user.role === 'Admin'" [class.bi-person]="user.role === 'Member'"></i>
-              {{ getRoleLabel(user.role) }}
-            </span>
-          </div>
-          <div class="detail-row">
-            <span class="label">ID do Barco:</span>
-            <span class="value">{{ getBoatName(user.boatId) }}</span>
-          </div>
-        </div>
-      </ui-card>
+      </div>
 
-      <!-- Quotas Card -->
-      <ui-card class="quotas-card">
-        <div class="card-header">
-          <i class="bi bi-calendar3"></i>
-          <h3>Cotas de Reserva</h3>
-        </div>
-        <div class="card-content">
-          <div class="quota-item standard">
-            <div class="quota-info">
-              <i class="bi bi-calendar-check"></i>
-              <span class="quota-label">Cotas Padrões</span>
-            </div>
-            <span class="quota-value">{{ user.standardQuota }}</span>
-          </div>
-          <div class="quota-item substitution">
-            <div class="quota-info">
-              <i class="bi bi-calendar-event"></i>
-              <span class="quota-label">Cotas Suplentes</span>
-            </div>
-            <span class="quota-value">{{ user.substitutionQuota }}</span>
-          </div>
-          <div class="quota-item contingency">
-            <div class="quota-info">
-              <i class="bi bi-calendar-plus"></i>
-              <span class="quota-label">Cotas Contingentes</span>
-            </div>
-            <span class="quota-value">{{ user.contingencyQuota }}</span>
-          </div>
-        </div>
-      </ui-card>
+      <ul class="admin__items">
+        @for (item of filteredUsers; track item.userId) {
+          <li>
+            <button type="button" class="admin__item" [class.is-active]="item.userId === userId" (click)="onSelectUserId(item.userId)">
+              <span class="avatar avatar--sm">{{ initials(item.name) }}</span>
+              <span class="admin__item-meta">
+                <span class="admin__item-name">{{ item.name }}</span>
+                <span class="admin__item-sub">{{ getBoatName(item.boatId) }}</span>
+              </span>
+              @if (item.role === 'Admin') {
+                <span class="chip admin__item-badge"><i class="bi bi-shield-check" aria-hidden="true"></i></span>
+              }
+            </button>
+          </li>
+        } @empty {
+          <li class="empty-state">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <p>Nenhum cotista encontrado.</p>
+          </li>
+        }
+      </ul>
+    </aside>
 
-      <!-- Reservations Card -->
-      <ui-card class="reservations-card">
-        <div class="card-header">
-          <i class="bi bi-calendar-check"></i>
-          <h3>Reservas</h3>
-        </div>
-        <div class="card-content">
-          @if (getUserReservations().length === 0) {
-            <div class="empty-reservations">
-              <i class="bi bi-calendar-x"></i>
-              <p>Nenhuma reserva encontrada</p>
+    <!-- Detail -->
+    <div class="admin__detail">
+      @if (user) {
+        <section class="panel admin__identity">
+          <span class="avatar avatar--lg">{{ initials(user.name) }}</span>
+          <div class="admin__identity-meta">
+            <h2>{{ user.name }}</h2>
+            <p class="page__lead">{{ user.email }}</p>
+            <div class="admin__tags">
+              <span class="chip">
+                <i class="bi" [class.bi-shield-check]="user.role === 'Admin'" [class.bi-person]="user.role === 'Member'" aria-hidden="true"></i>
+                {{ getRoleLabel(user.role) }}
+              </span>
+              <span class="chip"><i class="bi bi-sailboat" aria-hidden="true"></i>{{ getBoatName(user.boatId) }}</span>
+              <span class="chip"><i class="bi bi-hash" aria-hidden="true"></i>{{ user.userId }}</span>
             </div>
+          </div>
+
+          @if (userId !== currentUser?.userId) {
+            <button type="button" class="btn btn-secondary" (click)="changeUserRole()">
+              <i class="bi" [class.bi-shield-check]="user.role === 'Member'" [class.bi-person]="user.role === 'Admin'" aria-hidden="true"></i>
+              {{ user.role === 'Member' ? 'Tornar administrador' : 'Tornar membro' }}
+            </button>
           } @else {
-            @for (reservation of getUserReservations(); track reservation.reservationId) {
-              <div class="reservation-item">
-                <i class="bi bi-calendar-event"></i>
-                <span>{{ formatReservationDate(reservation.day, reservation.month, reservation.year) }}</span>
+            <span class="chip"><i class="bi bi-person-check" aria-hidden="true"></i>Você</span>
+          }
+        </section>
+
+        <div class="admin__grid">
+          <section class="panel">
+            <div class="panel__header">
+              <div>
+                <h3 class="panel__title"><i class="bi bi-pie-chart" aria-hidden="true"></i> Cotas do cotista</h3>
+                <p class="panel__subtitle">Saldo disponível por tipo</p>
+              </div>
+            </div>
+
+            @if (userTotalQuotas > 0) {
+              <ui-donut-chart [slices]="quotaSlices" caption="cotas disponíveis"></ui-donut-chart>
+            } @else {
+              <div class="empty-state">
+                <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+                <p>Este cotista não tem cotas disponíveis.</p>
               </div>
             }
-          }
-        </div>
-      </ui-card>
-    </div>
+          </section>
 
-    <!-- Role Change Action -->
-    @if (userId !== currentUser?.userId) {
-      <div class="action-section">
-        @if (user.role === 'Member') {
-          <button class="btn btn-warning btn-action" (click)="changeUserRole()">
-            <i class="bi bi-shield-check"></i>
-            Tornar Usuário Administrador
-          </button>
-        } @else if (user.role === 'Admin') {
-          <button class="btn btn-warning btn-action" (click)="changeUserRole()">
-            <i class="bi bi-person"></i>
-            Tornar Usuário Membro
-          </button>
-        }
-      </div>
-    }
-  }
+          <section class="panel">
+            <div class="panel__header">
+              <div>
+                <h3 class="panel__title"><i class="bi bi-calendar-check" aria-hidden="true"></i> Reservas ativas</h3>
+                <p class="panel__subtitle">{{ getUserReservations().length }} registro(s)</p>
+              </div>
+            </div>
+
+            @if (getUserReservations().length === 0) {
+              <div class="empty-state">
+                <i class="bi bi-calendar-x" aria-hidden="true"></i>
+                <p>Nenhuma reserva ativa para este cotista.</p>
+              </div>
+            } @else {
+              <ul class="admin__reservations">
+                @for (reservation of getUserReservations(); track reservation.reservationId) {
+                  <li>
+                    <span class="series-dot" [ngClass]="'series-dot--' + typeKey(reservation.type)"></span>
+                    <span class="admin__reservation-date">{{ formatReservationDate(reservation.day, reservation.month, reservation.year) }}</span>
+                    <span class="admin__reservation-type">{{ typeLabel(reservation.type) }}</span>
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+        </div>
+      }
+
+      <section class="panel">
+        <div class="panel__header">
+          <div>
+            <h3 class="panel__title"><i class="bi bi-bar-chart" aria-hidden="true"></i> Cotas disponíveis por cotista</h3>
+            <p class="panel__subtitle">Saldo total de cada membro (12 maiores)</p>
+          </div>
+        </div>
+        <ui-bar-chart [bars]="quotasPerUserBars" color="var(--series-standard)"></ui-bar-chart>
+      </section>
+    </div>
+  </div>
 </div>

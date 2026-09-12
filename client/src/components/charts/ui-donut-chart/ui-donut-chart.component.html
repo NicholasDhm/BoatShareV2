@@ -1,0 +1,49 @@
+<div class="viz donut">
+  <div class="donut__plot">
+    <svg viewBox="0 0 160 160" class="viz__plot" role="img" [attr.aria-label]="caption">
+      <circle class="donut__track" cx="80" cy="80" [attr.r]="radius"></circle>
+
+      @if (sum > 0) {
+        @for (arc of arcs; track arc.label; let i = $index) {
+          <circle
+            class="donut__arc"
+            [class.is-dimmed]="hovered !== null && hovered !== i"
+            [class.is-active]="hovered === i"
+            cx="80" cy="80" [attr.r]="radius"
+            [attr.stroke]="arc.color"
+            [attr.stroke-dasharray]="arc.dash + ' ' + circumference"
+            [attr.stroke-dashoffset]="arc.offset"
+            (mouseenter)="hovered = i"
+            (mouseleave)="hovered = null">
+            <title>{{ arc.label }}: {{ arc.value }} ({{ percent(arc.share) }})</title>
+          </circle>
+        }
+      }
+    </svg>
+
+    <div class="donut__centre">
+      <span class="donut__value">{{ centreValue }}</span>
+      <span class="donut__caption">{{ centreCaption }}</span>
+    </div>
+  </div>
+
+  <!-- Legend doubles as the direct-label channel: every value is readable without hovering -->
+  <ul class="legend donut__legend">
+    @for (arc of arcs; track arc.label; let i = $index) {
+      <li>
+        <button
+          type="button"
+          class="legend__item donut__legend-item"
+          [class.is-dimmed]="hovered !== null && hovered !== i"
+          (mouseenter)="hovered = i"
+          (mouseleave)="hovered = null"
+          (focus)="hovered = i"
+          (blur)="hovered = null">
+          <span class="series-dot" [style.background]="arc.color"></span>
+          <span class="donut__legend-label">{{ arc.label }}</span>
+          <span class="legend__value">{{ arc.value }}</span>
+        </button>
+      </li>
+    }
+  </ul>
+</div>

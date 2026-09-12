@@ -1,286 +1,84 @@
-.profile-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-}
+:host { display: block; }
 
-.profile-header {
+.profile__hero {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  gap: var(--space-5);
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2rem;
-
-  .header-content {
-    h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #1f2937;
-      margin-bottom: 0.5rem;
-    }
-
-    .subtitle {
-      color: #6b7280;
-      font-size: 1rem;
-      margin: 0;
-    }
-  }
-
-  .header-actions {
-    display: flex;
-    gap: 0.75rem;
-
-    .btn {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.625rem 1.25rem;
-      font-weight: 500;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-
-      i {
-        font-size: 1rem;
-      }
-
-      &:hover {
-        transform: translateY(-1px);
-      }
-    }
-  }
 }
 
-// Profile Cards
-.profile-card {
-  width: 100%;
-  margin-bottom: 1.5rem;
-  padding: 1.5rem;
+.profile__identity { flex: 1; min-width: 220px; }
 
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding-bottom: 1rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
-    width: 100%;
-
-    i {
-      font-size: 1.25rem;
-      color: #3b82f6;
-    }
-
-    h3 {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: #1f2937;
-      margin: 0;
-    }
-  }
+.profile__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
-// Info Grid
-.info-grid {
+.profile__grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+  align-items: start;
 }
 
-.info-item {
+.profile__password { flex: 1; max-width: 260px; }
+
+.profile__password-error { margin-top: var(--space-3); }
+
+.profile__quota-cards {
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--stroke);
+}
+
+.profile__reservations {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-
-  .info-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #9ca3af;
-  }
-
-  .info-value {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #1f2937;
-
-    &.password-dots {
-      color: #9ca3af;
-      letter-spacing: 2px;
-    }
-  }
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.badge {
+.res-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-sunken);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-md);
+  transition: border-color var(--t-fast), transform var(--t-fast);
+}
+
+.res-row:hover {
+  border-color: var(--stroke-brand);
+  transform: translateX(2px);
+}
+
+.res-row__date { display: flex; flex-direction: column; line-height: 1.3; }
+.res-row__date strong { font-size: 0.9375rem; font-weight: 620; color: var(--ink); }
+.res-row__date small { font-size: 0.75rem; color: var(--ink-3); text-transform: capitalize; }
+
+.res-row__type {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.625rem;
-  border-radius: 6px;
+  gap: var(--space-2);
   font-size: 0.8125rem;
-  font-weight: 500;
-
-  i {
-    font-size: 0.8125rem;
-  }
-
-  &.badge-admin {
-    background: #fef3c7;
-    color: #d97706;
-  }
-
-  &.badge-member {
-    background: #dbeafe;
-    color: #1e40af;
-  }
-
-  &.badge-boat {
-    background: #d1fae5;
-    color: #047857;
-  }
+  color: var(--ink-2);
 }
 
-.password-form {
-  input {
-    width: 200px;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-
-    &:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-  }
+@media (max-width: 900px) {
+  .profile__grid { grid-template-columns: minmax(0, 1fr); }
 }
 
-// Quotas Grid
-.quotas-grid {
-  display: flex;
-  gap: 0.75rem;
-  width: 100%;
-}
-
-.quota-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-
-  .quota-number {
-    font-size: 1.5rem;
-    font-weight: 700;
-    line-height: 1;
+@media (max-width: 560px) {
+  .res-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: var(--space-2);
   }
-
-  .quota-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    margin-top: 0.25rem;
-  }
-
-  &.standard {
-    background: #dbeafe;
-    .quota-number { color: #1d4ed8; }
-    .quota-label { color: #3b82f6; }
-  }
-
-  &.substitution {
-    background: #ffedd5;
-    .quota-number { color: #c2410c; }
-    .quota-label { color: #ea580c; }
-  }
-
-  &.contingency {
-    background: #fef08a;
-    .quota-number { color: #a16207; }
-    .quota-label { color: #ca8a04; }
-  }
-}
-
-// Reservations
-.reservations-content {
-  width: 100%;
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem 1rem;
-  text-align: center;
-  color: #9ca3af;
-
-  i {
-    font-size: 2.5rem;
-    margin-bottom: 0.75rem;
-    opacity: 0.4;
-  }
-
-  p {
-    font-size: 0.875rem;
-    margin: 0;
-  }
-}
-
-.reservations-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.625rem;
-}
-
-.reservation-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: #374151;
-
-  i {
-    color: #3b82f6;
-    font-size: 0.875rem;
-  }
-}
-
-// Responsive
-@media (max-width: 768px) {
-  .profile-container {
-    padding: 1rem;
-  }
-
-  .profile-header {
-    flex-direction: column;
-    align-items: stretch;
-
-    .header-content h1 {
-      font-size: 1.5rem;
-    }
-
-    .header-actions {
-      .btn {
-        flex: 1;
-        justify-content: center;
-      }
-    }
-  }
-
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .quotas-grid {
-    flex-wrap: wrap;
-  }
+  .res-row__type { grid-column: 1 / -1; }
 }

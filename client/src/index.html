@@ -1,16 +1,32 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <title>BoatShare</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="BoatShare — gestão de cotas e reservas de embarcações.">
+  <meta name="theme-color" content="#060b14">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script>
+    // Apply the stored theme before first paint so the shell never flashes.
+    (function () {
+      try {
+        var stored = localStorage.getItem('boatshare-theme');
+        if (stored !== 'dark' && stored !== 'light') {
+          stored = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        document.documentElement.setAttribute('data-theme', stored);
+      } catch (e) { /* keep the dark default */ }
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>
-  
-  <!-- Bootstrap JS -->
+
+  <!-- Bootstrap JS (popovers) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

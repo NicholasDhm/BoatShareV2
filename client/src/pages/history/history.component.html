@@ -1,99 +1,146 @@
-<div class="history-container">
-	<!-- Header -->
-	<div class="history-header">
-		<h1>Histórico de Reservas</h1>
-		<p class="subtitle">Visualize suas reservas passadas</p>
-	</div>
+<div class="page history">
+  <header class="page__head">
+    <div>
+      <span class="page__eyebrow"><i class="bi bi-archive" aria-hidden="true"></i> Arquivo</span>
+      <h1>Histórico de reservas</h1>
+      <p class="page__lead">Todas as reservas já encerradas, suas e da embarcação.</p>
+    </div>
+  </header>
 
-	<!-- Toggle Buttons -->
-	<div class="view-toggle">
-		<button
-			class="toggle-btn"
-			[class.active]="viewMode === 'user'"
-			(click)="toggleView('user')">
-			<i class="bi bi-person"></i>
-			Minhas Reservas
-		</button>
-		<button
-			class="toggle-btn"
-			[class.active]="viewMode === 'boat'"
-			(click)="toggleView('boat')">
-			<i class="bi bi-ship"></i>
-			Histórico do Barco
-		</button>
-	</div>
+  <!-- Filters: one row, scoping everything below -->
+  <div class="history__filters">
+    <div class="segmented">
+      <button type="button" class="segmented__item" [class.is-active]="viewMode === 'user'" (click)="toggleView('user')">
+        <i class="bi bi-person" aria-hidden="true"></i> Minhas reservas
+      </button>
+      <button type="button" class="segmented__item" [class.is-active]="viewMode === 'boat'" (click)="toggleView('boat')">
+        <i class="bi bi-sailboat" aria-hidden="true"></i> Do barco
+      </button>
+    </div>
 
-	<!-- Error Message -->
-	@if (errorMessage) {
-		<div class="error-message">
-			<i class="bi bi-exclamation-triangle"></i>
-			{{ errorMessage }}
-		</div>
-	}
+    <div class="history__types">
+      @for (filter of typeFilters; track filter.key) {
+        <button type="button" class="chip history__chip" [class.is-active]="typeFilter === filter.key" (click)="setTypeFilter(filter.key)">
+          @if (filter.key !== 'All') {
+            <span class="series-dot" [ngClass]="'series-dot--' + typeKey(filter.key)"></span>
+          }
+          {{ filter.label }}
+        </button>
+      }
+    </div>
+  </div>
 
-	<!-- Loading State -->
-	@if (isLoading()) {
-		<div class="loading-state">
-			<ui-loading-spinner></ui-loading-spinner>
-			<p>Carregando histórico...</p>
-		</div>
-	}
+  @if (errorMessage) {
+    <div class="alert alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+  }
 
-	<!-- Reservations List -->
-	@if (!isLoading() && !errorMessage) {
-		<div class="reservations-list">
-			@if (getDisplayedReservations().length === 0) {
-				<div class="empty-state">
-					<i class="bi bi-archive"></i>
-					<h3>Nenhuma reserva arquivada</h3>
-					<p>
-						@if (viewMode === 'user') {
-							Você não tem reservas arquivadas no momento.
-						} @else {
-							Este barco não tem reservas arquivadas no momento.
-						}
-					</p>
-				</div>
-			} @else {
-				@for (reservation of getDisplayedReservations(); track reservation.reservationId) {
-					<ui-card class="reservation-card">
-						<div class="reservation-content">
-							<div class="reservation-date">
-								<i class="bi bi-calendar-event"></i>
-								<span>{{ formatDate(reservation.year, reservation.month, reservation.day) }}</span>
-							</div>
+  @if (isLoading()) {
+    <ui-loading-spinner></ui-loading-spinner>
+  }
 
-							<div class="reservation-details">
-								<div class="detail-row">
-									<span class="label">Tipo:</span>
-									<span class="value" [ngClass]="reservation.type">
-										{{ getReservationTypeLabel(reservation.type) }}
-									</span>
-								</div>
+  @if (!isLoading() && !errorMessage) {
+    <!-- Stats -->
+    <section class="history__kpis">
+      <ui-stat-tile label="Reservas arquivadas" [value]="totalCount" icon="bi-archive" tone="accent"
+        [hint]="viewMode === 'user' ? 'No seu nome' : 'De todos os cotistas'"></ui-stat-tile>
+      <ui-stat-tile label="Tipo mais usado" [value]="topType" icon="bi-pie-chart" tone="neutral"
+        hint="Maior fatia do período"></ui-stat-tile>
+      <ui-stat-tile label="Mês mais movimentado" [value]="busiestMonth" icon="bi-calendar-week" tone="neutral"
+        hint="Somando todos os anos"></ui-stat-tile>
+      @if (viewMode === 'boat') {
+        <ui-stat-tile label="Cotistas no histórico" [value]="distinctMembers" icon="bi-people" tone="accent"
+          hint="Membros com registro"></ui-stat-tile>
+      }
+    </section>
 
-								@if (viewMode === 'boat' && reservation.userName) {
-									<div class="detail-row">
-										<span class="label">Usuário:</span>
-										<span class="value">{{ reservation.userName }}</span>
-									</div>
-								}
+    @if (totalCount > 0) {
+      <!-- Charts -->
+      <section class="history__charts">
+        <div class="panel">
+          <div class="panel__header">
+            <div>
+              <h3 class="panel__title"><i class="bi bi-bar-chart" aria-hidden="true"></i> Sazonalidade</h3>
+              <p class="panel__subtitle">Reservas por mês, somando todos os anos do arquivo</p>
+            </div>
+          </div>
+          <ui-bar-chart [bars]="monthlyBars" color="var(--series-standard)"></ui-bar-chart>
+        </div>
 
-								<div class="detail-row">
-									<span class="label">Status Final:</span>
-									<span class="value status" [ngClass]="reservation.status">
-										{{ getStatusLabel(reservation.status || 'Legacy') }}
-									</span>
-								</div>
+        <div class="panel">
+          <div class="panel__header">
+            <div>
+              <h3 class="panel__title"><i class="bi bi-pie-chart" aria-hidden="true"></i> Por tipo de cota</h3>
+              <p class="panel__subtitle">Distribuição do arquivo</p>
+            </div>
+          </div>
+          <ui-donut-chart [slices]="typeSlices" caption="reservas"></ui-donut-chart>
+        </div>
+      </section>
 
-								<div class="detail-row">
-									<span class="label">Criada em:</span>
-									<span class="value">{{ formatCreatedDate(reservation.createdAtIsoDate) }}</span>
-								</div>
-							</div>
-						</div>
-					</ui-card>
-				}
-			}
-		</div>
-	}
+      <!-- Table view: every value reachable without hovering a chart -->
+      <section class="panel panel--flush">
+        <div class="history__table-head">
+          <h3 class="panel__title"><i class="bi bi-list-ul" aria-hidden="true"></i> Registros</h3>
+          <span class="panel__subtitle">{{ totalCount }} registro(s)</span>
+        </div>
+
+        <div class="history__table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Tipo</th>
+                @if (viewMode === 'boat') { <th>Cotista</th> }
+                <th>Status final</th>
+                <th>Criada em</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (reservation of getDisplayedReservations(); track reservation.reservationId) {
+                <tr>
+                  <td>
+                    {{ formatDate(reservation.year, reservation.month, reservation.day) }}
+                    <span class="history__weekday">{{ formatWeekday(reservation.year, reservation.month, reservation.day) }}</span>
+                  </td>
+                  <td>
+                    <span class="history__type">
+                      <span class="series-dot" [ngClass]="'series-dot--' + typeKey(reservation.type)"></span>
+                      {{ getReservationTypeLabel(reservation.type) }}
+                    </span>
+                  </td>
+                  @if (viewMode === 'boat') { <td>{{ reservation.userName || '—' }}</td> }
+                  <td>
+                    <span class="status" [ngClass]="'status--' + getStatusTone(reservation.status)">
+                      <i class="bi" [ngClass]="getStatusIcon(reservation.status)" aria-hidden="true"></i>
+                      {{ getStatusLabel(reservation.status || 'Legacy') }}
+                    </span>
+                  </td>
+                  <td>{{ formatCreatedDate(reservation.createdAtIsoDate) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    } @else {
+      <div class="panel">
+        <div class="empty-state">
+          <i class="bi bi-archive" aria-hidden="true"></i>
+          <h3>Nenhuma reserva arquivada</h3>
+          <p>
+            @if (typeFilter !== 'All') {
+              Nenhum registro para este tipo de cota. Tente outro filtro.
+            } @else if (viewMode === 'user') {
+              Você ainda não tem reservas encerradas.
+            } @else {
+              Esta embarcação ainda não tem reservas encerradas.
+            }
+          </p>
+        </div>
+      </div>
+    }
+  }
 </div>

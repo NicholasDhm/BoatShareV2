@@ -1,329 +1,143 @@
-.manage-boats-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-}
+:host { display: block; }
 
-.boats-header {
-  margin-bottom: 2rem;
-
-  h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 0.5rem;
-  }
-
-  .subtitle {
-    color: #6b7280;
-    font-size: 1rem;
-    margin: 0;
-  }
-}
-
-.boat-selector {
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  label {
-    font-weight: 600;
-    color: #374151;
-    font-size: 0.875rem;
-  }
-
-  .form-select {
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    background-color: white;
-    color: #1f2937;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-      border-color: #3b82f6;
-    }
-
-    &:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-  }
-}
-
-// Profile Cards (matching profile page)
-.profile-card {
-  width: 100%;
-  margin-bottom: 1.5rem;
-  padding: 1.5rem;
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding-bottom: 1rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
-    width: 100%;
-
-    i:first-child {
-      font-size: 1.25rem;
-      color: #3b82f6;
-    }
-
-    h3 {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: #1f2937;
-      margin: 0;
-      flex: 1;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 0.5rem;
-
-      .btn-sm {
-        display: flex;
-        align-items: center;
-        gap: 0.375rem;
-        padding: 0.375rem 0.75rem;
-        font-size: 0.8125rem;
-
-        i {
-          font-size: 0.875rem;
-          color: inherit;
-        }
-      }
-    }
-  }
-}
-
-.edit-image-form {
-  width: 100%;
-
-  .form-label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 0.5rem;
-    display: block;
-  }
-
-  .form-control {
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 0.875rem;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-
-    &:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-  }
-}
-
-// Boat Image
-.boat-image-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-
-  .boat-image {
-    max-width: 100%;
-    max-height: 300px;
-    object-fit: cover;
-    border-radius: 8px;
-  }
-
-  .boat-image-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    color: #9ca3af;
-    padding: 3rem;
-    background: #f9fafb;
-    border-radius: 8px;
-    width: 100%;
-
-    i {
-      font-size: 3rem;
-      opacity: 0.5;
-    }
-
-    span {
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-  }
-}
-
-// Info Grid (matching profile page)
-.info-grid {
+.fleet__kpis {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-  width: 100%;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
 }
 
-.info-item {
+.fleet__forms,
+.fleet__detail,
+.fleet__charts {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.fleet__forms { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: start; }
+.fleet__detail { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: start; }
+.fleet__charts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.fleet__form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.fleet__form-wide { grid-column: 1 / -1; }
+
+.fleet__form-actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  margin-top: var(--space-4);
+}
+
+.fleet__confirm { margin-top: var(--space-4); }
+
+/* Fleet picker */
+.fleet__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+.fleet__card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink-2);
+  transition: transform var(--t-base), border-color var(--t-base);
+}
+
+.fleet__card:hover { transform: translateY(-2px); border-color: var(--stroke-strong); }
+.fleet__card.is-active { border-color: var(--stroke-brand); box-shadow: var(--accent-glow); }
+
+.fleet__thumb {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  color: var(--ink-3);
+  font-size: 1.1rem;
+}
+
+.fleet__thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.fleet__card-meta { display: flex; flex-direction: column; min-width: 0; }
+.fleet__card-name { font-size: 0.9375rem; font-weight: 620; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fleet__card-sub { font-size: 0.75rem; color: var(--ink-3); }
+
+/* Detail */
+.fleet__image-panel { display: flex; flex-direction: column; }
+
+.fleet__image {
+  position: relative;
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+  background: var(--surface-sunken);
+}
+
+.fleet__image img { width: 100%; height: 100%; max-height: 340px; object-fit: cover; }
+
+.fleet__image-edit { width: 100%; padding: var(--space-6); }
+
+.fleet__image-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+}
+
+.fleet__image-foot h2 { font-size: 1.25rem; }
+
+.fleet__kv { margin-top: var(--space-5); }
+
+.fleet__reservations {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-
-  .info-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #9ca3af;
-  }
-
-  .info-value {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #1f2937;
-  }
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  max-height: 380px;
+  overflow-y: auto;
+  list-style: none;
 }
 
-.badge {
-  display: inline-flex;
+.fleet__reservations li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1.4fr) minmax(0, 1fr) auto;
   align-items: center;
-  padding: 0.25rem 0.625rem;
-  border-radius: 6px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-
-  &.badge-success {
-    background: #d1fae5;
-    color: #047857;
-  }
-
-  &.badge-danger {
-    background: #fee2e2;
-    color: #dc2626;
-  }
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-sunken);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
 }
 
-// Reservations
-.reservations-content {
-  width: 100%;
+.fleet__reservation-date { font-size: 0.875rem; color: var(--ink); }
+.fleet__reservation-user { font-size: 0.8125rem; color: var(--ink-2); }
+.fleet__reservation-type { font-size: 0.75rem; color: var(--ink-3); }
+
+@media (max-width: 1080px) {
+  .fleet__kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fleet__forms,
+  .fleet__detail,
+  .fleet__charts { grid-template-columns: minmax(0, 1fr); }
 }
 
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem 1rem;
-  text-align: center;
-  color: #9ca3af;
-
-  i {
-    font-size: 2.5rem;
-    margin-bottom: 0.75rem;
-    opacity: 0.4;
-  }
-
-  p {
-    font-size: 0.875rem;
-    margin: 0;
-  }
-}
-
-.reservations-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.625rem;
-}
-
-.reservation-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: #374151;
-
-  i {
-    color: #3b82f6;
-    font-size: 0.875rem;
-  }
-}
-
-// Action Section
-.action-section {
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem;
-
-  .btn-action {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 2rem;
-    font-size: 1rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
-
-    &:hover {
-      transform: translateY(-2px);
-    }
-
-    i {
-      font-size: 1.25rem;
-    }
-  }
-}
-
-// Form styles
-.manage_boats_container {
-  padding: 30px;
-
-  p {
-    margin: 0;
-  }
-
-  .boat_container {
-    min-width: 300px;
-    padding: 15px 20px;
-    border-radius: 6px;
-    background-color: var(--background-colour-one);
-
-    .display_row {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      width: 100%;
-    }
-  }
-}
-
-// Responsive Design
-@media (max-width: 768px) {
-  .manage-boats-container {
-    padding: 1rem;
-  }
-
-  .boats-header {
-    h1 {
-      font-size: 1.5rem;
-    }
-  }
-
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 560px) {
+  .fleet__kpis { grid-template-columns: minmax(0, 1fr); }
+  .fleet__form-grid { grid-template-columns: minmax(0, 1fr); }
+  .fleet__reservations li { grid-template-columns: auto minmax(0, 1fr); }
+  .fleet__reservation-user,
+  .fleet__reservation-type { grid-column: 2; }
 }

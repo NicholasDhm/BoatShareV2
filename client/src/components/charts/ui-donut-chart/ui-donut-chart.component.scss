@@ -1,0 +1,80 @@
+:host { display: block; }
+
+.donut {
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.donut__plot {
+  position: relative;
+  width: 100%;
+  max-width: 190px;
+  margin: 0 auto;
+}
+
+.donut__track {
+  fill: none;
+  stroke: var(--series-track);
+  stroke-width: 16;
+}
+
+.donut__arc {
+  fill: none;
+  stroke-width: 16;
+  stroke-linecap: butt;
+  transform: rotate(-90deg);
+  transform-origin: 80px 80px;
+  transition: stroke-width var(--t-fast), opacity var(--t-fast);
+  cursor: pointer;
+}
+
+.donut__arc.is-active { stroke-width: 20; }
+.donut__arc.is-dimmed { opacity: 0.32; }
+
+.donut__centre {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  text-align: center;
+}
+
+.donut__value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.donut__caption {
+  font-size: 0.75rem;
+  color: var(--ink-3);
+  max-width: 108px;
+}
+
+.donut__legend {
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.donut__legend-item {
+  width: 100%;
+  padding: 6px 8px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: background var(--t-fast), opacity var(--t-fast);
+}
+
+.donut__legend-item:hover { background: var(--surface-2); }
+.donut__legend-item.is-dimmed { opacity: 0.45; }
+.donut__legend-label { flex: 1; text-align: left; }

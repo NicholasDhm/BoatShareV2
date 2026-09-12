@@ -27,6 +27,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
   isLoading = false;
   errorMessage = '';
+  showPassword = false;
   
   private readonly destroy$ = new Subject<void>();
 
@@ -43,7 +44,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       const emailInput = document.getElementById('email');
       emailInput?.focus();
     }, 100);
-    console.log(new Date().toISOString())
   }
 
   ngOnDestroy(): void {
@@ -92,7 +92,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (error instanceof Error) {
       return error.message;
     }
-    return 'An unexpected error occurred. Please try again.';
+    return 'Não foi possível entrar. Tente novamente.';
   }
 
   // Getters for template
@@ -109,20 +109,20 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   get emailErrorMessage(): string {
     if (this.email?.errors?.['required']) {
-      return 'Email is required';
+      return 'Informe seu email';
     }
     if (this.email?.errors?.['email']) {
-      return 'Please enter a valid email address';
+      return 'Informe um email válido';
     }
     if (this.email?.errors?.['maxlength']) {
-      return 'Email is too long';
+      return 'Email muito longo';
     }
     return '';
   }
 
   get passwordErrorMessage(): string {
     if (this.password?.errors?.['required']) {
-      return 'Password is required';
+      return 'Informe sua senha';
     }
     return '';
   }

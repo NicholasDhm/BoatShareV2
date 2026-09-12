@@ -21,6 +21,7 @@ export class RegisterUserComponent implements OnInit {
 	boats: IBoat[] = [];
 	isLoading = false;
 	errorMessage = '';
+	showPassword = false;
 
 	constructor(
 		private _boatService: BoatService,
@@ -73,7 +74,7 @@ export class RegisterUserComponent implements OnInit {
 		if (error instanceof Error) {
 			return error.message;
 		}
-		return 'An unexpected error occurred. Please try again.';
+		return 'Não foi possível criar a conta. Tente novamente.';
 	}
 
 	// Getters for template
@@ -100,31 +101,31 @@ export class RegisterUserComponent implements OnInit {
 
 	get nameErrorMessage(): string {
 		if (this.name?.errors?.['required']) {
-			return 'Name is required';
+			return 'Informe seu nome';
 		}
 		return '';
 	}
 
 	get emailErrorMessage(): string {
 		if (this.email?.errors?.['required']) {
-			return 'Email is required';
+			return 'Informe seu email';
 		}
 		if (this.email?.errors?.['email']) {
-			return 'Please enter a valid email address';
+			return 'Informe um email válido';
 		}
 		return '';
 	}
 
 	get boatIdErrorMessage(): string {
 		if (this.boatId?.errors?.['required']) {
-			return 'Please select a boat';
+			return 'Selecione um barco';
 		}
 		return '';
 	}
 
 	get passwordErrorMessage(): string {
 		if (this.password?.errors?.['required']) {
-			return 'Password is required';
+			return 'Crie uma senha';
 		}
 		return '';
 	}

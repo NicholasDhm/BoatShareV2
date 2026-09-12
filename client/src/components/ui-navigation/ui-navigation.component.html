@@ -1,140 +1,113 @@
-<!-- Modern Navigation with improved accessibility and design -->
-<nav class="navbar navbar-expand-lg" role="navigation" aria-label="Main navigation">
-  <div class="container-fluid">
-    <!-- Brand/Logo -->
-    <a class="navbar-brand" routerLink="/dashboard" aria-label="BoatShare - Go to dashboard">
-      <i class="bi bi-sailboat me-2" aria-hidden="true"></i>
-      <span>BoatShare</span>
+<header class="topbar">
+  <div class="topbar__inner">
+    <!-- Brand -->
+    <a class="brand" [routerLink]="isAuthenticated ? '/dashboard' : '/login'" (click)="closeAll()" aria-label="BoatShare">
+      <span class="brand__mark"><i class="bi bi-water" aria-hidden="true"></i></span>
+      <span class="brand__text">
+        <strong>BoatShare</strong>
+        <small>Gestão de cotas</small>
+      </span>
     </a>
 
-    <!-- Mobile toggle button - only show when logged in -->
-    @if (role !== 'Unknown') {
-      <button
-        class="navbar-toggler"
-        type="button"
-        (click)="toggleMenu()"
-        [attr.aria-expanded]="isMenuOpen"
-        [class.active]="isMenuOpen"
-        aria-controls="navbarNav"
-        aria-label="Toggle navigation">
-        <span class="hamburger-icon">
-          <span class="line"></span>
-          <span class="line"></span>
-          <span class="line"></span>
-        </span>
-      </button>
+    @if (isAuthenticated) {
+      <!-- Primary navigation -->
+      <nav class="nav" aria-label="Navegação principal">
+        <a class="nav__link" routerLink="/dashboard" routerLinkActive="is-active" (click)="closeAll()">
+          <i class="bi bi-grid-1x2" aria-hidden="true"></i><span>Painel</span>
+        </a>
+        <a class="nav__link" routerLink="/history" routerLinkActive="is-active" (click)="closeAll()">
+          <i class="bi bi-clock-history" aria-hidden="true"></i><span>Histórico</span>
+        </a>
+        <a class="nav__link" routerLink="/profile" routerLinkActive="is-active" (click)="closeAll()">
+          <i class="bi bi-person" aria-hidden="true"></i><span>Perfil</span>
+        </a>
+        @if (role === 'Admin') {
+          <a class="nav__link" routerLink="/admin/users" routerLinkActive="is-active" (click)="closeAll()">
+            <i class="bi bi-people" aria-hidden="true"></i><span>Usuários</span>
+          </a>
+          <a class="nav__link" routerLink="/admin/boats" routerLinkActive="is-active" (click)="closeAll()">
+            <i class="bi bi-sailboat" aria-hidden="true"></i><span>Barcos</span>
+          </a>
+        }
+      </nav>
     }
 
-    <!-- Navigation Links - Only show when logged in -->
-    @if (role !== 'Unknown') {
-      <div class="collapse navbar-collapse"
-           [ngClass]="{'show': isMenuOpen}"
-           id="navbarNav">
-        <ul class="navbar-nav me-auto" role="menubar">
-          <!-- Dashboard -->
-          <li class="nav-item" role="none">
-            <a
-              class="nav-link"
-              routerLink="/dashboard"
-              routerLinkActive="active"
-              (click)="closeMenu()"
-              role="menuitem"
-              aria-label="Go to dashboard">
-              <i class="bi bi-house-door me-1" aria-hidden="true"></i>
-              Início
-            </a>
-          </li>
+    <!-- Actions -->
+    <div class="topbar__actions">
+      <ui-theme-toggle></ui-theme-toggle>
 
-          <!-- Profile -->
-          <li class="nav-item" role="none">
-            <a
-              class="nav-link"
-              routerLink="/profile"
-              routerLinkActive="active"
-              (click)="closeMenu()"
-              role="menuitem"
-              aria-label="View profile">
-              <i class="bi bi-person me-1" aria-hidden="true"></i>
-              Perfil
-            </a>
-          </li>
+      @if (isAuthenticated) {
+        <div class="user">
+          <button type="button" class="user__trigger" (click)="toggleUserMenu()" [attr.aria-expanded]="isUserMenuOpen">
+            <span class="avatar avatar--sm">{{ initials }}</span>
+            <span class="user__meta">
+              <span class="user__name">{{ userName }}</span>
+              <span class="user__role">{{ roleLabel }}</span>
+            </span>
+            <i class="bi bi-chevron-down user__caret" [class.is-open]="isUserMenuOpen" aria-hidden="true"></i>
+          </button>
 
-          <!-- History -->
-          <li class="nav-item" role="none">
-            <a
-              class="nav-link"
-              routerLink="/history"
-              routerLinkActive="active"
-              (click)="closeMenu()"
-              role="menuitem"
-              aria-label="View history">
-              <i class="bi bi-clock-history me-1" aria-hidden="true"></i>
-              Histórico
-            </a>
-          </li>
-
-          <!-- Admin Section -->
-          @if (role === 'Admin') {
-            <li class="nav-item dropdown" role="none">
-              <a
-                class="nav-link dropdown-toggle"
-                (click)="toggleAdminDropdown(); $event.preventDefault()"
-                [class.show]="isAdminDropdownOpen"
-                href="#"
-                id="adminDropdown"
-                role="menuitem"
-                [attr.aria-expanded]="isAdminDropdownOpen"
-                aria-haspopup="true"
-                aria-label="Admin options">
-                <i class="bi bi-gear me-1" aria-hidden="true"></i>
-                Administração
+          @if (isUserMenuOpen) {
+            <div class="menu panel">
+              <div class="menu__head">
+                <span class="avatar">{{ initials }}</span>
+                <div>
+                  <div class="menu__name">{{ userName }}</div>
+                  @if (boatName) {
+                    <div class="menu__sub"><i class="bi bi-sailboat" aria-hidden="true"></i> {{ boatName }}</div>
+                  }
+                </div>
+              </div>
+              <a class="menu__item" routerLink="/profile" (click)="closeAll()">
+                <i class="bi bi-person-gear" aria-hidden="true"></i> Meu perfil
               </a>
-              <ul class="dropdown-menu"
-                  [class.show]="isAdminDropdownOpen"
-                  aria-labelledby="adminDropdown"
-                  role="menu">
-                <li role="none">
-                  <a
-                    class="dropdown-item"
-                    routerLink="/admin/users"
-                    (click)="closeAdminDropdown()"
-                    role="menuitem"
-                    aria-label="Manage users">
-                    <i class="bi bi-people me-2" aria-hidden="true"></i>
-                    Usuários
-                  </a>
-                </li>
-                <li role="none">
-                  <a
-                    class="dropdown-item"
-                    routerLink="/admin/boats"
-                    (click)="closeAdminDropdown()"
-                    role="menuitem"
-                    aria-label="Manage boats">
-                    <i class="bi bi-sailboat me-2" aria-hidden="true"></i>
-                    Barcos
-                  </a>
-                </li>
-                <li role="none">
-                  <hr class="dropdown-divider">
-                </li>
-                <li role="none">
-                  <a
-                    class="dropdown-item"
-                    (click)="closeAdminDropdown(); $event.preventDefault()"
-                    href="#"
-                    role="menuitem"
-                    aria-label="View analytics">
-                    <i class="bi bi-graph-up me-2" aria-hidden="true"></i>
-                    Relatórios
-                    <small class="text-muted ms-1">(Em breve)</small>
-                  </a>
-                </li>
-              </ul>
-            </li>
+              <a class="menu__item" routerLink="/history" (click)="closeAll()">
+                <i class="bi bi-clock-history" aria-hidden="true"></i> Meu histórico
+              </a>
+              <button type="button" class="menu__item menu__item--danger" (click)="logout()">
+                <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair da conta
+              </button>
+            </div>
           }
-        </ul>
-      </div>
-    }
+        </div>
+
+        <button
+          type="button"
+          class="burger"
+          (click)="toggleMenu()"
+          [class.is-open]="isMenuOpen"
+          [attr.aria-expanded]="isMenuOpen"
+          aria-label="Abrir menu">
+          <span></span><span></span><span></span>
+        </button>
+      }
+    </div>
   </div>
-</nav>
+
+  <!-- Mobile drawer -->
+  @if (isAuthenticated && isMenuOpen) {
+    <div class="drawer panel">
+      <a class="drawer__link" routerLink="/dashboard" routerLinkActive="is-active" (click)="closeAll()">
+        <i class="bi bi-grid-1x2" aria-hidden="true"></i> Painel
+      </a>
+      <a class="drawer__link" routerLink="/history" routerLinkActive="is-active" (click)="closeAll()">
+        <i class="bi bi-clock-history" aria-hidden="true"></i> Histórico
+      </a>
+      <a class="drawer__link" routerLink="/profile" routerLinkActive="is-active" (click)="closeAll()">
+        <i class="bi bi-person" aria-hidden="true"></i> Perfil
+      </a>
+      @if (role === 'Admin') {
+        <span class="drawer__divider">Administração</span>
+        <a class="drawer__link" routerLink="/admin/users" routerLinkActive="is-active" (click)="closeAll()">
+          <i class="bi bi-people" aria-hidden="true"></i> Usuários
+        </a>
+        <a class="drawer__link" routerLink="/admin/boats" routerLinkActive="is-active" (click)="closeAll()">
+          <i class="bi bi-sailboat" aria-hidden="true"></i> Barcos
+        </a>
+      }
+      <button type="button" class="drawer__link drawer__link--danger" (click)="logout()">
+        <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sair da conta
+      </button>
+    </div>
+  }
+</header>

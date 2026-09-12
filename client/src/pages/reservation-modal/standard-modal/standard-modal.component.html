@@ -1,62 +1,63 @@
-<ui-card layout="vertical" justifyContent="space-between" class="modal" [ngClass]="reservationType">
-  
-  <ui-card layout="vertical" gapStyle="large">
-    <ui-card layout="vertical">
-      @if (status) {
-        <h3>Sua Reserva</h3>
-      } @else {
-        <h3>Fazer Reserva</h3>
-      }
-      <span class="d-flex date-display">
-        <p> {{ weekday + ','}} </p>
-        &nbsp;
-        <p> {{ reservationDate | date: 'longDate':'':'pt-BR'}} </p>
-      </span>
-      @if (status === "Pending" && !firstReservationUserName) {
-        <span class="confirmation_period">
-          <p>O Período de Confirmação será entre: </p>
-          &nbsp;
-          <span>
-            <p>{{ confirmationDate | date: 'shortDate'}}</p>
-            <p>-</p>
-            <p>{{ reservationDate | date: 'shortDate'}}</p>
-          </span>
-        </span>
-      }
-    </ui-card>
+<div class="modal-shell" role="dialog" aria-modal="true" [attr.data-type]="reservationType">
+  <header class="modal-shell__head">
+    <span class="modal-shell__type">
+      <span class="series-dot" [ngClass]="'series-dot--' + typeKey"></span>
+      {{ reservationTypeInPt }}
+    </span>
+    <button type="button" class="modal-shell__close" (click)="closeModal()" aria-label="Fechar">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+  </header>
 
-    <ui-card layout="vertical">
+  <div class="modal-shell__body">
+    <h2>{{ status ? 'Sua reserva' : 'Fazer reserva' }}</h2>
+
+    <p class="modal-shell__date">
+      <i class="bi bi-calendar-event" aria-hidden="true"></i>
+      <span class="modal-shell__weekday">{{ weekday }},</span>
+      {{ reservationDate | date: 'longDate':'':'pt-BR' }}
+    </p>
+
+    @if (status === "Pending" && !firstReservationUserName) {
+      <div class="modal-shell__window">
+        <span class="modal-shell__window-label">Período de confirmação</span>
+        <span class="modal-shell__window-dates">
+          {{ confirmationDate | date: 'shortDate' }} — {{ reservationDate | date: 'shortDate' }}
+        </span>
+      </div>
+    }
+
+    <p class="modal-shell__text">
       @if (reservationType === "Substitution" && status) {
         @if (firstReservationUserName && firstReservationUserName !== activeUser?.name) {
-          <p>Você já fez uma reserva para esta data. Se <strong class="user-name">{{ firstReservationUserName }}</strong> cancelar a reserva, ela será sua. Você pode aguardar ou cancelar sua reserva.</p>
+          Você entrou na fila para esta data. Se <strong>{{ firstReservationUserName }}</strong> cancelar,
+          a reserva passa a ser sua. Você pode aguardar ou cancelar sua suplência.
         } @else {
-          <p>Você já fez uma reserva para esta data. Deseja cancelar?</p>
+          Você já fez uma reserva para esta data. Deseja cancelar?
         }
       } @else if (reservationType === "Substitution" && !status) {
-        <p>Uma reserva já foi feita por <strong class="user-name">{{ firstReservationUserName }}</strong> para esta data. Escolha outra data ou entre na fila.</p> 
+        Esta data já foi reservada por <strong>{{ firstReservationUserName }}</strong>.
+        Escolha outra data ou entre na fila como suplente.
       } @else if (status === "Confirmed") {
-        <p>Você já confirmou uma reserva para esta data. Reservas confirmadas não podem ser canceladas.</p>
+        Você já confirmou esta reserva. Reservas confirmadas não podem ser canceladas.
       } @else if (status) {
-        <p>Você já fez uma reserva para esta data. Deseja cancelar?</p>
+        Você já fez uma reserva para esta data. Deseja cancelar?
       } @else {
-        <p>Não há reservas para esta data. Reserve agora!</p>
+        Não há reservas para esta data. Ela está livre para você.
       }
-      <span class="d-flex justify-content-between w-100 align-items-center" [class.Greyish]="status">
-        <p>Tipo de Reserva:</p>
-        &nbsp;
-        <p class="reservation-type-value" [ngClass]="reservationType + '__text'"> {{ reservationTypeInPt }}</p>
-      </span>
-  
-    </ui-card>
-  </ui-card>
+    </p>
+  </div>
 
-  <ui-card gapStyle="medium">
+  <footer class="modal-shell__foot">
     @if (status && status !== "Confirmed") {
-      <button type="button" class="btn btn-danger" (click)="onCancelReservation()">Cancelar Reserva</button>
+      <button type="button" class="btn btn-danger" (click)="onCancelReservation()">
+        <i class="bi bi-x-circle" aria-hidden="true"></i> Cancelar reserva
+      </button>
     } @else if (!status) {
-      <button type="button" class="btn" [ngClass]="reservationType" (click)="makeReservation()">Fazer Reserva</button>
+      <button type="button" class="btn btn-primary" (click)="makeReservation()">
+        <i class="bi bi-check-lg" aria-hidden="true"></i> Confirmar reserva
+      </button>
     }
-    <button type="button" class="btn btn-secondary" (click)="closeModal()">Fechar</button>
-  </ui-card>
-
-</ui-card>
+    <button type="button" class="btn btn-ghost" (click)="closeModal()">Fechar</button>
+  </footer>
+</div>

@@ -1,40 +1,18 @@
-.Disabled {
-  fill: var(--disabled-colour);
-}
-
-.Standard {
-  fill: var(--standard-colour);
-}
-
-.Contingency {
-  fill: var(--contingency-colour);
-}
-
-.Greyish {
-  fill: var(--greyish-colour);
-}
-
-.Substitution {
-  fill: var(--substitution-colour);
-}
-
-i {
-  background-color: var(--background-colour-one);
-  justify-content: center;
+:host {
+  display: inline-flex;
   align-items: center;
-  display: flex;
-  width: 18px;
-  height: 18px;
+  justify-content: center;
+  line-height: 1;
 }
 
-.confirmed {
-  color: var(--confirmed-colour);
-}
+svg { display: block; }
 
-.pending {
-  color: var(--pending-colour);
-}
+svg.Standard { fill: var(--series-standard); }
+svg.Substitution { fill: var(--series-substitution); }
+svg.Contingency { fill: var(--series-contingency); }
+svg.Greyish,
+svg.Disabled { fill: var(--ink-3); }
 
-.unconfirmed {
-  color: var(--unconfirmed-colour);
-}
+i.confirmed { color: var(--status-good); }
+i.pending { color: var(--status-warning); }
+i.unconfirmed { color: var(--status-critical); }
